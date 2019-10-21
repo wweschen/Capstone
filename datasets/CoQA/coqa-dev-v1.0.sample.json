@@ -1,0 +1,4366 @@
+{
+  "version": "1.0",
+  "data": [
+    {
+      "source": "mctest",
+      "id": "3dr23u6we5exclen4th8uq9rb42tel",
+      "filename": "mc160.test.41",
+      "story": "Once upon a time, in a barn near a farm house, there lived a little white kitten named Cotton. Cotton lived high up in a nice warm place above the barn where all of the farmer's horses slept. But Cotton wasn't alone in her little home above the barn, oh no. She shared her hay bed with her mommy and 5 other sisters. All of her sisters were cute and fluffy, like Cotton. But she was the only white one in the bunch. The rest of her sisters were all orange with beautiful white tiger stripes like Cotton's mommy. Being different made Cotton quite sad. She often wished she looked like the rest of her family. So one day, when Cotton found a can of the old farmer's orange paint, she used it to paint herself like them. When her mommy and sisters found her they started laughing. \n\n\"What are you doing, Cotton?!\" \n\n\"I only wanted to be more like you\". \n\nCotton's mommy rubbed her face on Cotton's and said \"Oh Cotton, but your fur is so pretty and special, like you. We would never want you to be any other way\". And with that, Cotton's mommy picked her up and dropped her into a big bucket of water. When Cotton came out she was herself again. Her sisters licked her face until Cotton's fur was all all dry. \n\n\"Don't ever do that again, Cotton!\" they all cried. \"Next time you might mess up that pretty white fur of yours and we wouldn't want that!\" \n\nThen Cotton thought, \"I change my mind. I like being special\".",
+      "questions": [
+        {
+          "input_text": "What color was Cotton?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "Where did she live?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "Did she live alone?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Who did she live with?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "What color were her sisters?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "Was Cotton happy that she looked different than the rest of her family?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "What did she do to try to make herself the same color as her sisters?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "Whose paint was it?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "What did Cotton's mother and siblings do when they saw her painted orange?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "Where did Cotton's mother put her to clean the paint off?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "What did the other cats do when Cotton emerged from the bucket of water?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "Did they want Cotton to change the color of her fur?",
+          "turn_id": 12
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 59,
+          "span_end": 93,
+          "span_text": "a little white kitten named Cotton",
+          "input_text": "white",
+          "turn_id": 1
+        },
+        {
+          "span_start": 18,
+          "span_end": 80,
+          "span_text": "in a barn near a farm house, there lived a little white kitten",
+          "input_text": "in a barn",
+          "turn_id": 2
+        },
+        {
+          "span_start": 196,
+          "span_end": 215,
+          "span_text": "Cotton wasn't alone",
+          "input_text": "no",
+          "turn_id": 3
+        },
+        {
+          "span_start": 281,
+          "span_end": 315,
+          "span_text": "with her mommy and 5 other sisters",
+          "input_text": "with her mommy and 5 sisters",
+          "turn_id": 4
+        },
+        {
+          "span_start": 428,
+          "span_end": 490,
+          "span_text": "her sisters were all orange with beautiful white tiger stripes",
+          "input_text": "orange and white",
+          "turn_id": 5
+        },
+        {
+          "span_start": 512,
+          "span_end": 549,
+          "span_text": "Being different made Cotton quite sad",
+          "input_text": "no",
+          "turn_id": 6
+        },
+        {
+          "span_start": 678,
+          "span_end": 716,
+          "span_text": "she used it to paint herself like them",
+          "input_text": "she painted herself",
+          "turn_id": 7
+        },
+        {
+          "span_start": 647,
+          "span_end": 676,
+          "span_text": "the old farmer's orange paint",
+          "input_text": "the farmer",
+          "turn_id": 8
+        },
+        {
+          "span_start": 718,
+          "span_end": 776,
+          "span_text": "When her mommy and sisters found her they started laughing",
+          "input_text": "they started laughing",
+          "turn_id": 9
+        },
+        {
+          "span_start": 1035,
+          "span_end": 1097,
+          "span_text": "mommy picked her up and dropped her into a big bucket of water",
+          "input_text": "a bucket of water",
+          "turn_id": 10
+        },
+        {
+          "span_start": 1143,
+          "span_end": 1170,
+          "span_text": "Her sisters licked her face",
+          "input_text": "licked her face",
+          "turn_id": 11
+        },
+        {
+          "span_start": 965,
+          "span_end": 1008,
+          "span_text": "We would never want you to be any other way",
+          "input_text": "no",
+          "turn_id": 12
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 68,
+            "span_end": 93,
+            "span_text": "white kitten named Cotton",
+            "input_text": "white",
+            "turn_id": 1
+          },
+          {
+            "span_start": 17,
+            "span_end": 93,
+            "span_text": " in a barn near a farm house, there lived a little white kitten named Cotton",
+            "input_text": "in a barn",
+            "turn_id": 2
+          },
+          {
+            "span_start": 192,
+            "span_end": 215,
+            "span_text": "But Cotton wasn't alone",
+            "input_text": "no",
+            "turn_id": 3
+          },
+          {
+            "span_start": 258,
+            "span_end": 315,
+            "span_text": "She shared her hay bed with her mommy and 5 other sisters",
+            "input_text": "her mommy and 5 other sisters",
+            "turn_id": 4
+          },
+          {
+            "span_start": 416,
+            "span_end": 490,
+            "span_text": "The rest of her sisters were all orange with beautiful white tiger stripes",
+            "input_text": "orange with white tiger stripes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 512,
+            "span_end": 549,
+            "span_text": "Being different made Cotton quite sad",
+            "input_text": "no",
+            "turn_id": 6
+          },
+          {
+            "span_start": 678,
+            "span_end": 716,
+            "span_text": "she used it to paint herself like them",
+            "input_text": "she painted herself",
+            "turn_id": 7
+          },
+          {
+            "span_start": 655,
+            "span_end": 676,
+            "span_text": "farmer's orange paint",
+            "input_text": "the farmer's",
+            "turn_id": 8
+          },
+          {
+            "span_start": 718,
+            "span_end": 777,
+            "span_text": "When her mommy and sisters found her they started laughing.",
+            "input_text": "they started laughing",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1059,
+            "span_end": 1097,
+            "span_text": "dropped her into a big bucket of water",
+            "input_text": "dropped her into a big bucket of water",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1143,
+            "span_end": 1171,
+            "span_text": "Her sisters licked her face ",
+            "input_text": "licked her face",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1209,
+            "span_end": 1244,
+            "span_text": "\"Don't ever do that again, Cotton!\"",
+            "input_text": "no",
+            "turn_id": 12
+          }
+        ],
+        "1": [
+          {
+            "span_start": 68,
+            "span_end": 74,
+            "span_text": "white ",
+            "input_text": "white",
+            "turn_id": 1
+          },
+          {
+            "span_start": 18,
+            "span_end": 27,
+            "span_text": "in a barn",
+            "input_text": "in a barn",
+            "turn_id": 2
+          },
+          {
+            "span_start": 202,
+            "span_end": 215,
+            "span_text": " wasn't alone",
+            "input_text": "No",
+            "turn_id": 3
+          },
+          {
+            "span_start": 286,
+            "span_end": 315,
+            "span_text": "her mommy and 5 other sisters",
+            "input_text": "her mommy and 5 other sisters",
+            "turn_id": 4
+          },
+          {
+            "span_start": 449,
+            "span_end": 456,
+            "span_text": "orange ",
+            "input_text": "orange",
+            "turn_id": 5
+          },
+          {
+            "span_start": 546,
+            "span_end": 549,
+            "span_text": "sad",
+            "input_text": "No",
+            "turn_id": 6
+          },
+          {
+            "span_start": 693,
+            "span_end": 716,
+            "span_text": "paint herself like them",
+            "input_text": "paint herself like them",
+            "turn_id": 7
+          },
+          {
+            "span_start": 647,
+            "span_end": 663,
+            "span_text": "the old farmer's",
+            "input_text": "the old farmer's",
+            "turn_id": 8
+          },
+          {
+            "span_start": 866,
+            "span_end": 882,
+            "span_text": " rubbed her face",
+            "input_text": "rubbed her face",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1071,
+            "span_end": 1097,
+            "span_text": "into a big bucket of water",
+            "input_text": "into a big bucket of water",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1154,
+            "span_end": 1170,
+            "span_text": " licked her face",
+            "input_text": "licked her face",
+            "turn_id": 11
+          },
+          {
+            "span_start": 974,
+            "span_end": 1008,
+            "span_text": "never want you to be any other way",
+            "input_text": "No",
+            "turn_id": 12
+          }
+        ],
+        "2": [
+          {
+            "span_start": 68,
+            "span_end": 94,
+            "span_text": "white kitten named Cotton.",
+            "input_text": "white",
+            "turn_id": 1
+          },
+          {
+            "span_start": 17,
+            "span_end": 94,
+            "span_text": " in a barn near a farm house, there lived a little white kitten named Cotton.",
+            "input_text": "in a barn near",
+            "turn_id": 2
+          },
+          {
+            "span_start": 191,
+            "span_end": 316,
+            "span_text": " But Cotton wasn't alone in her little home above the barn, oh no. She shared her hay bed with her mommy and 5 other sisters.",
+            "input_text": "no",
+            "turn_id": 3
+          },
+          {
+            "span_start": 258,
+            "span_end": 316,
+            "span_text": "She shared her hay bed with her mommy and 5 other sisters.",
+            "input_text": "her mommy and 5 other sisters",
+            "turn_id": 4
+          },
+          {
+            "span_start": 416,
+            "span_end": 511,
+            "span_text": "The rest of her sisters were all orange with beautiful white tiger stripes like Cotton's mommy.",
+            "input_text": "orange",
+            "turn_id": 5
+          },
+          {
+            "span_start": 512,
+            "span_end": 550,
+            "span_text": "Being different made Cotton quite sad.",
+            "input_text": "no",
+            "turn_id": 6
+          },
+          {
+            "span_start": 607,
+            "span_end": 718,
+            "span_text": " So one day, when Cotton found a can of the old farmer's orange paint, she used it to paint herself like them. ",
+            "input_text": "paint herself like them",
+            "turn_id": 7
+          },
+          {
+            "span_start": 608,
+            "span_end": 676,
+            "span_text": "So one day, when Cotton found a can of the old farmer's orange paint",
+            "input_text": "the farmer's",
+            "turn_id": 8
+          },
+          {
+            "span_start": 718,
+            "span_end": 778,
+            "span_text": "When her mommy and sisters found her they started laughing. ",
+            "input_text": "started laughing",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1011,
+            "span_end": 1098,
+            "span_text": "And with that, Cotton's mommy picked her up and dropped her into a big bucket of water.",
+            "input_text": "a big bucket of water",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1142,
+            "span_end": 1207,
+            "span_text": " Her sisters licked her face until Cotton's fur was all all dry. ",
+            "input_text": "licked her face",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1209,
+            "span_end": 1260,
+            "span_text": "\"Don't ever do that again, Cotton!\" they all cried.",
+            "input_text": "no",
+            "turn_id": 12
+          }
+        ]
+      },
+      "name": "mc160.test.41"
+    },
+    {
+      "source": "mctest",
+      "id": "3azhrg4cu4ktme1zh7c2ro3pn2430d",
+      "filename": "mc500.test.4",
+      "story": "Once there was a beautiful fish named Asta. Asta lived in the ocean. There were lots of other fish in the ocean where Asta lived. They played all day long. \n\nOne day, a bottle floated by over the heads of Asta and his friends. They looked up and saw the bottle. \"What is it?\" said Asta's friend Sharkie. \"It looks like a bird's belly,\" said Asta. But when they swam closer, it was not a bird's belly. It was hard and clear, and there was something inside it. \n\nThe bottle floated above them. They wanted to open it. They wanted to see what was inside. So they caught the bottle and carried it down to the bottom of the ocean. They cracked it open on a rock. When they got it open, they found what was inside. It was a note. The note was written in orange crayon on white paper. Asta could not read the note. Sharkie could not read the note. They took the note to Asta's papa. \"What does it say?\" they asked. \n\nAsta's papa read the note. He told Asta and Sharkie, \"This note is from a little girl. She wants to be your friend. If you want to be her friend, we can write a note to her. But you have to find another bottle so we can send it to her.\" And that is what they did.",
+      "questions": [
+        {
+          "input_text": "what was the name of the fish",
+          "turn_id": 1
+        },
+        {
+          "input_text": "What looked like a birds belly",
+          "turn_id": 2
+        },
+        {
+          "input_text": "who said that",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Was Sharkie a friend?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "did they get the bottle?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "What was in it",
+          "turn_id": 6
+        },
+        {
+          "input_text": "Did a little boy write the note",
+          "turn_id": 7
+        },
+        {
+          "input_text": "Who could read the note",
+          "turn_id": 8
+        },
+        {
+          "input_text": "What did they do with the note",
+          "turn_id": 9
+        },
+        {
+          "input_text": "did they write back",
+          "turn_id": 10
+        },
+        {
+          "input_text": "were they excited",
+          "turn_id": 11
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 37,
+          "span_end": 43,
+          "span_text": " Asta.",
+          "input_text": "Asta.",
+          "turn_id": 1
+        },
+        {
+          "span_start": 167,
+          "span_end": 175,
+          "span_text": "a bottle",
+          "input_text": "a bottle",
+          "turn_id": 2
+        },
+        {
+          "span_start": 303,
+          "span_end": 346,
+          "span_text": " \"It looks like a bird's belly,\" said Asta.",
+          "input_text": "Asta.",
+          "turn_id": 3
+        },
+        {
+          "span_start": 281,
+          "span_end": 302,
+          "span_text": "Asta's friend Sharkie",
+          "input_text": "Yes",
+          "turn_id": 4
+        },
+        {
+          "span_start": 552,
+          "span_end": 577,
+          "span_text": "So they caught the bottle",
+          "input_text": "Yes",
+          "turn_id": 5
+        },
+        {
+          "span_start": 708,
+          "span_end": 723,
+          "span_text": " It was a note.",
+          "input_text": "a note",
+          "turn_id": 6
+        },
+        {
+          "span_start": 964,
+          "span_end": 995,
+          "span_text": "This note is from a little girl",
+          "input_text": "No",
+          "turn_id": 7
+        },
+        {
+          "span_start": 910,
+          "span_end": 935,
+          "span_text": "Asta's papa read the note",
+          "input_text": "Asta's papa",
+          "turn_id": 8
+        },
+        {
+          "span_start": -1,
+          "span_end": -1,
+          "span_text": "unknown",
+          "input_text": "unknown",
+          "turn_id": 9
+        },
+        {
+          "span_start": 1056,
+          "span_end": 1173,
+          "span_text": "we can write a note to her. But you have to find another bottle so we can send it to her.\" And that is what they did.",
+          "input_text": "yes",
+          "turn_id": 10
+        },
+        {
+          "span_text": "unknown",
+          "span_start": -1,
+          "span_end": -1,
+          "input_text": "unknown",
+          "turn_id": 11
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 38,
+            "span_end": 42,
+            "span_text": "Asta",
+            "input_text": "Asta",
+            "turn_id": 1
+          },
+          {
+            "span_start": 167,
+            "span_end": 175,
+            "span_text": "a bottle",
+            "input_text": "a bottle",
+            "turn_id": 2
+          },
+          {
+            "span_start": 341,
+            "span_end": 345,
+            "span_text": "Asta",
+            "input_text": "Asta",
+            "turn_id": 3
+          },
+          {
+            "span_start": 288,
+            "span_end": 302,
+            "span_text": "friend Sharkie",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 555,
+            "span_end": 578,
+            "span_text": "they caught the bottle ",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 716,
+            "span_end": 722,
+            "span_text": "a note",
+            "input_text": "a note",
+            "turn_id": 6
+          },
+          {
+            "span_start": 981,
+            "span_end": 995,
+            "span_text": " a little girl",
+            "input_text": "no",
+            "turn_id": 7
+          },
+          {
+            "span_start": 910,
+            "span_end": 921,
+            "span_text": "Asta's papa",
+            "input_text": "Asta's papa",
+            "turn_id": 8
+          },
+          {
+            "span_start": 841,
+            "span_end": 874,
+            "span_text": "They took the note to Asta's papa",
+            "input_text": "They took the note to Asta's papa",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1056,
+            "span_end": 1083,
+            "span_text": "we can write a note to her.",
+            "input_text": "yes",
+            "turn_id": 10
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 11
+          }
+        ],
+        "1": [
+          {
+            "span_start": 37,
+            "span_end": 42,
+            "span_text": " Asta",
+            "input_text": "Asta",
+            "turn_id": 1
+          },
+          {
+            "span_start": 250,
+            "span_end": 260,
+            "span_text": "the bottle",
+            "input_text": "the bottle",
+            "turn_id": 2
+          },
+          {
+            "span_start": 295,
+            "span_end": 302,
+            "span_text": "Sharkie",
+            "input_text": "Sharkie",
+            "turn_id": 3
+          },
+          {
+            "span_start": 295,
+            "span_end": 303,
+            "span_text": "Sharkie.",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 552,
+            "span_end": 592,
+            "span_text": "So they caught the bottle and carried it",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 716,
+            "span_end": 722,
+            "span_text": "a note",
+            "input_text": "a note",
+            "turn_id": 6
+          },
+          {
+            "span_start": 982,
+            "span_end": 997,
+            "span_text": "a little girl. ",
+            "input_text": "no",
+            "turn_id": 7
+          },
+          {
+            "span_start": 910,
+            "span_end": 921,
+            "span_text": "Asta's papa",
+            "input_text": "Asta's papa",
+            "turn_id": 8
+          },
+          {
+            "span_start": 841,
+            "span_end": 874,
+            "span_text": "They took the note to Asta's papa",
+            "input_text": "They took the note to Asta's papa",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1084,
+            "span_end": 1173,
+            "span_text": "But you have to find another bottle so we can send it to her.\" And that is what they did.",
+            "input_text": "yes",
+            "turn_id": 10
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 11
+          }
+        ],
+        "2": [
+          {
+            "span_start": 38,
+            "span_end": 42,
+            "span_text": "Asta",
+            "input_text": "Asta",
+            "turn_id": 1
+          },
+          {
+            "span_start": 166,
+            "span_end": 175,
+            "span_text": " a bottle",
+            "input_text": "a bottle",
+            "turn_id": 2
+          },
+          {
+            "span_start": 341,
+            "span_end": 345,
+            "span_text": "Asta",
+            "input_text": "Asta",
+            "turn_id": 3
+          },
+          {
+            "span_start": 281,
+            "span_end": 302,
+            "span_text": "Asta's friend Sharkie",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 554,
+            "span_end": 577,
+            "span_text": " they caught the bottle",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 715,
+            "span_end": 722,
+            "span_text": " a note",
+            "input_text": "a note",
+            "turn_id": 6
+          },
+          {
+            "span_start": 981,
+            "span_end": 995,
+            "span_text": " a little girl",
+            "input_text": "no",
+            "turn_id": 7
+          },
+          {
+            "span_start": 910,
+            "span_end": 921,
+            "span_text": "Asta's papa",
+            "input_text": "Asta's papa",
+            "turn_id": 8
+          },
+          {
+            "span_start": 841,
+            "span_end": 875,
+            "span_text": "They took the note to Asta's papa.",
+            "input_text": "They took the note to Asta's papa.",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1146,
+            "span_end": 1173,
+            "span_text": " And that is what they did.",
+            "input_text": "yes",
+            "turn_id": 10
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 11
+          }
+        ]
+      },
+      "name": "mc500.test.4"
+    },
+    {
+      "source": "race",
+      "id": "3ioen3p9s7jsqm9zwse0cwyj3kq612",
+      "filename": "high15012.txt",
+      "story": "My doorbell rings. On the step, I find the elderly Chinese lady, small and slight, holding the hand of a little boy. In her other hand, she holds a paper carrier bag. \n\nI know this lady. It is not her first visit. She is the boy's grandmother, and her daughter bought the house next door last October. \n\nHer daughter, Nicole, speaks fluent English. But she is now in Shanghai, and her parents are here with the little boy. Nicole has obviously told her mother that I am having heart surgery soon, so her mother has decided I need more nutrients. \n\nI know what is inside the bag--a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake. This has become an almost-daily practice. \n\nCommunication between us is somewhat affected by the fact that she doesn't speak English and all I can say in Chinese is hello. Once, she brought an iPad as well as the food. She pointed to the screen, which displayed a message from her daughter telling me that her mother wanted to know if the food was all right and whether it was too salty. I am not used to iPads, so she indicated I should go with her to her house. Then, she handed the iPad to her husband and almost immediately I found myself looking at Nicole in Shanghai and discussing her mother's cooking and salt intake. Instantly, tears welled in my eyes. \n\n\"Your mother just can't be bringing me meals like this all the time,\" I insisted. \"I can hardly do dishes in return.\" \n\n\"Oh, no, Lucy.\" Nicole said. \"Mum doesn't like western food. Don't worry about it; she has to cook for the three of them anyway, and she wants to do it.\" \n\nThe doorbell keeps ringing and there is the familiar brown paper carrier bag, handed smilingly to me. \n\nI am now working on some more Chinese words--it's the least I can do after such display of kindness. \n\n\"Thank you\" is, of course, the first one. Somehow, it seems inadequate.",
+      "questions": [
+        {
+          "input_text": "Who is at the door?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "Is she carrying something?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "What?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Do I know her?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Who is her daughter?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "Where does Nicole live?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "How is she related to the boy?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "What is in the bag?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "Has she done this before?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "Why?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "What has helped us communicate?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "What kind of dishes does she bring?",
+          "turn_id": 12
+        },
+        {
+          "input_text": "What do I do to help communicate with her?",
+          "turn_id": 13
+        },
+        {
+          "input_text": "Do she continue bringing the bag?",
+          "turn_id": 14
+        },
+        {
+          "input_text": "What is the first phrase I learn?",
+          "turn_id": 15
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 19,
+          "span_end": 115,
+          "span_text": "On the step, I find the elderly Chinese lady, small and slight, holding the hand of a little boy",
+          "input_text": "An elderly Chinese lady and a little boy",
+          "turn_id": 1
+        },
+        {
+          "span_start": 136,
+          "span_end": 165,
+          "span_text": "she holds a paper carrier bag",
+          "input_text": "Yes",
+          "turn_id": 2
+        },
+        {
+          "span_start": 146,
+          "span_end": 165,
+          "span_text": "a paper carrier bag",
+          "input_text": "a paper carrier bag",
+          "turn_id": 3
+        },
+        {
+          "span_start": 169,
+          "span_end": 185,
+          "span_text": "I know this lady",
+          "input_text": "Yes",
+          "turn_id": 4
+        },
+        {
+          "span_start": 304,
+          "span_end": 324,
+          "span_text": "Her daughter, Nicole",
+          "input_text": "Nicole",
+          "turn_id": 5
+        },
+        {
+          "span_start": 348,
+          "span_end": 375,
+          "span_text": " But she is now in Shanghai",
+          "input_text": "Shanghai",
+          "turn_id": 6
+        },
+        {
+          "span_start": 214,
+          "span_end": 302,
+          "span_text": "She is the boy's grandmother, and her daughter bought the house next door last October. ",
+          "input_text": "mother",
+          "turn_id": 7
+        },
+        {
+          "span_start": 579,
+          "span_end": 725,
+          "span_text": "a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake",
+          "input_text": "food",
+          "turn_id": 8
+        },
+        {
+          "span_start": 727,
+          "span_end": 769,
+          "span_text": "This has become an almost-daily practice. ",
+          "input_text": "Yes",
+          "turn_id": 9
+        },
+        {
+          "span_start": 423,
+          "span_end": 544,
+          "span_text": "Nicole has obviously told her mother that I am having heart surgery soon, so her mother has decided I need more nutrients",
+          "input_text": "I am having heart surgery soon, so her mother has decided I need more nutrients",
+          "turn_id": 10
+        },
+        {
+          "span_start": 917,
+          "span_end": 924,
+          "span_text": "an iPad",
+          "input_text": "an iPad",
+          "turn_id": 11
+        },
+        {
+          "span_start": 594,
+          "span_end": 725,
+          "span_text": "hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake",
+          "input_text": "hot soup and a container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake",
+          "turn_id": 12
+        },
+        {
+          "span_start": 1771,
+          "span_end": 1814,
+          "span_text": "I am now working on some more Chinese words",
+          "input_text": "I am now working on some more Chinese words",
+          "turn_id": 13
+        },
+        {
+          "span_start": 1667,
+          "span_end": 1769,
+          "span_text": "The doorbell keeps ringing and there is the familiar brown paper carrier bag, handed smilingly to me. ",
+          "input_text": "Yes",
+          "turn_id": 14
+        },
+        {
+          "span_start": 1874,
+          "span_end": 1885,
+          "span_text": "\"Thank you\"",
+          "input_text": "\"Thank you\"",
+          "turn_id": 15
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 43,
+            "span_end": 63,
+            "span_text": "elderly Chinese lady",
+            "input_text": "elderly Chinese lady",
+            "turn_id": 1
+          },
+          {
+            "span_start": 102,
+            "span_end": 115,
+            "span_text": " a little boy",
+            "input_text": "a little boy",
+            "turn_id": 2
+          },
+          {
+            "span_start": 103,
+            "span_end": 115,
+            "span_text": "a little boy",
+            "input_text": "a little boy",
+            "turn_id": 3
+          },
+          {
+            "span_start": 169,
+            "span_end": 185,
+            "span_text": "I know this lady",
+            "input_text": "Yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 247,
+            "span_end": 287,
+            "span_text": " her daughter bought the house next door",
+            "input_text": "her daughter bought the house next door",
+            "turn_id": 5
+          },
+          {
+            "span_start": 367,
+            "span_end": 375,
+            "span_text": "Shanghai",
+            "input_text": "Shanghai",
+            "turn_id": 6
+          },
+          {
+            "span_start": 411,
+            "span_end": 421,
+            "span_text": "little boy",
+            "input_text": "her brother",
+            "turn_id": 7
+          },
+          {
+            "span_start": 529,
+            "span_end": 544,
+            "span_text": " more nutrients",
+            "input_text": "more nutrients",
+            "turn_id": 8
+          },
+          {
+            "span_start": 727,
+            "span_end": 769,
+            "span_text": "This has become an almost-daily practice. ",
+            "input_text": "yes",
+            "turn_id": 9
+          },
+          {
+            "span_start": 732,
+            "span_end": 767,
+            "span_text": "has become an almost-daily practice",
+            "input_text": "has become an almost-daily practice",
+            "turn_id": 10
+          },
+          {
+            "span_start": 916,
+            "span_end": 925,
+            "span_text": " an iPad ",
+            "input_text": "an iPad",
+            "turn_id": 11
+          },
+          {
+            "span_start": 598,
+            "span_end": 726,
+            "span_text": "soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake.",
+            "input_text": "soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake.",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1280,
+            "span_end": 1287,
+            "span_text": " Nicole",
+            "input_text": "Nicole",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1667,
+            "span_end": 1768,
+            "span_text": "The doorbell keeps ringing and there is the familiar brown paper carrier bag, handed smilingly to me.",
+            "input_text": "yes",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1875,
+            "span_end": 1884,
+            "span_text": "Thank you",
+            "input_text": "Thank you",
+            "turn_id": 15
+          }
+        ],
+        "1": [
+          {
+            "span_start": 42,
+            "span_end": 63,
+            "span_text": " elderly Chinese lady",
+            "input_text": "an elderly Chinese lady",
+            "turn_id": 1
+          },
+          {
+            "span_start": 135,
+            "span_end": 167,
+            "span_text": " she holds a paper carrier bag. ",
+            "input_text": "yes",
+            "turn_id": 2
+          },
+          {
+            "span_start": 145,
+            "span_end": 167,
+            "span_text": " a paper carrier bag. ",
+            "input_text": "a paper carrier bag.",
+            "turn_id": 3
+          },
+          {
+            "span_start": 169,
+            "span_end": 186,
+            "span_text": "I know this lady.",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 318,
+            "span_end": 324,
+            "span_text": "Nicole",
+            "input_text": "Nicole",
+            "turn_id": 5
+          },
+          {
+            "span_start": 278,
+            "span_end": 288,
+            "span_text": "next door ",
+            "input_text": "next door",
+            "turn_id": 6
+          },
+          {
+            "span_start": 231,
+            "span_end": 242,
+            "span_text": "grandmother",
+            "input_text": "grandmother",
+            "turn_id": 7
+          },
+          {
+            "span_start": 579,
+            "span_end": 731,
+            "span_text": "a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake. This",
+            "input_text": "a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake. This",
+            "turn_id": 8
+          },
+          {
+            "span_start": 727,
+            "span_end": 769,
+            "span_text": "This has become an almost-daily practice. ",
+            "input_text": "yes",
+            "turn_id": 9
+          },
+          {
+            "span_start": 497,
+            "span_end": 546,
+            "span_text": "so her mother has decided I need more nutrients. ",
+            "input_text": "she has decided the narrator needs more nutrients.",
+            "turn_id": 10
+          },
+          {
+            "span_start": 917,
+            "span_end": 924,
+            "span_text": "an iPad",
+            "input_text": "an iPad",
+            "turn_id": 11
+          },
+          {
+            "span_start": 593,
+            "span_end": 726,
+            "span_text": " hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake.",
+            "input_text": "hot soup, rice, vegetables, chicken, meat, or shrimp, sometimes with a kind of pancake.",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1165,
+            "span_end": 1190,
+            "span_text": "go with her to her house.",
+            "input_text": "go with her to her house.",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1667,
+            "span_end": 1743,
+            "span_text": "The doorbell keeps ringing and there is the familiar brown paper carrier bag",
+            "input_text": "yes",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1874,
+            "span_end": 1885,
+            "span_text": "\"Thank you\"",
+            "input_text": "\"Thank you\"",
+            "turn_id": 15
+          }
+        ],
+        "2": [
+          {
+            "span_start": 43,
+            "span_end": 63,
+            "span_text": "elderly Chinese lady",
+            "input_text": "elderly Chinese lady",
+            "turn_id": 1
+          },
+          {
+            "span_start": 83,
+            "span_end": 115,
+            "span_text": "holding the hand of a little boy",
+            "input_text": "yes",
+            "turn_id": 2
+          },
+          {
+            "span_start": 147,
+            "span_end": 165,
+            "span_text": " paper carrier bag",
+            "input_text": "paper carrier bag",
+            "turn_id": 3
+          },
+          {
+            "span_start": 169,
+            "span_end": 185,
+            "span_text": "I know this lady",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 247,
+            "span_end": 287,
+            "span_text": " her daughter bought the house next door",
+            "input_text": "his neighbor",
+            "turn_id": 5
+          },
+          {
+            "span_start": 272,
+            "span_end": 287,
+            "span_text": "house next door",
+            "input_text": "house next door",
+            "turn_id": 6
+          },
+          {
+            "span_start": 214,
+            "span_end": 302,
+            "span_text": "She is the boy's grandmother, and her daughter bought the house next door last October. ",
+            "input_text": "mother",
+            "turn_id": 7
+          },
+          {
+            "span_start": 578,
+            "span_end": 727,
+            "span_text": "-a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake. ",
+            "input_text": "-a thermos with hot soup and a stainless-steel container with rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake.",
+            "turn_id": 8
+          },
+          {
+            "span_start": 728,
+            "span_end": 769,
+            "span_text": "his has become an almost-daily practice. ",
+            "input_text": "yes",
+            "turn_id": 9
+          },
+          {
+            "span_start": 465,
+            "span_end": 544,
+            "span_text": "I am having heart surgery soon, so her mother has decided I need more nutrients",
+            "input_text": "needs more nutrients before heart surger",
+            "turn_id": 10
+          },
+          {
+            "span_start": 916,
+            "span_end": 924,
+            "span_text": " an iPad",
+            "input_text": "an iPad",
+            "turn_id": 11
+          },
+          {
+            "span_start": 639,
+            "span_end": 725,
+            "span_text": " rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake",
+            "input_text": "rice, vegetables and either chicken, meat or shrimp, sometimes with a kind of pancake",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1123,
+            "span_end": 1137,
+            "span_text": " used to iPads",
+            "input_text": "use the iPad",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1667,
+            "span_end": 1769,
+            "span_text": "The doorbell keeps ringing and there is the familiar brown paper carrier bag, handed smilingly to me. ",
+            "input_text": "yes",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1874,
+            "span_end": 1885,
+            "span_text": "\"Thank you\"",
+            "input_text": "\"Thank you\"",
+            "turn_id": 15
+          }
+        ]
+      },
+      "name": "high15012.txt"
+    },
+    {
+      "source": "cnn",
+      "id": "36v4q8r5zk0iwte84nbw2t3d0qzqmg",
+      "filename": "cnn_8847b303dd9f9ec6f82a50567b6c3505e5238a09.story",
+      "story": "(CNN) -- Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\" has died. He was 69. \n\n\"We are deeply saddened by the loss of a great actor and a wonderful man,\" said his publicist, Lori De Waal, in a statement Monday. \"Dennis Farina was always warmhearted and professional, with a great sense of humor and passion for his profession. He will be greatly missed by his family, friends and colleagues.\" \n\nFarina, who had a long career as a police officer in Chicago, got into acting through director Michael Mann, who used him as a consultant and cast him in his 1981 movie, \"Thief.\" That role led to others in such Mann-created shows as \"Miami Vice\" (in which Farina played a mobster) and \"Crime Story\" (in which he starred as Lt. Mike Torello). \n\nFarina also had roles, generally as either cops or gangsters, in a number of movies, including \"Midnight Run\" (1988), \"Get Shorty\" (1995), \"The Mod Squad\" (1999) and \"Snatch\" (2000). \n\nIn 2004, he joined the cast of the long-running \"Law & Order\" after Jerry Orbach's departure, playing Detective Joe Fontana, a role he reprised on the spinoff \"Trial by Jury.\" Fontana was known for flashy clothes and an expensive car, a distinct counterpoint to Orbach's rumpled Lennie Briscoe. \n\nFarina was on \"Law & Order\" for two years, partnered with Jesse L. Martin's Ed Green. Martin's character became a senior detective after Farina left the show. ",
+      "questions": [
+        {
+          "input_text": "Is someone in showbiz?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "Whom?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "What did he do?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Is he still alive?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Was he in movies?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "Anything recent?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "What happened in the early 80's?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "Who cast him?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "What was the title of the movie?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "What parts did he usually get?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "What happened in 2004?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "Which one?",
+          "turn_id": 12
+        },
+        {
+          "input_text": "Who did he portray?",
+          "turn_id": 13
+        },
+        {
+          "input_text": "Did he have a beater for a car?",
+          "turn_id": 14
+        },
+        {
+          "input_text": "What did he have?",
+          "turn_id": 15
+        },
+        {
+          "input_text": "Were the characters clothes frumpy?",
+          "turn_id": 16
+        },
+        {
+          "input_text": "What were they like?",
+          "turn_id": 17
+        },
+        {
+          "input_text": "Was he on the show for five years?",
+          "turn_id": 18
+        },
+        {
+          "input_text": "Was he always an actor?",
+          "turn_id": 19
+        },
+        {
+          "input_text": "What had he been before?",
+          "turn_id": 20
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 8,
+          "span_end": 181,
+          "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\" has died",
+          "input_text": "Yes.",
+          "turn_id": 1
+        },
+        {
+          "span_start": 8,
+          "span_end": 183,
+          "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\" has died. ",
+          "input_text": "Dennis Farina",
+          "turn_id": 2
+        },
+        {
+          "span_start": 8,
+          "span_end": 66,
+          "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor b",
+          "input_text": "Actor",
+          "turn_id": 3
+        },
+        {
+          "span_start": 9,
+          "span_end": 181,
+          "span_text": "Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\" has died",
+          "input_text": "No",
+          "turn_id": 4
+        },
+        {
+          "span_start": 512,
+          "span_end": 690,
+          "span_text": "Farina, who had a long career as a police officer in Chicago, got into acting through director Michael Mann, who used him as a consultant and cast him in his 1981 movie, \"Thief.\"",
+          "input_text": "Yes",
+          "turn_id": 5
+        },
+        {
+          "span_start": 856,
+          "span_end": 1039,
+          "span_text": "Farina also had roles, generally as either cops or gangsters, in a number of movies, including \"Midnight Run\" (1988), \"Get Shorty\" (1995), \"The Mod Squad\" (1999) and \"Snatch\" (2000). ",
+          "input_text": "No",
+          "turn_id": 6
+        },
+        {
+          "span_start": 573,
+          "span_end": 690,
+          "span_text": " got into acting through director Michael Mann, who used him as a consultant and cast him in his 1981 movie, \"Thief.\"",
+          "input_text": "Farina was cast in a film",
+          "turn_id": 7
+        },
+        {
+          "span_start": 512,
+          "span_end": 662,
+          "span_text": "Farina, who had a long career as a police officer in Chicago, got into acting through director Michael Mann, who used him as a consultant and cast him",
+          "input_text": "Michael Mann",
+          "turn_id": 8
+        },
+        {
+          "span_start": 512,
+          "span_end": 690,
+          "span_text": "Farina, who had a long career as a police officer in Chicago, got into acting through director Michael Mann, who used him as a consultant and cast him in his 1981 movie, \"Thief.\"",
+          "input_text": "\"Thief\"",
+          "turn_id": 9
+        },
+        {
+          "span_start": 856,
+          "span_end": 1039,
+          "span_text": "Farina also had roles, generally as either cops or gangsters, in a number of movies, including \"Midnight Run\" (1988), \"Get Shorty\" (1995), \"The Mod Squad\" (1999) and \"Snatch\" (2000). ",
+          "input_text": "cops or gangsters",
+          "turn_id": 10
+        },
+        {
+          "span_start": 1041,
+          "span_end": 1103,
+          "span_text": "In 2004, he joined the cast of the long-running \"Law & Order\" ",
+          "input_text": "He joined a TV show cast.",
+          "turn_id": 11
+        },
+        {
+          "span_start": 1041,
+          "span_end": 1134,
+          "span_text": "In 2004, he joined the cast of the long-running \"Law & Order\" after Jerry Orbach's departure,",
+          "input_text": "\"Law & Order\"",
+          "turn_id": 12
+        },
+        {
+          "span_start": 1041,
+          "span_end": 1165,
+          "span_text": "In 2004, he joined the cast of the long-running \"Law & Order\" after Jerry Orbach's departure, playing Detective Joe Fontana,",
+          "input_text": "Detective Joe Fontana",
+          "turn_id": 13
+        },
+        {
+          "span_start": 1217,
+          "span_end": 1336,
+          "span_text": "Fontana was known for flashy clothes and an expensive car, a distinct counterpoint to Orbach's rumpled Lennie Briscoe. ",
+          "input_text": "No",
+          "turn_id": 14
+        },
+        {
+          "span_start": 1216,
+          "span_end": 1336,
+          "span_text": " Fontana was known for flashy clothes and an expensive car, a distinct counterpoint to Orbach's rumpled Lennie Briscoe. ",
+          "input_text": "An expensive car",
+          "turn_id": 15
+        },
+        {
+          "span_start": 1217,
+          "span_end": 1336,
+          "span_text": "Fontana was known for flashy clothes and an expensive car, a distinct counterpoint to Orbach's rumpled Lennie Briscoe. ",
+          "input_text": "No",
+          "turn_id": 16
+        },
+        {
+          "span_start": 1217,
+          "span_end": 1336,
+          "span_text": "Fontana was known for flashy clothes and an expensive car, a distinct counterpoint to Orbach's rumpled Lennie Briscoe. ",
+          "input_text": "Flashy",
+          "turn_id": 17
+        },
+        {
+          "span_start": 1338,
+          "span_end": 1381,
+          "span_text": "Farina was on \"Law & Order\" for two years, ",
+          "input_text": "No",
+          "turn_id": 18
+        },
+        {
+          "span_start": 8,
+          "span_end": 138,
+          "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,",
+          "input_text": "No",
+          "turn_id": 19
+        },
+        {
+          "span_start": 8,
+          "span_end": 65,
+          "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor ",
+          "input_text": "A cop",
+          "turn_id": 20
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 8,
+            "span_end": 172,
+            "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\"",
+            "input_text": "yes",
+            "turn_id": 1
+          },
+          {
+            "span_start": 8,
+            "span_end": 172,
+            "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\"",
+            "input_text": "Dennis Farina",
+            "turn_id": 2
+          },
+          {
+            "span_start": 234,
+            "span_end": 249,
+            "span_text": " a great actor ",
+            "input_text": "he was an actor",
+            "turn_id": 3
+          },
+          {
+            "span_start": 195,
+            "span_end": 248,
+            "span_text": "\n\"We are deeply saddened by the loss of a great actor",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 856,
+            "span_end": 939,
+            "span_text": "Farina also had roles, generally as either cops or gangsters, in a number of movies",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 1022,
+            "span_end": 1037,
+            "span_text": "\"Snatch\" (2000)",
+            "input_text": "yes",
+            "turn_id": 6
+          },
+          {
+            "span_start": 574,
+            "span_end": 680,
+            "span_text": "got into acting through director Michael Mann, who used him as a consultant and cast him in his 1981 movie",
+            "input_text": "he got into acting",
+            "turn_id": 7
+          },
+          {
+            "span_start": 598,
+            "span_end": 680,
+            "span_text": "director Michael Mann, who used him as a consultant and cast him in his 1981 movie",
+            "input_text": "Michael Mann",
+            "turn_id": 8
+          },
+          {
+            "span_start": 665,
+            "span_end": 689,
+            "span_text": " his 1981 movie, \"Thief.",
+            "input_text": "Thief",
+            "turn_id": 9
+          },
+          {
+            "span_start": 879,
+            "span_end": 916,
+            "span_text": "generally as either cops or gangsters",
+            "input_text": "cops or gangsters",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1041,
+            "span_end": 1101,
+            "span_text": "In 2004, he joined the cast of the long-running \"Law & Order",
+            "input_text": ", he joined the cast of Law & Order",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1049,
+            "span_end": 1101,
+            "span_text": " he joined the cast of the long-running \"Law & Order",
+            "input_text": "Law & Order",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1134,
+            "span_end": 1164,
+            "span_text": " playing Detective Joe Fontana",
+            "input_text": "Detective Joe Fontana",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1216,
+            "span_end": 1274,
+            "span_text": " Fontana was known for flashy clothes and an expensive car",
+            "input_text": "no",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1274,
+            "span_text": "Fontana was known for flashy clothes and an expensive car",
+            "input_text": "an expensive car",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1253,
+            "span_text": "Fontana was known for flashy clothes",
+            "input_text": "no",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1216,
+            "span_end": 1253,
+            "span_text": " Fontana was known for flashy clothes",
+            "input_text": "flashy",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1338,
+            "span_end": 1379,
+            "span_text": "Farina was on \"Law & Order\" for two years",
+            "input_text": "no",
+            "turn_id": 18
+          },
+          {
+            "span_start": 520,
+            "span_end": 561,
+            "span_text": "who had a long career as a police officer",
+            "input_text": "no",
+            "turn_id": 19
+          },
+          {
+            "span_start": 520,
+            "span_end": 561,
+            "span_text": "who had a long career as a police officer",
+            "input_text": "a police officer",
+            "turn_id": 20
+          }
+        ],
+        "1": [
+          {
+            "span_start": 9,
+            "span_end": 69,
+            "span_text": "Dennis Farina, the dapper, mustachioed cop-turned-actor best",
+            "input_text": "yes",
+            "turn_id": 1
+          },
+          {
+            "span_start": 9,
+            "span_end": 22,
+            "span_text": "Dennis Farina",
+            "input_text": "Dennis Farina",
+            "turn_id": 2
+          },
+          {
+            "span_start": 48,
+            "span_end": 64,
+            "span_text": "cop-turned-actor",
+            "input_text": "cop-turned-actor",
+            "turn_id": 3
+          },
+          {
+            "span_start": 173,
+            "span_end": 181,
+            "span_text": "has died",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 654,
+            "span_end": 689,
+            "span_text": "cast him in his 1981 movie, \"Thief.",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 1041,
+            "span_end": 1049,
+            "span_text": "In 2004,",
+            "input_text": "no",
+            "turn_id": 6
+          },
+          {
+            "span_start": 621,
+            "span_end": 689,
+            "span_text": "who used him as a consultant and cast him in his 1981 movie, \"Thief.",
+            "input_text": "he was a consultant",
+            "turn_id": 7
+          },
+          {
+            "span_start": 606,
+            "span_end": 662,
+            "span_text": " Michael Mann, who used him as a consultant and cast him",
+            "input_text": "Michael Mann",
+            "turn_id": 8
+          },
+          {
+            "span_start": 666,
+            "span_end": 688,
+            "span_text": "his 1981 movie, \"Thief",
+            "input_text": "Thief",
+            "turn_id": 9
+          },
+          {
+            "span_start": 856,
+            "span_end": 916,
+            "span_text": "Farina also had roles, generally as either cops or gangsters",
+            "input_text": "cops or gangsters",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1041,
+            "span_end": 1101,
+            "span_text": "In 2004, he joined the cast of the long-running \"Law & Order",
+            "input_text": "he joined the cast of  \"Law & Order",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1088,
+            "span_end": 1102,
+            "span_text": " \"Law & Order\"",
+            "input_text": "\"Law & Order\"",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1134,
+            "span_end": 1164,
+            "span_text": " playing Detective Joe Fontana",
+            "input_text": "Detective Joe Fontana",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1274,
+            "span_text": "Fontana was known for flashy clothes and an expensive car",
+            "input_text": "no",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1274,
+            "span_text": "Fontana was known for flashy clothes and an expensive car",
+            "input_text": "an expensive car",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1229,
+            "span_end": 1253,
+            "span_text": "known for flashy clothes",
+            "input_text": "no",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1253,
+            "span_text": "Fontana was known for flashy clothes",
+            "input_text": "flashy",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1338,
+            "span_end": 1379,
+            "span_text": "Farina was on \"Law & Order\" for two years",
+            "input_text": "no",
+            "turn_id": 18
+          },
+          {
+            "span_start": 48,
+            "span_end": 64,
+            "span_text": "cop-turned-actor",
+            "input_text": "no",
+            "turn_id": 19
+          },
+          {
+            "span_start": 48,
+            "span_end": 51,
+            "span_text": "cop",
+            "input_text": "cop",
+            "turn_id": 20
+          }
+        ],
+        "2": [
+          {
+            "span_start": 8,
+            "span_end": 194,
+            "span_text": " Dennis Farina, the dapper, mustachioed cop-turned-actor best known for his tough-as-nails work in such TV series as \"Law & Order,\" \"Crime Story,\" and \"Miami Vice,\" has died. He was 69. ",
+            "input_text": "yes",
+            "turn_id": 1
+          },
+          {
+            "span_start": 9,
+            "span_end": 22,
+            "span_text": "Dennis Farina",
+            "input_text": "Dennis Farina",
+            "turn_id": 2
+          },
+          {
+            "span_start": 48,
+            "span_end": 64,
+            "span_text": "cop-turned-actor",
+            "input_text": "cop-turned-actor",
+            "turn_id": 3
+          },
+          {
+            "span_start": 172,
+            "span_end": 194,
+            "span_text": " has died. He was 69. ",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 939,
+            "span_end": 1039,
+            "span_text": ", including \"Midnight Run\" (1988), \"Get Shorty\" (1995), \"The Mod Squad\" (1999) and \"Snatch\" (2000). ",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 1021,
+            "span_end": 1036,
+            "span_text": " \"Snatch\" (2000",
+            "input_text": "\"Snatch\"",
+            "turn_id": 6
+          },
+          {
+            "span_start": 574,
+            "span_end": 589,
+            "span_text": "got into acting",
+            "input_text": "got into acting",
+            "turn_id": 7
+          },
+          {
+            "span_start": 606,
+            "span_end": 619,
+            "span_text": " Michael Mann",
+            "input_text": "Michael Mann",
+            "turn_id": 8
+          },
+          {
+            "span_start": 681,
+            "span_end": 690,
+            "span_text": " \"Thief.\"",
+            "input_text": "\"Thief.\"",
+            "turn_id": 9
+          },
+          {
+            "span_start": 899,
+            "span_end": 916,
+            "span_text": "cops or gangsters",
+            "input_text": "cops or gangsters",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1052,
+            "span_end": 1102,
+            "span_text": " joined the cast of the long-running \"Law & Order\"",
+            "input_text": "joined the cast of \"Law & Order\"",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1088,
+            "span_end": 1103,
+            "span_text": " \"Law & Order\" ",
+            "input_text": "\"Law & Order\"",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1143,
+            "span_end": 1164,
+            "span_text": "Detective Joe Fontana",
+            "input_text": "Detective Joe Fontana",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1217,
+            "span_end": 1275,
+            "span_text": "Fontana was known for flashy clothes and an expensive car,",
+            "input_text": "no",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1239,
+            "span_end": 1274,
+            "span_text": "flashy clothes and an expensive car",
+            "input_text": "flashy clothes and an expensive car",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1239,
+            "span_end": 1253,
+            "span_text": "flashy clothes",
+            "input_text": "no",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1239,
+            "span_end": 1246,
+            "span_text": "flashy ",
+            "input_text": "flashy",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1365,
+            "span_end": 1379,
+            "span_text": " for two years",
+            "input_text": "no",
+            "turn_id": 18
+          },
+          {
+            "span_start": 48,
+            "span_end": 63,
+            "span_text": "cop-turned-acto",
+            "input_text": "no",
+            "turn_id": 19
+          },
+          {
+            "span_start": 48,
+            "span_end": 51,
+            "span_text": "cop",
+            "input_text": "cop",
+            "turn_id": 20
+          }
+        ]
+      },
+      "name": "cnn_8847b303dd9f9ec6f82a50567b6c3505e5238a09.story"
+    },
+    {
+      "source": "mctest",
+      "id": "3a1pq49wvhh8nbtgsb549nn9bzth12",
+      "filename": "mc500.train.257",
+      "story": "Kendra and Quinton travel to and from school every day. Kendra lives further from the bus stop than Quinton does, stops every morning at Quinton's house to join him to walk to the bus stop. Every afternoon, after school, when walking home from the bus stop they go in for cookies and milk that Quinton's mother has ready and waiting for them. Quinton can't eat cheese or cake so they had the same snack every day. They both work together on their homework and when they are done they play together. Kendra always makes sure to leave in time to get home for dinner. She doesn't want to miss story time which was right before bedtime. \n\nOne morning Kendra walked up to Quinton's house, she thought something might be wrong because normally Quinton was waiting outside for her and on this morning he was not to be found. Kendra went up to the door and knocked. She waited and waited and yet no one answered. She saw that Quinton's mother's car wasn't in their driveway which was weird. She waited for a few bit looking up and down the block and getting worried when Quinton was nowhere to be found. \n\nKendra didn't want to miss the bus to school and hurried off to make it in time. The bus driver saw that she was upset and that Quinton was not with her that morning. She told him what happened and he said that he was sure that everything would be okay. \n\nKendra got to school, ran to her teacher and told him what happened that morning. The teacher smiled and told her not to worry, Quinton's mother had called and he was going to the dentist and would be at school after lunch and that she would see him at the bus stop like normal tomorrow.",
+      "questions": [
+        {
+          "input_text": "Where do Quinton and Kendra travel to and from every day?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "Does Quinton live further from the bus stop?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "What do they do every afternoon after school?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Does Quinton eat cheese?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Do they play before their homework?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "What does Kendra not want to miss?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "When is that?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "What happened when Kendra knocked on Quinton's door?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "Did she see the car?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "Did she miss the bus?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "What did the bus driver see?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "Did Kendra tell him why?",
+          "turn_id": 12
+        },
+        {
+          "input_text": "What did he say?",
+          "turn_id": 13
+        },
+        {
+          "input_text": "When she got to school, who did she tell?",
+          "turn_id": 14
+        },
+        {
+          "input_text": "Did he frown?",
+          "turn_id": 15
+        },
+        {
+          "input_text": "Who had called?",
+          "turn_id": 16
+        },
+        {
+          "input_text": "Where did he go?",
+          "turn_id": 17
+        },
+        {
+          "input_text": "When would he be back?",
+          "turn_id": 18
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 0,
+          "span_end": 54,
+          "span_text": "Kendra and Quinton travel to and from school every day",
+          "input_text": "school",
+          "turn_id": 1
+        },
+        {
+          "span_start": 56,
+          "span_end": 107,
+          "span_text": "Kendra lives further from the bus stop than Quinton",
+          "input_text": "No",
+          "turn_id": 2
+        },
+        {
+          "span_start": 190,
+          "span_end": 341,
+          "span_text": "Every afternoon, after school, when walking home from the bus stop they go in for cookies and milk that Quinton's mother has ready and waiting for them",
+          "input_text": "go to Quentin's house",
+          "turn_id": 3
+        },
+        {
+          "span_start": 343,
+          "span_end": 367,
+          "span_text": "Quinton can't eat cheese",
+          "input_text": "No",
+          "turn_id": 4
+        },
+        {
+          "span_start": 414,
+          "span_end": 497,
+          "span_text": "They both work together on their homework and when they are done they play together",
+          "input_text": "No",
+          "turn_id": 5
+        },
+        {
+          "span_start": 565,
+          "span_end": 600,
+          "span_text": "She doesn't want to miss story time",
+          "input_text": "story time",
+          "turn_id": 6
+        },
+        {
+          "span_start": 601,
+          "span_end": 631,
+          "span_text": "which was right before bedtime",
+          "input_text": "right before bedtime",
+          "turn_id": 7
+        },
+        {
+          "span_start": 888,
+          "span_end": 903,
+          "span_text": "no one answered",
+          "input_text": "no one answered",
+          "turn_id": 8
+        },
+        {
+          "span_start": 906,
+          "span_end": 965,
+          "span_text": "he saw that Quinton's mother's car wasn't in their driveway",
+          "input_text": "No",
+          "turn_id": 9
+        },
+        {
+          "span_start": 1098,
+          "span_end": 1177,
+          "span_text": "Kendra didn't want to miss the bus to school and hurried off to make it in time",
+          "input_text": "No",
+          "turn_id": 10
+        },
+        {
+          "span_start": 1179,
+          "span_end": 1216,
+          "span_text": "The bus driver saw that she was upset",
+          "input_text": "that she was upset",
+          "turn_id": 11
+        },
+        {
+          "span_start": 1265,
+          "span_end": 1291,
+          "span_text": "She told him what happened",
+          "input_text": "yes",
+          "turn_id": 12
+        },
+        {
+          "span_start": 1296,
+          "span_end": 1350,
+          "span_text": "he said that he was sure that everything would be okay",
+          "input_text": "everything would be okay",
+          "turn_id": 13
+        },
+        {
+          "span_start": 1382,
+          "span_end": 1434,
+          "span_text": " her teacher and told him what happened that morning",
+          "input_text": "her teacher",
+          "turn_id": 14
+        },
+        {
+          "span_start": 1436,
+          "span_end": 1454,
+          "span_text": "The teacher smiled",
+          "input_text": "No",
+          "turn_id": 15
+        },
+        {
+          "span_start": 1481,
+          "span_end": 1509,
+          "span_text": " Quinton's mother had called",
+          "input_text": "Quinton's mother",
+          "turn_id": 16
+        },
+        {
+          "span_start": 1514,
+          "span_end": 1541,
+          "span_text": "he was going to the dentist",
+          "input_text": "to the dentist",
+          "turn_id": 17
+        },
+        {
+          "span_start": 1546,
+          "span_end": 1576,
+          "span_text": "would be at school after lunch",
+          "input_text": "yes",
+          "turn_id": 18
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 0,
+            "span_end": 54,
+            "span_text": "Kendra and Quinton travel to and from school every day",
+            "input_text": "school",
+            "turn_id": 1
+          },
+          {
+            "span_start": 56,
+            "span_end": 112,
+            "span_text": "Kendra lives further from the bus stop than Quinton does",
+            "input_text": "no",
+            "turn_id": 2
+          },
+          {
+            "span_start": 189,
+            "span_end": 287,
+            "span_text": " Every afternoon, after school, when walking home from the bus stop they go in for cookies and mil",
+            "input_text": "get cookies and milk",
+            "turn_id": 3
+          },
+          {
+            "span_start": 190,
+            "span_end": 309,
+            "span_text": "Every afternoon, after school, when walking home from the bus stop they go in for cookies and milk that Quinton's mothe",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 414,
+            "span_end": 500,
+            "span_text": "They both work together on their homework and when they are done they play together. K",
+            "input_text": "no",
+            "turn_id": 5
+          },
+          {
+            "span_start": 565,
+            "span_end": 633,
+            "span_text": "She doesn't want to miss story time which was right before bedtime. ",
+            "input_text": "story time",
+            "turn_id": 6
+          },
+          {
+            "span_start": 565,
+            "span_end": 633,
+            "span_text": "She doesn't want to miss story time which was right before bedtime. ",
+            "input_text": "right before bedtime.",
+            "turn_id": 7
+          },
+          {
+            "span_start": 817,
+            "span_end": 905,
+            "span_text": " Kendra went up to the door and knocked. She waited and waited and yet no one answered. ",
+            "input_text": "no answer",
+            "turn_id": 8
+          },
+          {
+            "span_start": 905,
+            "span_end": 981,
+            "span_text": "She saw that Quinton's mother's car wasn't in their driveway which was weird",
+            "input_text": "no",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1098,
+            "span_end": 1180,
+            "span_text": "Kendra didn't want to miss the bus to school and hurried off to make it in time. T",
+            "input_text": "no",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1179,
+            "span_end": 1263,
+            "span_text": "The bus driver saw that she was upset and that Quinton was not with her that morning",
+            "input_text": "she was upset",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1264,
+            "span_end": 1352,
+            "span_text": " She told him what happened and he said that he was sure that everything would be okay. ",
+            "input_text": "yes",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1266,
+            "span_end": 1352,
+            "span_text": "he told him what happened and he said that he was sure that everything would be okay. ",
+            "input_text": "heverything would be okay.",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1354,
+            "span_end": 1436,
+            "span_text": "Kendra got to school, ran to her teacher and told him what happened that morning. ",
+            "input_text": "her teacher",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1482,
+            "span_text": "The teacher smiled and told her not to worry, ",
+            "input_text": "no",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1509,
+            "span_text": "The teacher smiled and told her not to worry, Quinton's mother had called",
+            "input_text": "Quinton's mother",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1512,
+            "span_end": 1575,
+            "span_text": "d he was going to the dentist and would be at school after lunc",
+            "input_text": "dentist",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1544,
+            "span_end": 1576,
+            "span_text": "d would be at school after lunch",
+            "input_text": "after lunch",
+            "turn_id": 18
+          }
+        ],
+        "1": [
+          {
+            "span_start": 0,
+            "span_end": 54,
+            "span_text": "Kendra and Quinton travel to and from school every day",
+            "input_text": "school",
+            "turn_id": 1
+          },
+          {
+            "span_start": 56,
+            "span_end": 112,
+            "span_text": "Kendra lives further from the bus stop than Quinton does",
+            "input_text": "no",
+            "turn_id": 2
+          },
+          {
+            "span_start": 190,
+            "span_end": 289,
+            "span_text": "Every afternoon, after school, when walking home from the bus stop they go in for cookies and milk ",
+            "input_text": "they go in for cookies and milk",
+            "turn_id": 3
+          },
+          {
+            "span_start": 343,
+            "span_end": 367,
+            "span_text": "Quinton can't eat cheese",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 414,
+            "span_end": 497,
+            "span_text": "They both work together on their homework and when they are done they play together",
+            "input_text": "no",
+            "turn_id": 5
+          },
+          {
+            "span_start": 565,
+            "span_end": 600,
+            "span_text": "She doesn't want to miss story time",
+            "input_text": "story time",
+            "turn_id": 6
+          },
+          {
+            "span_start": 590,
+            "span_end": 631,
+            "span_text": "story time which was right before bedtime",
+            "input_text": "right before bedtime",
+            "turn_id": 7
+          },
+          {
+            "span_start": 818,
+            "span_end": 903,
+            "span_text": "Kendra went up to the door and knocked. She waited and waited and yet no one answered",
+            "input_text": "no one answered",
+            "turn_id": 8
+          },
+          {
+            "span_start": 905,
+            "span_end": 981,
+            "span_text": "She saw that Quinton's mother's car wasn't in their driveway which was weird",
+            "input_text": "no",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1098,
+            "span_end": 1177,
+            "span_text": "Kendra didn't want to miss the bus to school and hurried off to make it in time",
+            "input_text": "no",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1179,
+            "span_end": 1216,
+            "span_text": "The bus driver saw that she was upset",
+            "input_text": "that she was upset",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1265,
+            "span_end": 1291,
+            "span_text": "She told him what happened",
+            "input_text": "yes",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1296,
+            "span_end": 1350,
+            "span_text": "he said that he was sure that everything would be okay",
+            "input_text": "that everything would be okay",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1376,
+            "span_end": 1422,
+            "span_text": "ran to her teacher and told him what happened ",
+            "input_text": "her teacher",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1454,
+            "span_text": "The teacher smiled",
+            "input_text": "no",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1482,
+            "span_end": 1509,
+            "span_text": "Quinton's mother had called",
+            "input_text": "Quinton's mother",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1514,
+            "span_end": 1541,
+            "span_text": "he was going to the dentist",
+            "input_text": "the dentist",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1546,
+            "span_end": 1576,
+            "span_text": "would be at school after lunch",
+            "input_text": "after lunch",
+            "turn_id": 18
+          }
+        ],
+        "2": [
+          {
+            "span_start": 0,
+            "span_end": 55,
+            "span_text": "Kendra and Quinton travel to and from school every day.",
+            "input_text": "school",
+            "turn_id": 1
+          },
+          {
+            "span_start": 56,
+            "span_end": 94,
+            "span_text": "Kendra lives further from the bus stop",
+            "input_text": "no",
+            "turn_id": 2
+          },
+          {
+            "span_start": 189,
+            "span_end": 288,
+            "span_text": " Every afternoon, after school, when walking home from the bus stop they go in for cookies and milk",
+            "input_text": "go in for cookies and milk",
+            "turn_id": 3
+          },
+          {
+            "span_start": 343,
+            "span_end": 375,
+            "span_text": "Quinton can't eat cheese or cake",
+            "input_text": "no",
+            "turn_id": 4
+          },
+          {
+            "span_start": 413,
+            "span_end": 488,
+            "span_text": " They both work together on their homework and when they are done they play",
+            "input_text": "no",
+            "turn_id": 5
+          },
+          {
+            "span_start": 564,
+            "span_end": 600,
+            "span_text": " She doesn't want to miss story time",
+            "input_text": "story time",
+            "turn_id": 6
+          },
+          {
+            "span_start": 590,
+            "span_end": 633,
+            "span_text": "story time which was right before bedtime. ",
+            "input_text": "before bedtime",
+            "turn_id": 7
+          },
+          {
+            "span_start": 858,
+            "span_end": 903,
+            "span_text": "She waited and waited and yet no one answered",
+            "input_text": "no one answered",
+            "turn_id": 8
+          },
+          {
+            "span_start": 905,
+            "span_end": 965,
+            "span_text": "She saw that Quinton's mother's car wasn't in their driveway",
+            "input_text": "no",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1098,
+            "span_end": 1132,
+            "span_text": "Kendra didn't want to miss the bus",
+            "input_text": "no",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1178,
+            "span_end": 1217,
+            "span_text": " The bus driver saw that she was upset ",
+            "input_text": "that she was upset",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1265,
+            "span_end": 1291,
+            "span_text": "She told him what happened",
+            "input_text": "yes",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1295,
+            "span_end": 1352,
+            "span_text": " he said that he was sure that everything would be okay. ",
+            "input_text": "that everything would be okay",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1354,
+            "span_end": 1407,
+            "span_text": "Kendra got to school, ran to her teacher and told him",
+            "input_text": "her teacher",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1454,
+            "span_text": "The teacher smiled",
+            "input_text": "no",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1482,
+            "span_end": 1509,
+            "span_text": "Quinton's mother had called",
+            "input_text": "Quinton's mother",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1514,
+            "span_end": 1541,
+            "span_text": "he was going to the dentist",
+            "input_text": "to the dentist",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1542,
+            "span_end": 1576,
+            "span_text": "and would be at school after lunch",
+            "input_text": "after lunch",
+            "turn_id": 18
+          }
+        ]
+      },
+      "name": "mc500.train.257"
+    },
+    {
+      "source": "wikipedia",
+      "id": "3tayzsbpll8425psm9hhik4gdl02sc",
+      "filename": "Staten_Island.txt",
+      "story": "Staten Island is one of the five boroughs of New York City in the U.S. state of New York. In the southwest of the city, Staten Island is the southernmost part of both the city and state of New York, with Conference House Park at the southern tip of the island and the state. The borough is separated from New Jersey by the Arthur Kill and the Kill Van Kull, and from the rest of New York by New York Bay. With a 2016 Census-estimated population of 476,015, Staten Island is the least populated of the boroughs but is the third-largest in area at . Staten Island is the only borough of New York with a non-Hispanic White majority. The borough is coextensive with Richmond County, and until 1975 was the Borough of Richmond. Its flag was later changed to reflect this. Staten Island has been sometimes called \"the forgotten borough\" by inhabitants who feel neglected by the city government. \n\nThe North Shore\u2014especially the neighborhoods of St. George, Tompkinsville, Clifton, and Stapleton\u2014is the most urban part of the island; it contains the designated St. George Historic District and the St. Paul's Avenue-Stapleton Heights Historic District, which feature large Victorian houses. The East Shore is home to the F.D.R. Boardwalk, the fourth-longest in the world. The South Shore, site of the 17th-century Dutch and French Huguenot settlement, developed rapidly beginning in the 1960s and 1970s and is now mostly suburban in character. The West Shore is the least populated and most industrial part of the island.",
+      "questions": [
+        {
+          "input_text": "How many burroughs are there?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "in what city?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "and state?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "Is staten island one?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Where is it?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "What separates it from new jersey?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "What is its population?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "Is it the most populated?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "what ethnicity is the majority?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "What is it sometimes called?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "why?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "what is the most urban part?",
+          "turn_id": 12
+        },
+        {
+          "input_text": "which neighborhoods?",
+          "turn_id": 13
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 28,
+          "span_end": 32,
+          "span_text": "five",
+          "input_text": "five",
+          "turn_id": 1
+        },
+        {
+          "span_start": 45,
+          "span_end": 58,
+          "span_text": "New York City",
+          "input_text": "New York City",
+          "turn_id": 2
+        },
+        {
+          "span_start": 80,
+          "span_end": 88,
+          "span_text": "New York",
+          "input_text": "New York",
+          "turn_id": 3
+        },
+        {
+          "span_start": 17,
+          "span_end": 21,
+          "span_text": "one ",
+          "input_text": "Yes",
+          "turn_id": 4
+        },
+        {
+          "span_start": 88,
+          "span_end": 119,
+          "span_text": ". In the southwest of the city,",
+          "input_text": "In the southwest of the city",
+          "turn_id": 5
+        },
+        {
+          "span_start": 322,
+          "span_end": 356,
+          "span_text": " Arthur Kill and the Kill Van Kull",
+          "input_text": "Arthur Kill and the Kill Van Kull",
+          "turn_id": 6
+        },
+        {
+          "span_start": 448,
+          "span_end": 455,
+          "span_text": "476,015",
+          "input_text": "476,015",
+          "turn_id": 7
+        },
+        {
+          "span_start": 477,
+          "span_end": 493,
+          "span_text": " least populated",
+          "input_text": "no",
+          "turn_id": 8
+        },
+        {
+          "span_start": 600,
+          "span_end": 620,
+          "span_text": " non-Hispanic White ",
+          "input_text": "non-Hispanic White",
+          "turn_id": 9
+        },
+        {
+          "span_start": 808,
+          "span_end": 829,
+          "span_text": "the forgotten borough",
+          "input_text": "the forgotten borough",
+          "turn_id": 10
+        },
+        {
+          "span_start": 831,
+          "span_end": 890,
+          "span_text": "by inhabitants who feel neglected by the city government. \n",
+          "input_text": "because the inhabitants feel neglected by the city government",
+          "turn_id": 11
+        },
+        {
+          "span_start": 894,
+          "span_end": 906,
+          "span_text": " North Shore",
+          "input_text": "North Shore",
+          "turn_id": 12
+        },
+        {
+          "span_start": 939,
+          "span_end": 988,
+          "span_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+          "input_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+          "turn_id": 13
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 0,
+            "span_end": 59,
+            "span_text": "Staten Island is one of the five boroughs of New York City ",
+            "input_text": "five",
+            "turn_id": 1
+          },
+          {
+            "span_start": 0,
+            "span_end": 59,
+            "span_text": "Staten Island is one of the five boroughs of New York City ",
+            "input_text": "New York City",
+            "turn_id": 2
+          },
+          {
+            "span_start": 0,
+            "span_end": 90,
+            "span_text": "Staten Island is one of the five boroughs of New York City in the U.S. state of New York. ",
+            "input_text": "New York.",
+            "turn_id": 3
+          },
+          {
+            "span_start": 0,
+            "span_end": 41,
+            "span_text": "Staten Island is one of the five boroughs",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 89,
+            "span_end": 118,
+            "span_text": " In the southwest of the city",
+            "input_text": "In the southwest of the city",
+            "turn_id": 5
+          },
+          {
+            "span_start": 274,
+            "span_end": 357,
+            "span_text": " The borough is separated from New Jersey by the Arthur Kill and the Kill Van Kull,",
+            "input_text": "the Arthur Kill and the Kill Van Kull,",
+            "turn_id": 6
+          },
+          {
+            "span_start": 404,
+            "span_end": 456,
+            "span_text": " With a 2016 Census-estimated population of 476,015,",
+            "input_text": "476,015,",
+            "turn_id": 7
+          },
+          {
+            "span_start": 405,
+            "span_end": 509,
+            "span_text": "With a 2016 Census-estimated population of 476,015, Staten Island is the least populated of the boroughs",
+            "input_text": "no",
+            "turn_id": 8
+          },
+          {
+            "span_start": 548,
+            "span_end": 628,
+            "span_text": "Staten Island is the only borough of New York with a non-Hispanic White majority",
+            "input_text": "a non-Hispanic White majority",
+            "turn_id": 9
+          },
+          {
+            "span_start": 767,
+            "span_end": 846,
+            "span_text": "Staten Island has been sometimes called \"the forgotten borough\" by inhabitants ",
+            "input_text": "\"the forgotten borough\"",
+            "turn_id": 10
+          },
+          {
+            "span_start": 766,
+            "span_end": 890,
+            "span_text": " Staten Island has been sometimes called \"the forgotten borough\" by inhabitants who feel neglected by the city government. \n",
+            "input_text": "inhabitants who feel neglected by the city government.",
+            "turn_id": 11
+          },
+          {
+            "span_start": 891,
+            "span_end": 1028,
+            "span_text": "The North Shore\u2014especially the neighborhoods of St. George, Tompkinsville, Clifton, and Stapleton\u2014is the most urban part of the island; i",
+            "input_text": "The North Shore",
+            "turn_id": 12
+          },
+          {
+            "span_start": 907,
+            "span_end": 988,
+            "span_text": "especially the neighborhoods of St. George, Tompkinsville, Clifton, and Stapleton",
+            "input_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+            "turn_id": 13
+          }
+        ],
+        "1": [
+          {
+            "span_start": 28,
+            "span_end": 32,
+            "span_text": "five",
+            "input_text": "five",
+            "turn_id": 1
+          },
+          {
+            "span_start": 45,
+            "span_end": 58,
+            "span_text": "New York City",
+            "input_text": "New York City",
+            "turn_id": 2
+          },
+          {
+            "span_start": 80,
+            "span_end": 88,
+            "span_text": "New York",
+            "input_text": "New York",
+            "turn_id": 3
+          },
+          {
+            "span_start": 0,
+            "span_end": 43,
+            "span_text": "Staten Island is one of the five boroughs o",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 137,
+            "span_end": 197,
+            "span_text": "the southernmost part of both the city and state of New York",
+            "input_text": "the southernmost part of both the city and state of New York",
+            "turn_id": 5
+          },
+          {
+            "span_start": 319,
+            "span_end": 356,
+            "span_text": "the Arthur Kill and the Kill Van Kull",
+            "input_text": "the Arthur Kill and the Kill Van Kull",
+            "turn_id": 6
+          },
+          {
+            "span_start": 448,
+            "span_end": 455,
+            "span_text": "476,015",
+            "input_text": "476,015",
+            "turn_id": 7
+          },
+          {
+            "span_start": 457,
+            "span_end": 509,
+            "span_text": "Staten Island is the least populated of the boroughs",
+            "input_text": "no",
+            "turn_id": 8
+          },
+          {
+            "span_start": 599,
+            "span_end": 628,
+            "span_text": "a non-Hispanic White majority",
+            "input_text": "a non-Hispanic White majority",
+            "turn_id": 9
+          },
+          {
+            "span_start": 808,
+            "span_end": 829,
+            "span_text": "the forgotten borough",
+            "input_text": "the forgotten borough",
+            "turn_id": 10
+          },
+          {
+            "span_start": 834,
+            "span_end": 888,
+            "span_text": "inhabitants who feel neglected by the city government.",
+            "input_text": "inhabitants who feel neglected by the city government.",
+            "turn_id": 11
+          },
+          {
+            "span_start": 891,
+            "span_end": 906,
+            "span_text": "The North Shore",
+            "input_text": "The North Shore",
+            "turn_id": 12
+          },
+          {
+            "span_start": 939,
+            "span_end": 988,
+            "span_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+            "input_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+            "turn_id": 13
+          }
+        ],
+        "2": [
+          {
+            "span_start": 28,
+            "span_end": 41,
+            "span_text": "five boroughs",
+            "input_text": "five",
+            "turn_id": 1
+          },
+          {
+            "span_start": 44,
+            "span_end": 58,
+            "span_text": " New York City",
+            "input_text": "New York City",
+            "turn_id": 2
+          },
+          {
+            "span_start": 79,
+            "span_end": 88,
+            "span_text": " New York",
+            "input_text": "New York",
+            "turn_id": 3
+          },
+          {
+            "span_start": 120,
+            "span_end": 133,
+            "span_text": "Staten Island",
+            "input_text": "yes",
+            "turn_id": 4
+          },
+          {
+            "span_start": 140,
+            "span_end": 197,
+            "span_text": " southernmost part of both the city and state of New York",
+            "input_text": "southernmost part of both the city and state of New York",
+            "turn_id": 5
+          },
+          {
+            "span_start": 323,
+            "span_end": 356,
+            "span_text": "Arthur Kill and the Kill Van Kull",
+            "input_text": "Arthur Kill and the Kill Van Kull",
+            "turn_id": 6
+          },
+          {
+            "span_start": 448,
+            "span_end": 455,
+            "span_text": "476,015",
+            "input_text": "476,015",
+            "turn_id": 7
+          },
+          {
+            "span_start": 477,
+            "span_end": 510,
+            "span_text": " least populated of the boroughs ",
+            "input_text": "no",
+            "turn_id": 8
+          },
+          {
+            "span_start": 601,
+            "span_end": 619,
+            "span_text": "non-Hispanic White",
+            "input_text": "non-Hispanic White",
+            "turn_id": 9
+          },
+          {
+            "span_start": 807,
+            "span_end": 830,
+            "span_text": "\"the forgotten borough\"",
+            "input_text": "\"the forgotten borough\"",
+            "turn_id": 10
+          },
+          {
+            "span_start": 833,
+            "span_end": 888,
+            "span_text": " inhabitants who feel neglected by the city government.",
+            "input_text": "inhabitants feel neglected by the city government.",
+            "turn_id": 11
+          },
+          {
+            "span_start": 891,
+            "span_end": 906,
+            "span_text": "The North Shore",
+            "input_text": "The North Shore",
+            "turn_id": 12
+          },
+          {
+            "span_start": 939,
+            "span_end": 988,
+            "span_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+            "input_text": "St. George, Tompkinsville, Clifton, and Stapleton",
+            "turn_id": 13
+          }
+        ]
+      },
+      "name": "Staten_Island.txt"
+    },
+    {
+      "source": "race",
+      "id": "33lk57mylt5u8gs4bgqv5venyoxzs3",
+      "filename": "high18372.txt",
+      "story": "Thunder was coming when Reginald Eppes woke up at five in the morning. He checked the weather forecast. A violent storm was coming ,but it sounded like his small town wouldn't be hit too hard. But Eppes, a firefighter, had clearly known the power of these huge storms from experiences. \"Do you know where the flashlights are?\" he asked his wife. Danielle. Just then, thunder was all-around them. The moment he turned the flashlight on. The house lights went off. A second later, the kitchen windows were broken. Eppes and Danielle ran to their boys who were still sleeping in their bedroom. \n\n\"Get up, get up, R.J.! \" Eppes shouted, waving his flashlight. The sleepy boy moved to the edge of the bed. Eppes held out his arms and ordered his son to jump. He was too late. The roof was torn down. R.J. was buried ,under the pieces. \n\n\"I've lost him,\" Eppes thought. Quickly, he hurried to Joel to shield him. Glass, wood, and plaster ( ) hit them. Then something huge, heavy-maybe the washing machine-knocked into him. He hurt his arms, but he still held the flashlight in one hand. \n\nAfter a long period, the wind began to die down. Eppes found himself standing in the ruins of his home. Darkness lay all about him. Then he thought he saw a shape moving straight toward him. It was R.J., guided home by the light of his father's flashlight. \n\nAt the hospital later, R.J. described what had happened to him. \"I rushed out when the wall started moving I was scared. My mom and dad were gone. Pieces of glass hit my back, and something hit my neck really hard. \" \n\nR.J. had been raised up into the air by the wind and dropped back to the ground. Amazingly, R.J. was not hurt badly. Of all his family, Eppes was hurt most seriously.",
+      "questions": [
+        {
+          "input_text": "When did Reginald Eppes wake up?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "What was the first thing he checked?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "Was there a storm headed that way?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "What was his profession?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Did the house lights go out?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "What device did they use when the power went out?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "Who was buried under the roof?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "Who did he need to shield?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "What were they hit by?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "Was RJ badly hurt?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "Who was hurt the worst?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "What guided RJ home?",
+          "turn_id": 12
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 24,
+          "span_end": 69,
+          "span_text": "Reginald Eppes woke up at five in the morning",
+          "input_text": "Five in the morning",
+          "turn_id": 1
+        },
+        {
+          "span_start": 71,
+          "span_end": 102,
+          "span_text": "He checked the weather forecast",
+          "input_text": "Weather forecast",
+          "turn_id": 2
+        },
+        {
+          "span_start": 104,
+          "span_end": 130,
+          "span_text": "A violent storm was coming",
+          "input_text": "Yes",
+          "turn_id": 3
+        },
+        {
+          "span_start": 193,
+          "span_end": 217,
+          "span_text": "But Eppes, a firefighter",
+          "input_text": "Firefighter",
+          "turn_id": 4
+        },
+        {
+          "span_start": 396,
+          "span_end": 461,
+          "span_text": "The moment he turned the flashlight on. The house lights went off",
+          "input_text": "Yes",
+          "turn_id": 5
+        },
+        {
+          "span_start": 396,
+          "span_end": 461,
+          "span_text": "The moment he turned the flashlight on. The house lights went off",
+          "input_text": "Flashlight",
+          "turn_id": 6
+        },
+        {
+          "span_start": 771,
+          "span_end": 829,
+          "span_text": "The roof was torn down. R.J. was buried ,under the pieces.",
+          "input_text": "R.J.",
+          "turn_id": 7
+        },
+        {
+          "span_start": 864,
+          "span_end": 906,
+          "span_text": "Quickly, he hurried to Joel to shield him.",
+          "input_text": "Joel",
+          "turn_id": 8
+        },
+        {
+          "span_start": 907,
+          "span_end": 1016,
+          "span_text": "Glass, wood, and plaster ( ) hit them. Then something huge, heavy-maybe the washing machine-knocked into him.",
+          "input_text": "Glass, wood, plaster, and maybe the washing machine",
+          "turn_id": 9
+        },
+        {
+          "span_start": 1641,
+          "span_end": 1677,
+          "span_text": " Amazingly, R.J. was not hurt badly.",
+          "input_text": "No",
+          "turn_id": 10
+        },
+        {
+          "span_start": 1696,
+          "span_end": 1726,
+          "span_text": " Eppes was hurt most seriously",
+          "input_text": "Eppes",
+          "turn_id": 11
+        },
+        {
+          "span_start": 1274,
+          "span_end": 1339,
+          "span_text": "It was R.J., guided home by the light of his father's flashlight.",
+          "input_text": "The flashlight",
+          "turn_id": 12
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 24,
+            "span_end": 69,
+            "span_text": "Reginald Eppes woke up at five in the morning",
+            "input_text": "five in the morning",
+            "turn_id": 1
+          },
+          {
+            "span_start": 74,
+            "span_end": 102,
+            "span_text": "checked the weather forecast",
+            "input_text": "the weather forecast",
+            "turn_id": 2
+          },
+          {
+            "span_start": 104,
+            "span_end": 131,
+            "span_text": "A violent storm was coming ",
+            "input_text": "yes",
+            "turn_id": 3
+          },
+          {
+            "span_start": 192,
+            "span_end": 217,
+            "span_text": " But Eppes, a firefighter",
+            "input_text": "firefighter",
+            "turn_id": 4
+          },
+          {
+            "span_start": 436,
+            "span_end": 462,
+            "span_text": "The house lights went off.",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 396,
+            "span_end": 434,
+            "span_text": "The moment he turned the flashlight on",
+            "input_text": "flashlight",
+            "turn_id": 6
+          },
+          {
+            "span_start": 771,
+            "span_end": 810,
+            "span_text": "The roof was torn down. R.J. was buried",
+            "input_text": "R.J.",
+            "turn_id": 7
+          },
+          {
+            "span_start": 864,
+            "span_end": 905,
+            "span_text": "Quickly, he hurried to Joel to shield him",
+            "input_text": "Joel",
+            "turn_id": 8
+          },
+          {
+            "span_start": 103,
+            "span_end": 131,
+            "span_text": " A violent storm was coming ",
+            "input_text": "A violent storm",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1652,
+            "span_end": 1677,
+            "span_text": " R.J. was not hurt badly.",
+            "input_text": "no",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1697,
+            "span_end": 1727,
+            "span_text": "Eppes was hurt most seriously.",
+            "input_text": "Eppes",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1274,
+            "span_end": 1340,
+            "span_text": "It was R.J., guided home by the light of his father's flashlight. ",
+            "input_text": "the light of his father's flashlight.",
+            "turn_id": 12
+          }
+        ],
+        "1": [
+          {
+            "span_start": 24,
+            "span_end": 69,
+            "span_text": "Reginald Eppes woke up at five in the morning",
+            "input_text": "five in the morning",
+            "turn_id": 1
+          },
+          {
+            "span_start": 71,
+            "span_end": 103,
+            "span_text": "He checked the weather forecast.",
+            "input_text": "the weather forecast",
+            "turn_id": 2
+          },
+          {
+            "span_start": 104,
+            "span_end": 130,
+            "span_text": "A violent storm was coming",
+            "input_text": "yes",
+            "turn_id": 3
+          },
+          {
+            "span_start": 197,
+            "span_end": 217,
+            "span_text": "Eppes, a firefighter",
+            "input_text": "firefighter",
+            "turn_id": 4
+          },
+          {
+            "span_start": 436,
+            "span_end": 461,
+            "span_text": "The house lights went off",
+            "input_text": "yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 396,
+            "span_end": 434,
+            "span_text": "The moment he turned the flashlight on",
+            "input_text": "flashlight",
+            "turn_id": 6
+          },
+          {
+            "span_start": 795,
+            "span_end": 828,
+            "span_text": "R.J. was buried ,under the pieces",
+            "input_text": "R.J.",
+            "turn_id": 7
+          },
+          {
+            "span_start": 864,
+            "span_end": 906,
+            "span_text": "Quickly, he hurried to Joel to shield him.",
+            "input_text": "Joel",
+            "turn_id": 8
+          },
+          {
+            "span_start": 906,
+            "span_end": 944,
+            "span_text": " Glass, wood, and plaster ( ) hit them",
+            "input_text": "Glass, wood, and plaster",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1653,
+            "span_end": 1677,
+            "span_text": "R.J. was not hurt badly.",
+            "input_text": "no",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1697,
+            "span_end": 1726,
+            "span_text": "Eppes was hurt most seriously",
+            "input_text": "Eppes",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1273,
+            "span_end": 1339,
+            "span_text": " It was R.J., guided home by the light of his father's flashlight.",
+            "input_text": "the light of his father's flashlight.",
+            "turn_id": 12
+          }
+        ],
+        "2": [
+          {
+            "span_start": 0,
+            "span_end": 71,
+            "span_text": "Thunder was coming when Reginald Eppes woke up at five in the morning. ",
+            "input_text": "five in the morning",
+            "turn_id": 1
+          },
+          {
+            "span_start": 71,
+            "span_end": 103,
+            "span_text": "He checked the weather forecast.",
+            "input_text": "the weather forecast",
+            "turn_id": 2
+          },
+          {
+            "span_start": 104,
+            "span_end": 131,
+            "span_text": "A violent storm was coming ",
+            "input_text": "Yes",
+            "turn_id": 3
+          },
+          {
+            "span_start": 193,
+            "span_end": 217,
+            "span_text": "But Eppes, a firefighter",
+            "input_text": "a firefighter",
+            "turn_id": 4
+          },
+          {
+            "span_start": 396,
+            "span_end": 463,
+            "span_text": "The moment he turned the flashlight on. The house lights went off. ",
+            "input_text": "Yes",
+            "turn_id": 5
+          },
+          {
+            "span_start": 396,
+            "span_end": 462,
+            "span_text": "The moment he turned the flashlight on. The house lights went off.",
+            "input_text": "flashlight",
+            "turn_id": 6
+          },
+          {
+            "span_start": 771,
+            "span_end": 830,
+            "span_text": "The roof was torn down. R.J. was buried ,under the pieces. ",
+            "input_text": "R.J.",
+            "turn_id": 7
+          },
+          {
+            "span_start": 873,
+            "span_end": 907,
+            "span_text": "he hurried to Joel to shield him. ",
+            "input_text": "Joel",
+            "turn_id": 8
+          },
+          {
+            "span_start": 907,
+            "span_end": 945,
+            "span_text": "Glass, wood, and plaster ( ) hit them.",
+            "input_text": "Glass, wood, and plaster",
+            "turn_id": 9
+          },
+          {
+            "span_start": 1653,
+            "span_end": 1678,
+            "span_text": "R.J. was not hurt badly. ",
+            "input_text": "No",
+            "turn_id": 10
+          },
+          {
+            "span_start": 1697,
+            "span_end": 1727,
+            "span_text": "Eppes was hurt most seriously.",
+            "input_text": "Eppes",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1273,
+            "span_end": 1340,
+            "span_text": " It was R.J., guided home by the light of his father's flashlight. ",
+            "input_text": "his father's flashlight",
+            "turn_id": 12
+          }
+        ]
+      },
+      "name": "high18372.txt"
+    },
+    {
+      "source": "cnn",
+      "id": "3h8dhmccw9bthwa0epswnh4as77kdu",
+      "filename": "cnn_ec2934ac6c759bcb8c875ed119d155310d29f8aa.story",
+      "story": "(CNN) -- FBI agents on Friday night searched the Maryland home of the suspect in the recent disappearance of an American woman in Aruba, an agent said. \n\nThe search is occurring in the Gaithersburg residence of Gary Giordano, who is currently being held in an Aruban jail, FBI Special Agent Rich Wolf told CNN. \n\nAgents, wearing vests that said FBI and carrying empty cardboard and plastic boxes, arrived about 8:40 p.m. Friday. About 15 unmarked cars could be seen on the street, as well as a Montgomery County police vehicle. \n\nSupervisory Special Agent Philip Celestini, who was at the residence, declined to comment further on the search, citing the active investigation. \n\nAruban Solicitor General Taco Stein said earlier Friday that the suspect will appear in court Monday, where an investigating magistrate could order him held for at least eight more days, order him to remain on the island or release him outright due to a lack of evidence. \n\nGiordano was arrested by Aruban police on August 5, three days after Robyn Gardner was last seen near Baby Beach on the western tip of the Caribbean island. \n\nGiordano told authorities that he had been snorkeling with Gardner when he signaled to her to swim back, according to a statement. When he reached the beach, Gardner was nowhere to be found, Giordano allegedly said. \n\nThe area that Giordano led authorities to is a rocky, unsightly location that locals say is not a popular snorkeling spot. \n\nAlthough prosecutors have continued to identify the 50-year-old American man by his initials, GVG, they also released a photo of a man who appears to be Giordano. His attorney, Michael Lopez, also has said that his client is being held as a suspect in Gardner's death. Lopez has not returned telephone calls seeking comment. ",
+      "questions": [
+        {
+          "input_text": "Whose house was searched?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "In what city?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "County?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "State?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "Where is he now?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "Why?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "What organization is doing the search?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "How many unmarked vehicles were there?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "Who spoke for the Aruban government?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "When will Giordano go to court?",
+          "turn_id": 10
+        },
+        {
+          "input_text": "How many days could he be held?",
+          "turn_id": 11
+        },
+        {
+          "input_text": "Who went missing?",
+          "turn_id": 12
+        },
+        {
+          "input_text": "Where?",
+          "turn_id": 13
+        },
+        {
+          "input_text": "What was she doing?",
+          "turn_id": 14
+        },
+        {
+          "input_text": "With whom?",
+          "turn_id": 15
+        },
+        {
+          "input_text": "Did she return safely?",
+          "turn_id": 16
+        },
+        {
+          "input_text": "Is the beach a good snorkeling place?",
+          "turn_id": 17
+        },
+        {
+          "input_text": "How old is he?",
+          "turn_id": 18
+        },
+        {
+          "input_text": "When was he arrested?",
+          "turn_id": 19
+        },
+        {
+          "input_text": "How many were snorkeling?",
+          "turn_id": 20
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 211,
+          "span_end": 224,
+          "span_text": "Gary Giordano",
+          "input_text": "Gary Giordano",
+          "turn_id": 1
+        },
+        {
+          "span_start": 184,
+          "span_end": 197,
+          "span_text": " Gaithersburg",
+          "input_text": "Gaithersburg",
+          "turn_id": 2
+        },
+        {
+          "span_start": 494,
+          "span_end": 511,
+          "span_text": "Montgomery County",
+          "input_text": "Montgomery County",
+          "turn_id": 3
+        },
+        {
+          "span_start": 48,
+          "span_end": 57,
+          "span_text": " Maryland",
+          "input_text": "Maryland",
+          "turn_id": 4
+        },
+        {
+          "span_start": 260,
+          "span_end": 271,
+          "span_text": "Aruban jail",
+          "input_text": "Aruban jail",
+          "turn_id": 5
+        },
+        {
+          "span_start": 70,
+          "span_end": 126,
+          "span_text": "suspect in the recent disappearance of an American woman",
+          "input_text": "suspect in the recent disappearance of an American woman",
+          "turn_id": 6
+        },
+        {
+          "span_start": 345,
+          "span_end": 348,
+          "span_text": "FBI",
+          "input_text": "FBI",
+          "turn_id": 7
+        },
+        {
+          "span_start": 435,
+          "span_end": 437,
+          "span_text": "15",
+          "input_text": "15",
+          "turn_id": 8
+        },
+        {
+          "span_start": 678,
+          "span_end": 713,
+          "span_text": "Aruban Solicitor General Taco Stein",
+          "input_text": "Aruban Solicitor General Taco Stein",
+          "turn_id": 9
+        },
+        {
+          "span_start": 772,
+          "span_end": 778,
+          "span_text": "Monday",
+          "input_text": "Monday",
+          "turn_id": 10
+        },
+        {
+          "span_start": 839,
+          "span_end": 863,
+          "span_text": "at least eight more days",
+          "input_text": "at least eight more days",
+          "turn_id": 11
+        },
+        {
+          "span_start": 1021,
+          "span_end": 1033,
+          "span_text": "Robyn Gardne",
+          "input_text": "Robyn Gardne",
+          "turn_id": 12
+        },
+        {
+          "span_start": 1040,
+          "span_end": 1064,
+          "span_text": "ast seen near Baby Beach",
+          "input_text": "ast seen near Baby Beach",
+          "turn_id": 13
+        },
+        {
+          "span_start": 1154,
+          "span_end": 1164,
+          "span_text": "snorkeling",
+          "input_text": "snorkeling",
+          "turn_id": 14
+        },
+        {
+          "span_start": 1111,
+          "span_end": 1119,
+          "span_text": "Giordano",
+          "input_text": "Giordano",
+          "turn_id": 15
+        },
+        {
+          "span_start": 1269,
+          "span_end": 1300,
+          "span_text": "Gardner was nowhere to be found",
+          "input_text": "No, Gardner was nowhere to be found",
+          "turn_id": 16
+        },
+        {
+          "span_start": 1407,
+          "span_end": 1452,
+          "span_text": "locals say is not a popular snorkeling spot. ",
+          "input_text": "locals say is not a popular snorkeling spot.",
+          "turn_id": 17
+        },
+        {
+          "span_start": 1506,
+          "span_end": 1508,
+          "span_text": "50",
+          "input_text": "50",
+          "turn_id": 18
+        },
+        {
+          "span_start": 993,
+          "span_end": 1002,
+          "span_text": " August 5",
+          "input_text": "August 5",
+          "turn_id": 19
+        },
+        {
+          "span_start": 1111,
+          "span_end": 1177,
+          "span_text": "Giordano told authorities that he had been snorkeling with Gardner",
+          "input_text": "2, Giordano told authorities that he had been snorkeling with Gardner",
+          "turn_id": 20
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 36,
+            "span_end": 77,
+            "span_text": "searched the Maryland home of the suspect",
+            "input_text": "the suspect",
+            "turn_id": 1
+          },
+          {
+            "span_start": 181,
+            "span_end": 224,
+            "span_text": "the Gaithersburg residence of Gary Giordano",
+            "input_text": "Gaithersburg",
+            "turn_id": 2
+          },
+          {
+            "span_start": 491,
+            "span_end": 526,
+            "span_text": " a Montgomery County police vehicle",
+            "input_text": "Montgomery",
+            "turn_id": 3
+          },
+          {
+            "span_start": 45,
+            "span_end": 77,
+            "span_text": "the Maryland home of the suspect",
+            "input_text": "Maryland",
+            "turn_id": 4
+          },
+          {
+            "span_start": 211,
+            "span_end": 271,
+            "span_text": "Gary Giordano, who is currently being held in an Aruban jail",
+            "input_text": "Aruban jail",
+            "turn_id": 5
+          },
+          {
+            "span_start": 66,
+            "span_end": 135,
+            "span_text": "the suspect in the recent disappearance of an American woman in Aruba",
+            "input_text": "he is the suspect in the disappearance of an American woman",
+            "turn_id": 6
+          },
+          {
+            "span_start": 9,
+            "span_end": 44,
+            "span_text": "FBI agents on Friday night searched",
+            "input_text": "FBI",
+            "turn_id": 7
+          },
+          {
+            "span_start": 429,
+            "span_end": 451,
+            "span_text": "About 15 unmarked cars",
+            "input_text": "About 15",
+            "turn_id": 8
+          },
+          {
+            "span_start": 678,
+            "span_end": 713,
+            "span_text": "Aruban Solicitor General Taco Stein",
+            "input_text": "Taco Stein",
+            "turn_id": 9
+          },
+          {
+            "span_start": 739,
+            "span_end": 778,
+            "span_text": "the suspect will appear in court Monday",
+            "input_text": "Monday",
+            "turn_id": 10
+          },
+          {
+            "span_start": 829,
+            "span_end": 863,
+            "span_text": " held for at least eight more days",
+            "input_text": "at least eight more days",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1004,
+            "span_end": 1048,
+            "span_text": "three days after Robyn Gardner was last seen",
+            "input_text": "Robyn Gardner",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1039,
+            "span_end": 1064,
+            "span_text": "last seen near Baby Beach",
+            "input_text": "near Baby Beach",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1142,
+            "span_end": 1177,
+            "span_text": "he had been snorkeling with Gardner",
+            "input_text": "snorkeling",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1177,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner",
+            "input_text": "Giordano",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1268,
+            "span_end": 1300,
+            "span_text": " Gardner was nowhere to be found",
+            "input_text": "no",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1383,
+            "span_end": 1452,
+            "span_text": "unsightly location that locals say is not a popular snorkeling spot. ",
+            "input_text": "no",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1493,
+            "span_end": 1552,
+            "span_text": "identify the 50-year-old American man by his initials, GVG,",
+            "input_text": "50",
+            "turn_id": 18
+          },
+          {
+            "span_start": 952,
+            "span_end": 1002,
+            "span_text": "Giordano was arrested by Aruban police on August 5",
+            "input_text": "August 5",
+            "turn_id": 19
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1177,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner",
+            "input_text": "Two",
+            "turn_id": 20
+          }
+        ],
+        "1": [
+          {
+            "span_start": 211,
+            "span_end": 224,
+            "span_text": "Gary Giordano",
+            "input_text": "Gary Giordano",
+            "turn_id": 1
+          },
+          {
+            "span_start": 48,
+            "span_end": 57,
+            "span_text": " Maryland",
+            "input_text": "Maryland",
+            "turn_id": 2
+          },
+          {
+            "span_start": 185,
+            "span_end": 197,
+            "span_text": "Gaithersburg",
+            "input_text": "Gaithersburg",
+            "turn_id": 3
+          },
+          {
+            "span_start": 49,
+            "span_end": 58,
+            "span_text": "Maryland ",
+            "input_text": "Maryland",
+            "turn_id": 4
+          },
+          {
+            "span_start": 260,
+            "span_end": 265,
+            "span_text": "Aruba",
+            "input_text": "Aruba",
+            "turn_id": 5
+          },
+          {
+            "span_start": 70,
+            "span_end": 126,
+            "span_text": "suspect in the recent disappearance of an American woman",
+            "input_text": "suspect in the recent disappearance of an American woman",
+            "turn_id": 6
+          },
+          {
+            "span_start": 9,
+            "span_end": 12,
+            "span_text": "FBI",
+            "input_text": "FBI",
+            "turn_id": 7
+          },
+          {
+            "span_start": 435,
+            "span_end": 437,
+            "span_text": "15",
+            "input_text": "15",
+            "turn_id": 8
+          },
+          {
+            "span_start": 685,
+            "span_end": 702,
+            "span_text": "Solicitor General",
+            "input_text": "Solicitor General",
+            "turn_id": 9
+          },
+          {
+            "span_start": 772,
+            "span_end": 778,
+            "span_text": "Monday",
+            "input_text": "on Monday",
+            "turn_id": 10
+          },
+          {
+            "span_start": 839,
+            "span_end": 863,
+            "span_text": "at least eight more days",
+            "input_text": "at least eight more days",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1021,
+            "span_end": 1035,
+            "span_text": "Robyn Gardner ",
+            "input_text": "Robyn Gardner",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1049,
+            "span_end": 1064,
+            "span_text": "near Baby Beach",
+            "input_text": "near Baby Beach",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1154,
+            "span_end": 1164,
+            "span_text": "snorkeling",
+            "input_text": "snorkeling",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1119,
+            "span_text": "Giordano",
+            "input_text": "Giordano",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1281,
+            "span_end": 1300,
+            "span_text": "nowhere to be found",
+            "input_text": "no",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1421,
+            "span_end": 1450,
+            "span_text": "not a popular snorkeling spot",
+            "input_text": "no",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1506,
+            "span_end": 1517,
+            "span_text": "50-year-old",
+            "input_text": "50-year-old",
+            "turn_id": 18
+          },
+          {
+            "span_start": 991,
+            "span_end": 1002,
+            "span_text": "on August 5",
+            "input_text": "on August 5",
+            "turn_id": 19
+          },
+          {
+            "span_start": 1141,
+            "span_end": 1177,
+            "span_text": " he had been snorkeling with Gardner",
+            "input_text": "Two",
+            "turn_id": 20
+          }
+        ],
+        "2": [
+          {
+            "span_start": 154,
+            "span_end": 224,
+            "span_text": "The search is occurring in the Gaithersburg residence of Gary Giordano",
+            "input_text": "Gary Giordano",
+            "turn_id": 1
+          },
+          {
+            "span_start": 154,
+            "span_end": 224,
+            "span_text": "The search is occurring in the Gaithersburg residence of Gary Giordano",
+            "input_text": "Gaithersburg",
+            "turn_id": 2
+          },
+          {
+            "span_start": 429,
+            "span_end": 527,
+            "span_text": "About 15 unmarked cars could be seen on the street, as well as a Montgomery County police vehicle.",
+            "input_text": "Montgomery County",
+            "turn_id": 3
+          },
+          {
+            "span_start": 36,
+            "span_end": 62,
+            "span_text": "searched the Maryland home",
+            "input_text": "Maryland",
+            "turn_id": 4
+          },
+          {
+            "span_start": 211,
+            "span_end": 271,
+            "span_text": "Gary Giordano, who is currently being held in an Aruban jail",
+            "input_text": "an Aruban jail",
+            "turn_id": 5
+          },
+          {
+            "span_start": 66,
+            "span_end": 126,
+            "span_text": "the suspect in the recent disappearance of an American woman",
+            "input_text": "he is a suspect in the recent disappearance of an American woman",
+            "turn_id": 6
+          },
+          {
+            "span_start": 8,
+            "span_end": 63,
+            "span_text": " FBI agents on Friday night searched the Maryland home ",
+            "input_text": "FBI",
+            "turn_id": 7
+          },
+          {
+            "span_start": 429,
+            "span_end": 452,
+            "span_text": "About 15 unmarked cars ",
+            "input_text": "15",
+            "turn_id": 8
+          },
+          {
+            "span_start": 678,
+            "span_end": 713,
+            "span_text": "Aruban Solicitor General Taco Stein",
+            "input_text": "Taco Stein",
+            "turn_id": 9
+          },
+          {
+            "span_start": 678,
+            "span_end": 779,
+            "span_text": "Aruban Solicitor General Taco Stein said earlier Friday that the suspect will appear in court Monday,",
+            "input_text": "Monday",
+            "turn_id": 10
+          },
+          {
+            "span_start": 780,
+            "span_end": 863,
+            "span_text": "where an investigating magistrate could order him held for at least eight more days",
+            "input_text": "eight more days",
+            "turn_id": 11
+          },
+          {
+            "span_start": 1004,
+            "span_end": 1048,
+            "span_text": "three days after Robyn Gardner was last seen",
+            "input_text": "Robyn Gardner",
+            "turn_id": 12
+          },
+          {
+            "span_start": 1021,
+            "span_end": 1065,
+            "span_text": "Robyn Gardner was last seen near Baby Beach ",
+            "input_text": "near baby beach",
+            "turn_id": 13
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1178,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner ",
+            "input_text": "snorkeling",
+            "turn_id": 14
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1178,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner ",
+            "input_text": "Giordano",
+            "turn_id": 15
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1327,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner when he signaled to her to swim back, according to a statement. When he reached the beach, Gardner was nowhere to be found, Giordano allegedly said. ",
+            "input_text": "No",
+            "turn_id": 16
+          },
+          {
+            "span_start": 1329,
+            "span_end": 1450,
+            "span_text": "The area that Giordano led authorities to is a rocky, unsightly location that locals say is not a popular snorkeling spot",
+            "input_text": "No",
+            "turn_id": 17
+          },
+          {
+            "span_start": 1454,
+            "span_end": 1530,
+            "span_text": "Although prosecutors have continued to identify the 50-year-old American man",
+            "input_text": "50",
+            "turn_id": 18
+          },
+          {
+            "span_start": 952,
+            "span_end": 1002,
+            "span_text": "Giordano was arrested by Aruban police on August 5",
+            "input_text": "August 5",
+            "turn_id": 19
+          },
+          {
+            "span_start": 1111,
+            "span_end": 1178,
+            "span_text": "Giordano told authorities that he had been snorkeling with Gardner ",
+            "input_text": "Two",
+            "turn_id": 20
+          }
+        ]
+      },
+      "name": "cnn_ec2934ac6c759bcb8c875ed119d155310d29f8aa.story"
+    },
+    {
+      "source": "race",
+      "id": "3tu5zicbrd13b4c4am1dxb2igltq8b",
+      "filename": "middle3330.txt",
+      "story": "Which country grows the most tea? The answer is India. It grows three times as much as China. Which country drinks the most tea? It's neither China nor Japan. It's Great Britain. In the wild, tea plants may be 30 feet tall. But a plant grown for market is pruned. Pruning keeps the plant only three or four feet tall. This is an easy height for tea picking. Only the two top leaves and bud of each new shoot are picked. So to make money, tea plantations must be huge. In general, there are two kinds of tea. Black tea and green tea. Black tea is fermented. In the process, the tea loses nearly all of its healthy qualities. Green tea is steamed right after the leaves are picked. Green tea _ its healthy qualities. For example, it may prevent heart disease. How did we get tea bag? The answer: by accident. Tea merchants used to send samples in tin boxes. This was costly. One merchant thought of a cheaper way. He sent samples in small silk bags. Customers would cut open the bag. They would brew the leaves as usual. One customer put the bag into a pot. Then he just poured hot water over it. And the tea bag was born. Shen Nong was the first to drink tea. (Shen was a Chinese emperor.) This was about 2737 B.C. Shen had bad digestion. So he drank several cups of hot water daily. One day something happened. Leaves from a wild tea tree fell into the hot water pot. The next cup was poured. The water was now colored. Shen sipped it. He liked it. He drank it all. Shen was proud of his new drink. He served it to his guests. Word spread. People thought this way. Tea is good enough for the Emperor. So it must be good enough for the people. Tea became the drink of China.",
+      "questions": [
+        {
+          "input_text": "Which country consumes tea the most?",
+          "turn_id": 1
+        },
+        {
+          "input_text": "Which country grows it the most?",
+          "turn_id": 2
+        },
+        {
+          "input_text": "How tall is the tea plant?",
+          "turn_id": 3
+        },
+        {
+          "input_text": "What did they do to green tea after picking it?",
+          "turn_id": 4
+        },
+        {
+          "input_text": "What good thing do the tea do to the health?",
+          "turn_id": 5
+        },
+        {
+          "input_text": "How was the tea created?",
+          "turn_id": 6
+        },
+        {
+          "input_text": "Who took the tea first?",
+          "turn_id": 7
+        },
+        {
+          "input_text": "When did he take it?",
+          "turn_id": 8
+        },
+        {
+          "input_text": "Was he happy with it?",
+          "turn_id": 9
+        },
+        {
+          "input_text": "How did his body react to the tea?",
+          "turn_id": 10
+        }
+      ],
+      "answers": [
+        {
+          "span_start": 159,
+          "span_end": 177,
+          "span_text": "It's Great Britain",
+          "input_text": "Great Britain",
+          "turn_id": 1
+        },
+        {
+          "span_start": 34,
+          "span_end": 54,
+          "span_text": "The answer is India.",
+          "input_text": "India.",
+          "turn_id": 2
+        },
+        {
+          "span_start": 196,
+          "span_end": 222,
+          "span_text": "plants may be 30 feet tall",
+          "input_text": "may be 30 feet tall",
+          "turn_id": 3
+        },
+        {
+          "span_start": 224,
+          "span_end": 264,
+          "span_text": "But a plant grown for market is pruned. ",
+          "input_text": "prune it",
+          "turn_id": 4
+        },
+        {
+          "span_start": 731,
+          "span_end": 757,
+          "span_text": "may prevent heart disease.",
+          "input_text": "may prevent heart disease.",
+          "turn_id": 5
+        },
+        {
+          "span_start": 794,
+          "span_end": 805,
+          "span_text": "by accident",
+          "input_text": "by accident",
+          "turn_id": 6
+        },
+        {
+          "span_start": 1120,
+          "span_end": 1158,
+          "span_text": " Shen Nong was the first to drink tea.",
+          "input_text": "Shen Nong",
+          "turn_id": 7
+        },
+        {
+          "span_start": 1190,
+          "span_end": 1212,
+          "span_text": "his was about 2737 B.C",
+          "input_text": "about 2737 B.C",
+          "turn_id": 8
+        },
+        {
+          "span_start": 1436,
+          "span_end": 1448,
+          "span_text": "He liked it.",
+          "input_text": "yes",
+          "turn_id": 9
+        },
+        {
+          "span_text": "unknown",
+          "span_start": -1,
+          "span_end": -1,
+          "input_text": "unknown",
+          "turn_id": 10
+        }
+      ],
+      "additional_answers": {
+        "0": [
+          {
+            "span_start": 94,
+            "span_end": 177,
+            "span_text": "Which country drinks the most tea? It's neither China nor Japan. It's Great Britain",
+            "input_text": "Great Britain",
+            "turn_id": 1
+          },
+          {
+            "span_start": 0,
+            "span_end": 53,
+            "span_text": "Which country grows the most tea? The answer is India",
+            "input_text": "India",
+            "turn_id": 2
+          },
+          {
+            "span_start": 192,
+            "span_end": 222,
+            "span_text": "tea plants may be 30 feet tall",
+            "input_text": "30 feet tall.",
+            "turn_id": 3
+          },
+          {
+            "span_start": 624,
+            "span_end": 678,
+            "span_text": "Green tea is steamed right after the leaves are picked",
+            "input_text": "They steam it.",
+            "turn_id": 4
+          },
+          {
+            "span_start": 727,
+            "span_end": 756,
+            "span_text": " it may prevent heart disease",
+            "input_text": "It may prevent heart disease.",
+            "turn_id": 5
+          },
+          {
+            "span_start": 1310,
+            "span_end": 1366,
+            "span_text": " Leaves from a wild tea tree fell into the hot water pot",
+            "input_text": "Leaves from a wild tea tree fell into a hot water pot.",
+            "turn_id": 6
+          },
+          {
+            "span_start": 1121,
+            "span_end": 1157,
+            "span_text": "Shen Nong was the first to drink tea",
+            "input_text": "Shen Nong.",
+            "turn_id": 7
+          },
+          {
+            "span_start": 1189,
+            "span_end": 1213,
+            "span_text": "This was about 2737 B.C.",
+            "input_text": "About 2737 B.C.",
+            "turn_id": 8
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1448,
+            "span_text": "He liked it.",
+            "input_text": "Yes.",
+            "turn_id": 9
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 10
+          }
+        ],
+        "1": [
+          {
+            "span_start": 0,
+            "span_end": 53,
+            "span_text": "Which country grows the most tea? The answer is India",
+            "input_text": "India",
+            "turn_id": 1
+          },
+          {
+            "span_start": 0,
+            "span_end": 54,
+            "span_text": "Which country grows the most tea? The answer is India.",
+            "input_text": "India.",
+            "turn_id": 2
+          },
+          {
+            "span_start": 179,
+            "span_end": 222,
+            "span_text": "In the wild, tea plants may be 30 feet tall",
+            "input_text": "30 feet tall",
+            "turn_id": 3
+          },
+          {
+            "span_start": 624,
+            "span_end": 680,
+            "span_text": "Green tea is steamed right after the leaves are picked. ",
+            "input_text": "Steam it",
+            "turn_id": 4
+          },
+          {
+            "span_start": 715,
+            "span_end": 756,
+            "span_text": "For example, it may prevent heart disease",
+            "input_text": "Prevent heart disease",
+            "turn_id": 5
+          },
+          {
+            "span_start": 757,
+            "span_end": 807,
+            "span_text": " How did we get tea bag? The answer: by accident. ",
+            "input_text": "By accident.",
+            "turn_id": 6
+          },
+          {
+            "span_start": 1121,
+            "span_end": 1157,
+            "span_text": "Shen Nong was the first to drink tea",
+            "input_text": "Shen Nong",
+            "turn_id": 7
+          },
+          {
+            "span_start": 1189,
+            "span_end": 1213,
+            "span_text": "This was about 2737 B.C.",
+            "input_text": "About 2737 B.C.",
+            "turn_id": 8
+          },
+          {
+            "span_start": 1420,
+            "span_end": 1447,
+            "span_text": "Shen sipped it. He liked it",
+            "input_text": "Yes",
+            "turn_id": 9
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 10
+          }
+        ],
+        "2": [
+          {
+            "span_start": 94,
+            "span_end": 177,
+            "span_text": "Which country drinks the most tea? It's neither China nor Japan. It's Great Britain",
+            "input_text": "Great Britain",
+            "turn_id": 1
+          },
+          {
+            "span_start": 0,
+            "span_end": 53,
+            "span_text": "Which country grows the most tea? The answer is India",
+            "input_text": "India",
+            "turn_id": 2
+          },
+          {
+            "span_start": 179,
+            "span_end": 222,
+            "span_text": "In the wild, tea plants may be 30 feet tall",
+            "input_text": "30 feet tall",
+            "turn_id": 3
+          },
+          {
+            "span_start": 624,
+            "span_end": 678,
+            "span_text": "Green tea is steamed right after the leaves are picked",
+            "input_text": "steam it",
+            "turn_id": 4
+          },
+          {
+            "span_start": 681,
+            "span_end": 756,
+            "span_text": "reen tea _ its healthy qualities. For example, it may prevent heart disease",
+            "input_text": "may prevent heart disease",
+            "turn_id": 5
+          },
+          {
+            "span_start": 1311,
+            "span_end": 1366,
+            "span_text": "Leaves from a wild tea tree fell into the hot water pot",
+            "input_text": "Leaves fell into the hot water",
+            "turn_id": 6
+          },
+          {
+            "span_start": 1311,
+            "span_end": 1434,
+            "span_text": "Leaves from a wild tea tree fell into the hot water pot. The next cup was poured. The water was now colored. Shen sipped it",
+            "input_text": "Shen",
+            "turn_id": 7
+          },
+          {
+            "span_start": 1121,
+            "span_end": 1212,
+            "span_text": "Shen Nong was the first to drink tea. (Shen was a Chinese emperor.) This was about 2737 B.C",
+            "input_text": "about 2737 B.C",
+            "turn_id": 8
+          },
+          {
+            "span_start": 1436,
+            "span_end": 1447,
+            "span_text": "He liked it",
+            "input_text": "yes",
+            "turn_id": 9
+          },
+          {
+            "span_text": "unknown",
+            "span_start": -1,
+            "span_end": -1,
+            "input_text": "unknown",
+            "turn_id": 10
+          }
+        ]
+      },
+      "name": "middle3330.txt"
+    } ]}
