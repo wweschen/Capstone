@@ -124,7 +124,7 @@ class PGNetDecoderModel(tf.keras.layers.Layer):
         inputs = tf_utils.pack_inputs([enc_states, answer_ids, answer_mask])
         return super(PGNetDecoderModel, self).__call__(inputs, **kwargs)
 
-    def call(self, inputs, mode="pgnet"):
+    def call(self, inputs ):
         unpacked_inputs = tf_utils.unpack_inputs(inputs)
 
         enc_states = unpacked_inputs[0]
@@ -134,26 +134,23 @@ class PGNetDecoderModel(tf.keras.layers.Layer):
         emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(answer_ids,
                                                                        axis=1)]  # list length max_dec_steps containing shape (batch_size, emb_size)
 
-        self._enc_states = enc_states
-
-        self._dec_in_state = None
 
         #prev_coverage = self.prev_coverage if self.config.mode == "decode" and self.config.use_coverage else None
 
-        decoder_outputs, self._dec_out_state, self.attn_dists, self.p_gens, self.coverage = self.decoder(
+        decoder_outputs,  dec_out_state,  attn_dists,  p_gens,  coverage = self.decoder(
             emb_dec_inputs,
-            self._dec_in_state,
-            self._enc_states,
+            None,
+            enc_states,
             dec_mask )
 
         vocab_dists = self.output_projector(decoder_outputs)
 
         if self.config.use_pointer_gen:
-            final_dists = self.final_distribution(vocab_dists, self.attn_dists)
+            final_dists = self.final_distribution(vocab_dists,  attn_dists)
         else:  # final distribution is just vocabulary distribution
             final_dists = vocab_dists
 
-        return final_dists,self.attn_dists
+        return final_dists, attn_dists
 
     def get_config(self):
         config = {"config": self.config.to_dict()}
@@ -232,7 +229,7 @@ class PGNetSummaryModel(tf.keras.layers.Layer):
       else:  # final distribution is just vocabulary distribution
           final_dists = vocab_dists
 
-      return  final_dists
+      return  final_dists,self.attn_dists
 
   def get_config(self):
     config = {"config": self.config.to_dict()}
@@ -511,7 +508,7 @@ class AttentionDecoder (tf.keras.layers.Layer):
                 context_vector, attn_dist, _ = self.attention_layer (encoder_state=encoder_states,
                                                                      decoder_state=state,
                                                                      coverage=coverage,
-                                                                           input_mask=enc_padding_mask)  # don't allow coverage to update
+                                                                     input_mask=enc_padding_mask)  # don't allow coverage to update
             else:
                 context_vector, attn_dist, coverage = self.attention_layer(encoder_state=encoder_states,
                                                                            decoder_state=state,

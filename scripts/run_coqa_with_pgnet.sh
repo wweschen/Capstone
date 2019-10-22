@@ -5,8 +5,8 @@ export MODEL_DIR=../outputs/coqa/
 
 
 python ../run_coqa_pgnet.py \
-  --input_meta_data_path=${COQA_DIR}/coqa_meta_data \
-  --train_data_path=${COQA_DIR}/coqa_train.tf_record \
+  --input_meta_data_path=${COQA_DIR}/coqa_pg_meta_data \
+  --train_data_path=${COQA_DIR}/coqa_pg_train.tf_record \
   --predict_file=${COQA_DIR}/coqa-dev-v1.0.sample.json \
   --vocab_file=${BERT_BASE_DIR}/vocab.txt \
   --bert_config_file=$BERT_BASE_DIR/bert_config.json \

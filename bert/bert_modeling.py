@@ -91,10 +91,6 @@ class BertConfig(object):
     return config
 
 
-  def add_from_dict(self, json_object):
-      """Constructs a `BertConfig` from a Python dictionary of parameters."""
-      for (key, value) in six.iteritems(json_object):
-          self.__dict__[key] = value
 
   @classmethod
   def from_json_file(cls, json_file):
@@ -102,6 +98,11 @@ class BertConfig(object):
     with tf.io.gfile.GFile(json_file, "r") as reader:
       text = reader.read()
     return cls.from_dict(json.loads(text))
+
+  def add_from_dict(self, json_object):
+      """add more to this instance of BertConfig from a Python dictionary of parameters."""
+      for (key, value) in six.iteritems(json_object):
+          self.__dict__[key] = value
 
   def to_dict(self):
     """Serializes this instance to a Python dictionary."""

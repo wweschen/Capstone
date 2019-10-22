@@ -81,7 +81,6 @@ def coqa_loss_fn( final_dists,
                   target_words_ids,
                   dec_padding_mask,
                   loss_factor=1.0):
-    """Returns sparse categorical crossentropy for start/end logits."""
 
     # Calculate the loss per step
     # This is fiddly; we use tf.gather_nd to pick out the probabilities of the gold target words
@@ -185,7 +184,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     with strategy.scope():
       # Prediction always uses float32, even if training uses mixed precision.
       #tf.keras.mixed_precision.experimental.set_policy('float32')
-      coqa_model, _ = bert_models.coqa_model(
+      coqa_model, _ = pgnet_models.coqa_model(
           bert_config, input_meta_data['max_seq_length'], float_type=tf.float32)
 
     checkpoint_path = tf.train.latest_checkpoint(FLAGS.model_dir)

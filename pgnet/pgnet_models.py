@@ -11,6 +11,7 @@ import tensorflow_hub as hub
 from modeling import tf_utils
 import pgnet.pgnet_modeling as modeling
 import bert.bert_modeling as bert_modeling
+import bert.bert_models as bert_models
 
 
 
@@ -88,13 +89,60 @@ def coqa_model(bert_config, max_seq_length,max_answer_length, float_type, initia
   # has dimensionality (batch_size, sequence_length, num_hidden).
   sequence_output = core_model.outputs[1]
 
+  #
+  # if initializer is None:
+  #   initializer = tf.keras.initializers.TruncatedNormal(
+  #       stddev=bert_config.initializer_range)
+  # coqa_logits_layer = bert_models.BertCoqaLogitsLayer(
+  #     initializer=initializer, float_type=float_type, name='coqa_logits')
+  # start_logits, end_logits = coqa_logits_layer(sequence_output)
+  #
+  # #figure out the span text from the start logits and end_logits here.
+  # #span_text_ids,span_mask=get_best_span_prediction(input_word_ids, start_logits, end_logits )
+  #
+  # pgnet_model_layer = bert_modeling.PGNetSummaryModel(config=bert_config, float_type=float_type, name=name)
+  # final_dists, attn_dists = pgnet_model_layer(span_text_ids, answer_ids, answer_mask)
+  # coqa = tf.keras.Model(
+  #     inputs=[
+  #         span_text_ids,
+  #         span_mask,
+  #         answer_ids,
+  #         answer_mask],
+  #     outputs=[final_dists, attn_dists,start_logits, end_logits ])
+  #
   coqa= modeling.get_pgnet_model(
                                  input_states=sequence_output,
                                  answer_ids=answer_ids,
                                  answer_mask=answer_mask,
-                                 config=bert_config)
+                                 config=bert_config,
+                                 name='coqa_model',
+                                 float_type=float_type)
 
   return coqa, core_model
+
+def get_best_span_prediction(ids,start_logits, end_logits):
+    _, starts = tf.nn.top_k(start_logits, k=1)
+    _, ends = tf.nn.top_k(end_logits, k=1)
+
+    spanarray = []
+    maskarray = []
+
+    starts = tf.unstack(starts, axis=0)
+    ends = tf.unstack(ends, axis=0)
+    ids = tf.unstack(ids, axis=0)
+    batch_size = len(ids)
+    str_len = len(ids[0])
+    for i in range(batch_size):
+        spanarray.append(tf.strided_slice(ids[i], starts[i], ends[i] + 1))
+        maskarray.append(tf.strided_slice(tf.fill([str_len], 1), starts[i], ends[i] + 1))
+        for j in range(str_len - len(spanarray[i])):
+            spanarray[i] = tf.concat([spanarray[i], [0]], axis=0)
+            maskarray[i] = tf.concat([maskarray[i], [0]], axis=0)
+
+    spans = tf.stack(spanarray, axis=0)
+    masks = tf.stack(maskarray, axis=0)
+
+    return spans,masks
 
 def train_model(pgnet_config,
                    seq_length,
