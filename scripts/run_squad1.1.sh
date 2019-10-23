@@ -9,7 +9,7 @@ export MODEL_DIR=../outputs/squad/
 python ../run_squad.py \
   --input_meta_data_path=${SQUAD_DIR}/squad_${SQUAD_VERSION}_meta_data \
   --train_data_path=${SQUAD_DIR}/squad_${SQUAD_VERSION}_train.tf_record \
-  --predict_file=${SQUAD_DIR}/dev-v1.1.json \
+  --predict_file=${SQUAD_DIR}/dev-v1.1.sample.json \
   --vocab_file=${BERT_BASE_DIR}/vocab.txt \
   --bert_config_file=$BERT_BASE_DIR/bert_config.json \
   --init_checkpoint=$BERT_BASE_DIR/bert_model.ckpt \

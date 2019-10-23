@@ -352,7 +352,8 @@ def run_customized_training_loop(
 
       _run_callbacks_on_batch_begin(current_step)
       # Runs several steps in the host while loop.
-      steps = _steps_to_run(current_step, steps_per_epoch, steps_per_loop)
+      #steps = _steps_to_run(current_step, steps_per_epoch, steps_per_loop)
+      steps=10 #for testing only
 
       if steps == 1:
         # TODO(zongweiz): merge with train_steps once tf.while_loop
