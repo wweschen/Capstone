@@ -59,7 +59,7 @@ def _float_metric_value(metric):
   return metric.result().numpy().astype(float)
 
 
-def _steps_to_run(current_step, steps_per_epoch, steps_per_loop):
+def steps_to_run(current_step, steps_per_epoch, steps_per_loop):
   """Calculates steps to run on device."""
   if steps_per_loop <= 0:
     raise ValueError('steps_per_loop should be positive integer.')
@@ -72,9 +72,9 @@ def _steps_to_run(current_step, steps_per_epoch, steps_per_loop):
     return steps_per_loop
 
 
-def write_txt_summary(training_summary, model_dir):
+def write_txt_summary(training_summary, summary_dir):
   """Writes a summary text file to record stats."""
-  summary_path = os.path.join(model_dir, _SUMMARY_TXT)
+  summary_path = os.path.join(summary_dir, _SUMMARY_TXT)
   with tf.io.gfile.GFile(summary_path, 'wb') as f:
     logging.info('Training Summary: \n%s', str(training_summary))
     f.write(json.dumps(training_summary, indent=4))
@@ -96,7 +96,6 @@ def run_customized_training_loop(
     eval_steps=None,
     metric_fn=None,
     init_checkpoint=None,
-    use_remote_tpu=False,
     custom_callbacks=None,
     run_eagerly=False):
   """Run BERT pretrain model training using low-level API.
@@ -130,7 +129,6 @@ def run_customized_training_loop(
         after every epoch.
       init_checkpoint: Optional checkpoint to load to `sub_model` returned by
         `model_fn`.
-      use_remote_tpu: Ignored, will be removed in the future.
       custom_callbacks: A list of Keras Callbacks objects to run during
         training. More specifically, `on_batch_begin()`, `on_batch_end()`,
         methods are invoked during training.
@@ -145,8 +143,6 @@ def run_customized_training_loop(
         attribute or when required parameters are set to none. (2) eval args are
         not specified correctly. (3) metric_fn must be a callable if specified.
   """
-  # TODO(bfontain): Remove use_remote_tpu once there are no models using it.
-  del use_remote_tpu
 
   if _sentinel is not None:
     raise ValueError('only call `run_customized_training_loop()` '
@@ -207,7 +203,7 @@ def run_customized_training_loop(
           'Checkpoint file %s found and restoring from '
           'initial checkpoint for core model.', init_checkpoint)
       checkpoint = tf.train.Checkpoint(model=sub_model)
-      checkpoint.restore(init_checkpoint).assert_consumed()
+      checkpoint.restore(init_checkpoint).assert_existing_objects_matched()
       logging.info('Loading from checkpoint file completed')
 
     train_loss_metric = tf.keras.metrics.Mean(
@@ -221,13 +217,14 @@ def run_customized_training_loop(
     ]
 
     # Create summary writers
+    summary_dir = os.path.join(model_dir, 'summaries')
     eval_summary_writer = tf.summary.create_file_writer(
-        os.path.join(model_dir, 'summaries/eval'))
+        os.path.join(summary_dir, 'eval'))
     if steps_per_loop >= _MIN_SUMMARY_STEPS:
       # Only writes summary when the stats are collected sufficiently over
       # enough steps.
       train_summary_writer = tf.summary.create_file_writer(
-          os.path.join(model_dir, 'summaries/train'))
+          os.path.join(summary_dir, 'train'))
     else:
       train_summary_writer = None
 
@@ -352,8 +349,7 @@ def run_customized_training_loop(
 
       _run_callbacks_on_batch_begin(current_step)
       # Runs several steps in the host while loop.
-      #steps = _steps_to_run(current_step, steps_per_epoch, steps_per_loop)
-      steps=10 #for testing only
+      steps = steps_to_run(current_step, steps_per_epoch, steps_per_loop)
 
       if steps == 1:
         # TODO(zongweiz): merge with train_steps once tf.while_loop
@@ -416,6 +412,6 @@ def run_customized_training_loop(
           train_metrics[0])
       training_summary['eval_metrics'] = _float_metric_value(eval_metrics[0])
 
-    write_txt_summary(training_summary, model_dir)
+    write_txt_summary(training_summary, summary_dir)
 
     return model

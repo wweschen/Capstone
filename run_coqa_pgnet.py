@@ -70,6 +70,12 @@ flags.DEFINE_integer(
 flags.DEFINE_float('cov_loss_wt', 1.0,
                    'Weight of coverage loss (lambda in the paper). '
                    'If zero, then no incentive to minimize coverage loss.')
+flags.DEFINE_boolean('use_pointer_gen', True,
+                     'If True, use pointer-generator model. If False, use baseline model.')
+
+flags.DEFINE_integer(
+    'max_oov_size', 10,
+    'The maximum number of possible OOV words per input sequence.  ')
 
 common_flags.define_common_bert_flags()
 
@@ -144,7 +150,7 @@ def get_loss_fn(loss_factor=1.0):
   def _loss_fn(labels, model_outputs):
     target_words_ids = labels['answer_ids']
     dec_padding_mask = labels['answer_mask']
-    final_dists, attn_dists = model_outputs
+    unique_ids,final_dists, attn_dists = model_outputs
     return coqa_loss_fn(final_dists,
                         attn_dists,
                         target_words_ids,
@@ -240,6 +246,10 @@ def train_coqa(strategy,
   # add some extra to bert_config
   bert_config.add_from_dict(input_meta_data)
 
+  # add use_pointer_gen
+  bert_config.add_from_dict({"use_pointer_gen":FLAGS.use_pointer_gen})
+  #max_oov_size  let's just add something for now
+  bert_config.add_from_dict({"max_oov_size": FLAGS.max_oov_size})
   epochs = FLAGS.num_train_epochs
   num_train_examples = input_meta_data['train_data_size']
   max_seq_length = input_meta_data['max_seq_length']
@@ -260,6 +270,7 @@ def train_coqa(strategy,
         bert_config,
         max_seq_length,
         max_answer_length,
+        FLAGS.max_oov_size,
         float_type=tf.float16 if use_float16 else tf.float32)
     coqa_model.optimizer = optimization.create_optimizer(
         FLAGS.learning_rate, steps_per_epoch * epochs, warmup_steps)
@@ -389,6 +400,9 @@ def export_coqa(model_export_path, input_meta_data):
 def main(_):
   # Users should always run this script under TF 2.x
   assert tf.version.VERSION.startswith('2.')
+
+  #tf.enable_eager_execution()
+  tf.compat.v1.enable_eager_execution()
 
   with tf.io.gfile.GFile(FLAGS.input_meta_data_path, 'rb') as reader:
     input_meta_data = json.loads(reader.read().decode('utf-8'))

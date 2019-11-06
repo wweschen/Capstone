@@ -348,11 +348,8 @@ class EmbeddingPostprocessor(tf.keras.layers.Layer):
     output = word_embeddings
     if self.use_type_embeddings:
       flat_token_type_ids = tf.reshape(token_type_ids, [-1])
-      one_hot_ids = tf.one_hot(
-          flat_token_type_ids,
-          depth=self.token_type_vocab_size,
-          dtype=self.dtype)
-      token_type_embeddings = tf.matmul(one_hot_ids, self.type_embeddings)
+      token_type_embeddings = tf.gather(self.type_embeddings,
+                                        flat_token_type_ids)
       token_type_embeddings = tf.reshape(token_type_embeddings,
                                          [batch_size, seq_length, width])
       output += token_type_embeddings
@@ -644,12 +641,14 @@ class Dense2DProjection(tf.keras.layers.Layer):
                kernel_initializer=None,
                bias_initializer="zeros",
                activation=None,
+               fp32_activation=False,
                **kwargs):
     super(Dense2DProjection, self).__init__(**kwargs)
     self.output_size = output_size
     self.kernel_initializer = kernel_initializer
     self.bias_initializer = bias_initializer
     self.activation = activation
+    self.fp32_activation = fp32_activation
 
   def build(self, input_shape):
     """Implements build() for the layer."""
@@ -692,6 +691,8 @@ class Dense2DProjection(tf.keras.layers.Layer):
     ret = tf.einsum("abc,cd->abd", inputs, self.kernel)
     ret += self.bias
     if self.activation is not None:
+      if self.dtype == tf.float16 and self.fp32_activation:
+        ret = tf.cast(ret, tf.float32)
       return self.activation(ret)
     return ret
 
@@ -760,7 +761,7 @@ class TransformerBlock(tf.keras.layers.Layer):
         kernel_initializer=get_initializer(self.initializer_range),
         activation=self.intermediate_activation,
         # Uses float32 so that gelu activation is done in float32.
-        dtype=tf.float32,
+        fp32_activation=True,
         name="intermediate")
     self.output_dense = Dense2DProjection(
         output_size=self.hidden_size,
@@ -780,9 +781,9 @@ class TransformerBlock(tf.keras.layers.Layer):
         self.output_layer_norm
     ]
 
-  def __call__(self, input_tensor, attention_mask=None):
+  def __call__(self, input_tensor, attention_mask=None, **kwargs):
     inputs = tf_utils.pack_inputs([input_tensor, attention_mask])
-    return super(TransformerBlock, self).__call__(inputs)
+    return super(TransformerBlock, self).__call__(inputs, **kwargs)
 
   def call(self, inputs):
     """Implements call() for the layer."""
@@ -795,23 +796,16 @@ class TransformerBlock(tf.keras.layers.Layer):
     attention_output = self.attention_dropout(attention_output)
     # Use float32 in keras layer norm and the gelu activation in the
     # intermediate dense layer for numeric stability
-    # TODO(reedwm): These casts are probably unnecessary, as we passed
-    # dtype=tf.float32 to the layer norm constructor, so it will cast its inputs
-    # to float32 automatically. These manual casts additionally do the "+"
-    # operator in float32, but "+" is numerically stable in float16.
-    if self.float_type == tf.float16:
-      input_tensor = tf.cast(input_tensor, tf.float32)
-      attention_output = tf.cast(attention_output, tf.float32)
     attention_output = self.attention_layer_norm(input_tensor +
                                                  attention_output)
+    if self.float_type == tf.float16:
+      attention_output = tf.cast(attention_output, tf.float16)
     intermediate_output = self.intermediate_dense(attention_output)
     if self.float_type == tf.float16:
       intermediate_output = tf.cast(intermediate_output, tf.float16)
     layer_output = self.output_dense(intermediate_output)
     layer_output = self.output_dropout(layer_output)
     # Use float32 in keras layer norm for numeric stability
-    if self.float_type == tf.float16:
-      layer_output = tf.cast(layer_output, tf.float32)
     layer_output = self.output_layer_norm(layer_output + attention_output)
     if self.float_type == tf.float16:
       layer_output = tf.cast(layer_output, tf.float16)
