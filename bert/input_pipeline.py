@@ -49,11 +49,11 @@ def file_based_input_fn_builder(input_file, name_to_features):
     # When `input_file` is a path to a single file or a list
     # containing a single path, disable auto sharding so that
     # same input file is sent to all workers.
-    if isinstance(input_file, str) or len(input_file) == 1:
-      options = tf.data.Options()
-      options.experimental_distribute.auto_shard_policy = (
-          tf.data.experimental.AutoShardPolicy.OFF)
-      d = d.with_options(options)
+    # if isinstance(input_file, str) or len(input_file) == 1:
+    #   options = tf.data.Options()
+    #   options.experimental_distribute.auto_shard_policy = (
+    #       tf.data.experimental.AutoShardPolicy.OFF)
+    #   d = d.with_options(options)
     return d
 
   return input_fn
@@ -248,7 +248,7 @@ def create_coqa_dataset(file_path, seq_length, batch_size, is_training=True):
 
 
 
-def create_coqa_dataset_end2end(file_path, seq_length, batch_size, is_training=True):
+def create_coqa_dataset_end2end(file_path, seq_length,answer_len,batch_size, is_training=True):
   """Creates input dataset from (tf)records files for train/eval."""
   name_to_features = {
       'unique_ids': tf.io.FixedLenFeature([], tf.int64),
@@ -257,19 +257,31 @@ def create_coqa_dataset_end2end(file_path, seq_length, batch_size, is_training=T
       'segment_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
   }
   if is_training:
-    name_to_features['answer_ids'] = tf.io.FixedLenFeature([], tf.int64)
-    name_to_features['answer_mask'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['answer_ids'] = tf.io.FixedLenFeature([answer_len], tf.int64)
+    name_to_features['answer_mask'] = tf.io.FixedLenFeature([answer_len], tf.int64)
+    name_to_features['start_positions'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['end_positions'] = tf.io.FixedLenFeature([], tf.int64)
 
   input_fn = file_based_input_fn_builder(file_path, name_to_features)
   dataset = input_fn()
 
   def _select_data_from_record(record):
-    x, y = {}, {}
-    for name, tensor in record.items():
-      if name in ('answer_ids', 'answer_mask'):
-        y[name] = tensor
-      else:
-        x[name] = tensor
+    x = {
+        'unique_ids':record['unique_ids'],
+        'input_word_ids': record['input_ids'],
+        'input_mask': record['input_mask'],
+        'answer_ids': record['answer_ids'],
+        'answer_mask': record['answer_mask'],
+        'input_type_ids': record['segment_ids'],
+    }
+
+    y = {
+        'answer_ids': record['answer_ids'],
+        'answer_mask': record['answer_mask'],
+        'start_positions': record['start_positions'],
+        'end_positions': record['end_positions'],
+    }
+
     return (x, y)
 
   dataset = dataset.map(_select_data_from_record)

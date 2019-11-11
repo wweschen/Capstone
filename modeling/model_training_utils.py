@@ -215,11 +215,11 @@ def run_customized_training_loop(
         metric.__class__.from_config(metric.get_config())
         for metric in eval_metrics
     ]
-
     # Create summary writers
     summary_dir = os.path.join(model_dir, 'summaries')
     eval_summary_writer = tf.summary.create_file_writer(
         os.path.join(summary_dir, 'eval'))
+
     if steps_per_loop >= _MIN_SUMMARY_STEPS:
       # Only writes summary when the stats are collected sufficiently over
       # enough steps.
@@ -252,7 +252,7 @@ def run_customized_training_loop(
       for metric in train_metrics:
         metric.update_state(labels, model_outputs)
 
-    @tf.function
+    #@tf.function
     def train_steps(iterator, steps):
       """Performs distributed training steps in a loop.
 

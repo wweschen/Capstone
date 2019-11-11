@@ -54,6 +54,27 @@ class PGNetTrainLayer(tf.keras.layers.Layer):
     unpacked_inputs = tf_utils.unpack_inputs(inputs)
 
     return
+
+# class CoqaModel(tf.keras.Model):
+#
+#   def __init__(self,bert_config,float_type,**kwargs):
+#       super(CoqaModel, self).__init__(**kwargs)
+#
+#       self.pgnet_model_layer = modeling.PGNetSummaryModel(config=bert_config,
+#                                                      float_type=float_type,
+#                                                      name='pgnet_summary_model')
+#
+#   def call(self, inputs,**kwargs):
+#       print(inputs)
+#       input_ids, input_mask, answer_ids, answer_mask=inputs
+#       final_dists, attn_dists = self.pgnet_model_layer(input_ids=input_ids,
+#                                                   input_mask=input_mask,
+#                                                   answer_ids=answer_ids,
+#                                                   answer_mask=answer_mask
+#                                                   )
+#       return final_dists, attn_dists
+
+
 def coqa_model(bert_config, max_seq_length,max_answer_length,max_oov_size, float_type, initializer=None):
   """Returns BERT Coqa model along with core BERT model to import weights.
 
@@ -69,7 +90,7 @@ def coqa_model(bert_config, max_seq_length,max_answer_length,max_oov_size, float
   unique_ids = tf.keras.layers.Input(
       shape=(1,), dtype=tf.int32, name='unique_ids')
   input_word_ids = tf.keras.layers.Input(
-      shape=(max_seq_length,), dtype=tf.int32, name='input_ids')
+      shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
   input_mask = tf.keras.layers.Input(
       shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
   input_type_ids = tf.keras.layers.Input(
@@ -95,32 +116,58 @@ def coqa_model(bert_config, max_seq_length,max_answer_length,max_oov_size, float
   if initializer is None:
         initializer = tf.keras.initializers.TruncatedNormal(
         stddev=bert_config.initializer_range)
-  coqa_logits_layer = bert_models.BertCoqaLogitsLayer(
-      initializer=initializer, float_type=float_type, name='coqa_logits')
-  start_logits, end_logits = coqa_logits_layer(sequence_output)
 
-  #figure out the span text from the start logits and end_logits here.
-  span_text_ids,span_mask=get_best_span_prediction(input_word_ids, start_logits, end_logits,max_seq_length )
+  #
+  # Double headed- trained on both span positions and final answer
+  #
+  # coqa_logits_layer = bert_models.BertCoqaLogitsLayer(
+  #     initializer=initializer, float_type=float_type, name='coqa_logits')
+  # start_logits, end_logits = coqa_logits_layer(sequence_output)
+  #
+  # #figure out the span text from the start logits and end_logits here.
+  # span_text_ids,span_mask=get_best_span_prediction(input_word_ids, start_logits, end_logits,max_seq_length )
+  #
+  # pgnet_model_layer =modeling.PGNetSummaryModel(config=bert_config ,
+  #                                                 float_type=float_type,
+  #                                                name='pgnet_summary_model')
+  # final_dists, attn_dists = pgnet_model_layer(  span_text_ids,
+  #                                               span_mask,
+  #                                               answer_ids,
+  #                                               answer_mask
+  #                                             )
+  # coqa = tf.keras.Model(
+  #     inputs=[
+  #         unique_ids,
+  #         answer_ids,
+  #         answer_mask ],
+  #     outputs=[final_dists, attn_dists,start_logits, end_logits ])
+
+  #PGNet only: end to end - question+context to answer
 
   pgnet_model_layer =modeling.PGNetSummaryModel(config=bert_config ,
                                                   float_type=float_type,
                                                  name='pgnet_summary_model')
-  final_dists, attn_dists = pgnet_model_layer(  span_text_ids,
-                                                span_mask,
+
+  final_dists, attn_dists = pgnet_model_layer(  input_word_ids,
+                                                input_mask,
                                                 answer_ids,
-                                                answer_mask
+                                                answer_mask,
                                               )
   coqa = tf.keras.Model(
-      inputs=[
-          unique_ids,
-          answer_ids,
-          answer_mask ],
-      outputs=[final_dists, attn_dists,start_logits, end_logits ])
+      inputs=({
+         'unique_ids': unique_ids,
+         'input_word_ids': input_word_ids,
+         'input_mask': input_mask,
+         'answer_ids': answer_ids,
+         'answer_mask': answer_mask,
+         'input_type_ids': input_type_ids},),
 
+      outputs=[unique_ids,final_dists, attn_dists ])
 
+  # Bert+PGNet:  end to end
   # pgnet_model_layer = modeling.PGNetDecoderModel(config=bert_config ,
-  #                                                float_type=float_type,
-  #                                                name='pgnet_decoder_model')
+  #                                                  float_type=float_type,
+  #                                                  name='pgnet_decoder_model')
   # final_dists, attn_dists = pgnet_model_layer(sequence_output, answer_ids, answer_mask)
   # coqa = tf.keras.Model(
   #     inputs=[
@@ -383,72 +430,12 @@ class Hypothesis(object):
 #           tf.logging.info('We\'ve been decoding with same checkpoint for %i seconds. Time to load new checkpoint', t1-t0)
 #           _ = util.load_ckpt(self._saver, self._sess)
 #           t0 = time.time()
-#
-# class PGNetTrainLossAndMetricLayer(tf.keras.layers.Layer):
-#     """Returns layer that computes custom loss and metrics for pretraining."""
-#
-#     def __init__(self, pgnet_config, **kwargs):
-#         super(PGNetTrainLossAndMetricLayer, self).__init__(**kwargs)
-#         self.config = copy.deepcopy(pgnet_config)
-#
-#
-#     def __call__(self,
-#                  lm_output,
-#                  sentence_output=None,
-#                  lm_label_ids=None,
-#                  lm_label_weights=None,
-#                  sentence_labels=None):
-#         inputs = tf_utils.pack_inputs([
-#             lm_output, sentence_output, lm_label_ids, lm_label_weights,
-#             sentence_labels
-#         ])
-#         return super(PGNetTrainLossAndMetricLayer, self).__call__(inputs)
-#
-#     def _add_metrics(self, lm_output, lm_labels, lm_label_weights,
-#                      lm_per_example_loss, sentence_output, sentence_labels,
-#                      sentence_per_example_loss):
-#         """Adds metrics."""
-#
-#     def call(self, inputs):
-#         """Implements call() for the layer."""
-#         unpacked_inputs = tf_utils.unpack_inputs(inputs)
-#
-#         if self.config.pointer_gen:
-#             # Calculate the loss per step
-#             # This is fiddly; we use tf.gather_nd to pick out the probabilities of the gold target words
-#             loss_per_step = []  # will be list length max_dec_steps containing shape (batch_size)
-#             batch_nums = tf.range(0, limit=self.config.batch_size)  # shape (batch_size)
-#             for dec_step, dist in enumerate(final_dists):
-#                 targets = self._target_batch[:, dec_step]  # The indices of the target words. shape (batch_size)
-#                 indices = tf.stack((batch_nums, targets), axis=1)  # shape (batch_size, 2)
-#                 gold_probs = tf.gather_nd(dist, indices)  # shape (batch_size). prob of correct words on this step
-#                 losses = -tf.log(gold_probs)
-#                 loss_per_step.append(losses)
-#
-#             # Apply dec_padding_mask and get loss
-#             self._loss = _mask_and_avg(loss_per_step, self._dec_padding_mask)
-#
-#         else:  # baseline model
-#             self._loss = tf.contrib.seq2seq.sequence_loss(tf.stack(vocab_scores, axis=1), self._target_batch,
-#                                                           self._dec_padding_mask)  # this applies softmax internally
-#
-#         tf.summary.scalar('loss', self._loss)
-#
-#         # Calculate coverage loss from the attention distributions
-#         if hps.coverage:
-#             with tf.variable_scope('coverage_loss'):
-#                 self._coverage_loss = _coverage_loss(self.attn_dists, self._dec_padding_mask)
-#                 tf.summary.scalar('coverage_loss', self._coverage_loss)
-#             self._total_loss = self._loss + hps.cov_loss_wt * self._coverage_loss
-#             tf.summary.scalar('total_loss', self._total_loss)
-#
-#
-#
-# def run_beam_search(sess, model, vocab, batch):
+
+# def run_beam_search( model, vocab, batch):
 #   """Performs beam search decoding on the given example.
 #
 #   Args:
-#     sess: a tf.Session
+#
 #     model: a seq2seq model
 #     vocab: Vocabulary object
 #     batch: Batch object that is the same example repeated across the batch
@@ -526,7 +513,7 @@ class Hypothesis(object):
 #
 #   # Return the hypothesis with highest average log prob
 #   return hyps_sorted[0]
-#
+
 
 
 def sort_hyps(hyps):

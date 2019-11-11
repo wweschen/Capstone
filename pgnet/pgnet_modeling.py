@@ -9,6 +9,8 @@ import six
 import tensorflow as tf
 import itertools
 
+from absl import logging
+
 from modeling import tf_utils
 
 def get_initializer(initializer_range=0.02):
@@ -185,54 +187,55 @@ class PGNetSummaryModel(tf.keras.layers.Layer):
         super(PGNetSummaryModel, self).build(unused_input_shapes)
 
     def __call__(self,
-                 input_word_ids,
+                 input_ids,
                  input_mask=None,
                  answer_ids=None,
                  answer_mask=None,
                  **kwargs):
-        inputs = (input_word_ids, input_mask, answer_ids, answer_mask)
+        if type(input_ids) is tuple:
+            inputs=input_ids
+        else:
+            inputs = (input_ids, input_mask, answer_ids, answer_mask)
         return super(PGNetSummaryModel, self).__call__(inputs, **kwargs)
 
     def call(self, inputs, mode="pgnet"):
 
-        input_word_ids = inputs[0]
-        input_mask = inputs[1]
-        answer_ids = inputs[2]
-        answer_mask = inputs[3]
+        input_ids ,input_mask ,answer_ids ,answer_mask = inputs
+        emb_enc_inputs = self.embedding_lookup(input_ids)
+        # tensor with shape (batch_size, max_seq_length, emb_size)
 
-        emb_enc_inputs = self.embedding_lookup(
-            input_word_ids)  # tensor with shape (batch_size, max_seq_length, emb_size)
         emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(answer_ids,
-                                                                       axis=1)]  # list length max_dec_steps containing shape (batch_size, emb_size)
+                                                                       axis=1)]
+        # list length max_dec_steps containing shape (batch_size, emb_size)
 
         enc_outputs, enc_state = self.encoder(emb_enc_inputs, input_mask)
 
-        self._enc_states = enc_outputs
+        _enc_states = enc_outputs
 
-        self._dec_in_state = enc_state
+        _dec_in_state = enc_state
 
-        if mode == "encoder":
-            return (self._enc_states, self._dec_in_state)
+        # if mode == "encoder":
+        #     return (_enc_states, _dec_in_state)
 
         prev_coverage = None  # self.prev_coverage #if self.config.mode == "decode" and self.config.use_coverage  else None
 
-        decoder_outputs, self._dec_out_state, self.attn_dists, self.p_gens, self.coverage = self.decoder(
+        decoder_outputs, _dec_out_state, attn_dists, p_gens, coverage = self.decoder(
             emb_dec_inputs,
-            self._dec_in_state,
-            self._enc_states,
+            _dec_in_state,
+            _enc_states,
             input_mask,
             prev_coverage=prev_coverage)
-        if mode == "decoder":
-            return (decoder_outputs, self._dec_out_state, self.attn_dists, self.p_gens, self.coverage)
+        # if mode == "decoder":
+        #     return (decoder_outputs, _dec_out_state, attn_dists, p_gens, coverage)
 
         vocab_dists = self.output_projector(decoder_outputs)
 
         if self.config.use_pointer_gen:
-            final_dists = self.final_distribution(vocab_dists, self.attn_dists, self.p_gens, input_word_ids)
+            final_dists = self.final_distribution(vocab_dists, attn_dists, p_gens, input_ids)
         else:  # final distribution is just vocabulary distribution
             final_dists = vocab_dists
 
-        return final_dists, self.attn_dists
+        return final_dists, attn_dists
 
     def get_config(self):
         config = {"config": self.config.to_dict()}
@@ -288,16 +291,17 @@ class Encoder(tf.keras.layers.Layer):
                                              return_state=True)
         self.bidirection = tf.keras.layers.Bidirectional(lstm_layer_fw, backward_layer=lstm_layer_bw,
                                                          merge_mode="concat")
+        self.dense = tf.keras.layers.Dense(self.hidden_dim)
 
         self.state_reducer = ReduceStateLayer(self.hidden_dim)
 
         super(Encoder, self).build(unused_input_shapes)
 
     def __call__(self,
-                 input_word_ids,
-                 input_mask=None,
+                 input_ids,
+                 input_mask,
                  **kwargs):
-        inputs = (input_word_ids, input_mask)
+        inputs = (input_ids, input_mask)
         return super(Encoder, self).__call__(inputs, **kwargs)
 
     def call(self, inputs):
@@ -306,21 +310,21 @@ class Encoder(tf.keras.layers.Layer):
         masks = inputs[1]
         masks = tf.expand_dims(masks, axis=2)
 
-        outputs = self.bidirection(input_ids * masks)
+        outputs = self.bidirection(input_ids * tf.cast(masks,dtype=tf.float32))
 
-        encoder_outputs = outputs[0]
+        encoder_outputs = self.dense(outputs[0])
 
-        fw_state_h, fw_state_ch = outputs[1], outputs[2]
-        bw_state_h, bw_state_ch = outputs[3], outputs[4]
+        fw_state_h, fw_state_c = outputs[1], outputs[2]
+        bw_state_h, bw_state_c = outputs[3], outputs[4]
 
-        state = self.state_reducer(fw_state_h, fw_state_ch, bw_state_h, bw_state_ch)
+        state = self.state_reducer(fw_state_h, fw_state_c, bw_state_h, bw_state_c)
 
         return encoder_outputs, state
 
     def compute_output_shape(self, inputShape):
         # calculate shapes from input shape
-        return [[None, self.max_seq_length, 2 * self.hidden_dim],
-                [[None, self.hidden_dim], [None, self.hidden_dim]]]
+        return [tf.TensorShape((None, self.max_seq_length,  self.hidden_dim)),
+                [tf.TensorShape((None, self.hidden_dim)), tf.TensorShape((None, self.hidden_dim))]]
 
 
 class ReduceStateLayer(tf.keras.layers.Layer):
@@ -390,7 +394,7 @@ class OutputProjectionLayer(tf.keras.layers.Layer):
 
         vocab_scores = []  # vocab_scores is the vocabulary distribution before applying softmax. Each entry on the list corresponds to one decoder step
         for i, output in enumerate(decoder_outputs):
-            vocab_scores.append(tf.maxmul(output, self.w)+ self.v)  # apply the linear layer
+            vocab_scores.append(tf.matmul(output, self.w)+ self.v)  # apply the linear layer
 
         vocab_dists = [tf.nn.softmax(s) for s in
                        vocab_scores]
@@ -488,7 +492,7 @@ class AttentionDecoder(tf.keras.layers.Layer):
         self.encoder_layer = tf.keras.layers.Conv2D(filters=self.vector_size, kernel_size=(1, 1), padding="SAME")
         # shape (batch_size,attn_length,1,attention_vec_size)
         self.linear = LinearLayer(self.vector_size)
-        self.linear2 = LinearLayer(self.vector_size)
+        self.linear2 = LinearLayer(1)
         self.attention_layer = AttentionLayer(self.vector_size, self.attention_length, True)
 
     def __call__(self,
@@ -537,7 +541,6 @@ class AttentionDecoder(tf.keras.layers.Layer):
                                                                decoder_state=state,
                                                                coverage=coverage,
                                                                input_mask=enc_padding_mask)
-            print('context_vector:', context_vector)
             # in decode mode, this is what updates the coverage vector
 
         for i, inp in enumerate(decoder_inputs):
@@ -548,7 +551,6 @@ class AttentionDecoder(tf.keras.layers.Layer):
             if input_size is None:
                 raise ValueError("Could not infer input size from input: %s" % inp.name)
 
-            print("[inp] + [context_vector]", [[inp], [context_vector]])
 
             x = self.linear([[inp], [context_vector]])
 
@@ -586,14 +588,6 @@ class AttentionDecoder(tf.keras.layers.Layer):
             coverage = tf.reshape(coverage, [batch_size, -1])
 
         return outputs, state, attn_dists, p_gens, coverage
-    # def compute_output_shape(self,inputShape):
-    #      #calculate shapes from input shape
-    #      return [[None,self.max_seq_length,self.hidden_dim],
-    #              [None,self.hidden_dim],
-    #              [None, self.hidden_dim],
-    #              [None, self.hidden_dim],
-    #              [None, self.hidden_dim],
-    #              ]
 
 
 from modeling import tf_utils
@@ -643,7 +637,6 @@ class AttentionLayer(tf.keras.layers.Layer):
         input_mask = inputs[2]
         coverage = inputs[3]
 
-        print("decoder_states:", decoder_states)
         decoder_features = self.linear_layer([decoder_states])
         decoder_features = tf.expand_dims(tf.expand_dims(decoder_features, 1), 1)
 
@@ -652,7 +645,7 @@ class AttentionLayer(tf.keras.layers.Layer):
         def masked_attention(e):
             """Take softmax of e then apply enc_padding_mask and re-normalize"""
             attn_dist = tf.nn.softmax(e)  # take softmax. shape (batch_size, attn_length)
-            attn_dist *= input_mask  # apply mask
+            attn_dist *= tf.dtypes.cast(input_mask,tf.float32)  # apply mask
             masked_sums = tf.reduce_sum(attn_dist, axis=1)  # shape (batch_size)
             return attn_dist / tf.reshape(masked_sums, [-1, 1])  # re-normalize
 

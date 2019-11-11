@@ -43,7 +43,7 @@ flags.DEFINE_string(
     'Path to file that contains meta data about input '
     'to be used for training and evaluation.')
 # Model training specific flags.
-flags.DEFINE_integer('train_batch_size', 32, 'Total batch size for training.')
+flags.DEFINE_integer('train_batch_size', 1, 'Total batch size for training.')
 # Predict processing related.
 flags.DEFINE_string('predict_file', None,
                     'Prediction data path with train tfrecords.')
@@ -77,6 +77,10 @@ flags.DEFINE_integer(
     'max_oov_size', 10,
     'The maximum number of possible OOV words per input sequence.  ')
 
+flags.DEFINE_integer('batch_size', 4, 'minibatch size')
+flags.DEFINE_integer('beam_size', 1, 'beam size')
+
+
 common_flags.define_common_bert_flags()
 
 FLAGS = flags.FLAGS
@@ -96,7 +100,7 @@ def coqa_loss_fn( final_dists,
         targets = target_words_ids[:,dec_step] # The indices of the target words. shape (batch_size)
         indices = tf.stack( (batch_nums, targets), axis=1) # shape (batch_size, 2)
         gold_probs = tf.gather_nd(dist, indices) # shape (batch_size). prob of correct words on this step
-        losses = -tf.log(gold_probs)
+        losses = -tf.math.log(gold_probs)
         loss_per_step.append(losses)
 
         # Apply dec_padding_mask and get loss
@@ -118,8 +122,8 @@ def _mask_and_avg(values, padding_mask):
   Returns:
     a scalar
   """
-
-  dec_lens = tf.reduce_sum(padding_mask, axis=1) # shape batch_size. float32
+  padding_mask=tf.cast(padding_mask,tf.dtypes.float32)
+  dec_lens = (tf.reduce_sum(padding_mask, axis=1)) # shape batch_size. float32
   values_per_step = [v * padding_mask[:,dec_step] for dec_step,v in enumerate(values)]
   values_per_ex = sum(values_per_step)/dec_lens # shape (batch_size); normalized value for each batch member
   return tf.reduce_mean(values_per_ex) # overall average
@@ -178,10 +182,21 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
   """Make predictions using a Bert-based coqa model."""
   primary_cpu_task = '/job:worker' if FLAGS.tpu else ''
 
+  num_train_examples = input_meta_data['train_data_size']
+  max_seq_length = input_meta_data['max_seq_length']
+  max_answer_length = input_meta_data['max_answer_length']
+
+  # add use_pointer_gen
+  bert_config.add_from_dict({"use_pointer_gen": FLAGS.use_pointer_gen})
+  # max_oov_size  let's just add something for now
+  bert_config.add_from_dict({"max_oov_size": FLAGS.max_oov_size})
+  bert_config.add_from_dict({"max_seq_length": max_seq_length})
+
   with tf.device(primary_cpu_task):
-    predict_dataset = input_pipeline.create_coqa_dataset(
+    predict_dataset = input_pipeline.create_coqa_dataset_end2end(
         predict_tfrecord_path,
         input_meta_data['max_seq_length'],
+        max_answer_length,
         FLAGS.predict_batch_size,
         is_training=False)
     predict_iterator = iter(
@@ -191,7 +206,11 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
       # Prediction always uses float32, even if training uses mixed precision.
       #tf.keras.mixed_precision.experimental.set_policy('float32')
       coqa_model, _ = pgnet_models.coqa_model(
-          bert_config, input_meta_data['max_seq_length'], float_type=tf.float32)
+           bert_config=bert_config,
+          max_seq_length=input_meta_data['max_seq_length'],
+          max_answer_length=input_meta_data['max_answer_length'],
+          max_oov_size= FLAGS.max_oov_size,
+          float_type=tf.float32)
 
     checkpoint_path = tf.train.latest_checkpoint(FLAGS.model_dir)
     logging.info('Restoring checkpoints from %s', checkpoint_path)
@@ -205,11 +224,11 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
       def _replicated_step(inputs):
         """Replicated prediction calculation."""
         x, _ = inputs
-        unique_ids, start_logits, end_logits = coqa_model(x, training=False)
+        unique_ids,final_dists, attn_dists  = coqa_model(x, training=False)
         return dict(
             unique_ids=unique_ids,
-            start_logits=start_logits,
-            end_logits=end_logits)
+            start_logits=final_dists,
+            end_logits=attn_dists)
 
       outputs = strategy.experimental_run_v2(
           _replicated_step, args=(next(iterator),))
@@ -246,14 +265,18 @@ def train_coqa(strategy,
   # add some extra to bert_config
   bert_config.add_from_dict(input_meta_data)
 
+  num_train_examples = input_meta_data['train_data_size']
+  max_seq_length = input_meta_data['max_seq_length']
+  max_answer_length = input_meta_data['max_answer_length']
+
   # add use_pointer_gen
   bert_config.add_from_dict({"use_pointer_gen":FLAGS.use_pointer_gen})
   #max_oov_size  let's just add something for now
   bert_config.add_from_dict({"max_oov_size": FLAGS.max_oov_size})
+  bert_config.add_from_dict({"max_seq_length":max_seq_length})
+
+
   epochs = FLAGS.num_train_epochs
-  num_train_examples = input_meta_data['train_data_size']
-  max_seq_length = input_meta_data['max_seq_length']
-  max_answer_length = input_meta_data['max_answer_length']
 
   steps_per_epoch = int(num_train_examples / FLAGS.train_batch_size)
   warmup_steps = int(epochs * num_train_examples * 0.1 / FLAGS.train_batch_size)
@@ -261,6 +284,7 @@ def train_coqa(strategy,
       input_pipeline.create_coqa_dataset_end2end,
       FLAGS.train_data_path,
       max_seq_length,
+      max_answer_length,
       FLAGS.train_batch_size,
       is_training=True)
 
@@ -319,6 +343,7 @@ def predict_coqa(strategy, input_meta_data):
   doc_stride = input_meta_data['doc_stride']
   max_seq_length=input_meta_data['max_seq_length']
   max_query_length = input_meta_data['max_query_length']
+  max_answer_length= input_meta_data['max_answer_length']
   # Whether data should be in Ver 2.0 format.
 
   eval_examples = coqa_pgnet_lib.read_coqa_examples(
@@ -348,6 +373,7 @@ def predict_coqa(strategy, input_meta_data):
       max_seq_length=max_seq_length,
       doc_stride=doc_stride,
       max_query_length=max_query_length,
+      max_answer_length=max_answer_length,
       is_training=False,
       output_fn=_append_feature  )
   eval_writer.close()
@@ -362,10 +388,9 @@ def predict_coqa(strategy, input_meta_data):
                                          eval_writer.filename, num_steps)
 
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
-  output_nbest_file = os.path.join(FLAGS.model_dir, 'nbest_predictions.json')
   output_null_log_odds_file = os.path.join(FLAGS.model_dir, 'null_odds.json')
 
-  coqa_pgnet_lib.write_predictions(
+  coqa_pgnet_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,
@@ -373,7 +398,6 @@ def predict_coqa(strategy, input_meta_data):
       FLAGS.max_answer_length,
       FLAGS.do_lower_case,
       output_prediction_file,
-      output_nbest_file,
       output_null_log_odds_file )
 
 
@@ -392,7 +416,9 @@ def export_coqa(model_export_path, input_meta_data):
   bert_config = bert_modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
 
   coqa_model, _ = pgnet_models.coqa_model(
-      bert_config, input_meta_data['max_seq_length'], float_type=tf.float32)
+      bert_config,
+      input_meta_data['max_seq_length'],
+      float_type=tf.float32)
   model_saving_utils.export_bert_model(
       model_export_path, model=coqa_model, checkpoint_dir=FLAGS.model_dir)
 
@@ -432,6 +458,9 @@ def main(_):
 if __name__ == '__main__':
   flags.mark_flag_as_required('bert_config_file')
   flags.mark_flag_as_required('model_dir')
+
+  tf.compat.v1.reset_default_graph()
+
   app.run(main)
 
 
