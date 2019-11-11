@@ -176,7 +176,10 @@ class PGNetSummaryModel(tf.keras.layers.Layer):
 
     def build(self, unused_input_shapes):
         """Implements build() for the layer."""
-        self.embedding_lookup = EmbeddingLookup(self.config.vocab_size, self.config.hidden_size)
+        self.embedding_lookup = EmbeddingLookup(self.config.vocab_size,
+                                                self.config.hidden_size,
+                                                dtype=tf.float32,
+                                                )
         self.encoder = Encoder(self.config.hidden_size, self.config.max_seq_length, dynamic=True)
         self.decoder = AttentionDecoder(self.config.hidden_size, self.config.hidden_size,
                                         self.config.max_seq_length, get_initializer())
