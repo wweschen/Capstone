@@ -17,7 +17,7 @@ import tensorflow as tf
 # pylint: disable=unused-import,g-import-not-at-top,redefined-outer-name,reimported
 from modeling import model_training_utils
 from bert import bert_modeling as bert_modeling
-from pgnet import pgnet_models
+from models import coqa_models
 from bert import optimization
 from bert import common_flags
 from bert import input_pipeline
@@ -87,7 +87,6 @@ FLAGS = flags.FLAGS
 
 
 def coqa_loss_fn( final_dists,
-                  #attn_dists,
                   target_words_ids,
                   dec_padding_mask,
                   loss_factor=1.0):
@@ -103,12 +102,10 @@ def coqa_loss_fn( final_dists,
         losses = -tf.math.log(gold_probs)
         loss_per_step.append(losses)
 
-        # Apply dec_padding_mask and get loss
-        _loss = _mask_and_avg(loss_per_step, dec_padding_mask)
+    # Apply dec_padding_mask and get loss
+    _loss = _mask_and_avg(loss_per_step, dec_padding_mask)
 
-    #always use coverage for now
-    #_cov_loss = _coverage_loss( attn_dists, dec_padding_mask)
-    _total_loss = _loss #+ FLAGS.cov_loss_wt *  _cov_loss
+    _total_loss = _loss
 
     return  _total_loss
 
@@ -206,8 +203,8 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     with strategy.scope():
       # Prediction always uses float32, even if training uses mixed precision.
       #tf.keras.mixed_precision.experimental.set_policy('float32')
-      coqa_model, _ = pgnet_models.coqa_model(
-           bert_config=bert_config,
+      coqa_model, _ = coqa_models.coqa_modelseq2seq(
+          config=bert_config,
           max_seq_length=input_meta_data['max_seq_length'],
           max_answer_length=max_answer_length,
           max_oov_size= FLAGS.max_oov_size,
@@ -226,12 +223,9 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
         """Replicated prediction calculation."""
         x, _ = inputs
         unique_ids,final_dists  = coqa_model(x, training=False)
-
-
         return dict(
             unique_ids=unique_ids,
-            start_logits=final_dists,
-            end_logits=attn_dists)
+            final_dists=final_dists )
 
       outputs = strategy.experimental_run_v2(
           _replicated_step, args=(next(iterator),))
@@ -284,7 +278,7 @@ def train_coqa(strategy,
   steps_per_epoch = int(num_train_examples / FLAGS.train_batch_size)
   warmup_steps = int(epochs * num_train_examples * 0.1 / FLAGS.train_batch_size)
   train_input_fn = functools.partial(
-      input_pipeline.create_coqa_dataset_end2end,
+      input_pipeline.create_coqa_dataset_seq2seq,
       FLAGS.train_data_path,
       max_seq_length,
       max_answer_length,
@@ -293,7 +287,7 @@ def train_coqa(strategy,
 
   def _get_coqa_model():
     """Get Squad model and optimizer."""
-    coqa_model, core_model = pgnet_models.coqa_model(
+    coqa_model, core_model  = coqa_models.coqa_modelseq2seq(
         bert_config,
         max_seq_length,
         max_answer_length,
@@ -316,7 +310,7 @@ def train_coqa(strategy,
       # up.
       coqa_model.optimizer = tf.train.experimental.enable_mixed_precision_graph_rewrite(
           coqa_model.optimizer)
-    return coqa_model, core_model
+    return coqa_model,core_model
 
   # The original BERT model does not scale the loss by
   # 1/num_replicas_in_sync. It could be an accident. So, in order to use
@@ -335,7 +329,7 @@ def train_coqa(strategy,
       steps_per_loop=FLAGS.steps_per_loop,
       epochs=epochs,
       train_input_fn=train_input_fn,
-      init_checkpoint=FLAGS.init_checkpoint,
+      init_checkpoint=False, #not using BERT
       run_eagerly=run_eagerly,
       custom_callbacks=custom_callbacks)
 
@@ -418,7 +412,7 @@ def export_coqa(model_export_path, input_meta_data):
     raise ValueError('Export path is not specified: %s' % model_export_path)
   bert_config = bert_modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
 
-  coqa_model, _ = pgnet_models.coqa_model(
+  coqa_model = coqa_models.coqa_model_seq2seq(
       bert_config,
       input_meta_data['max_seq_length'],
       float_type=tf.float32)

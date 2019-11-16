@@ -130,23 +130,6 @@ class PGNetConfig(object):
     """Serializes this instance to a JSON string."""
     return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"
 
-def get_pgnet_model(
-                  input_states,
-                   answer_ids,
-                   answer_mask,
-                   config=None,
-                   name=None,
-                   float_type=tf.float32):
-  """Wraps the core PGNetSummaryModel model as a keras.Model."""
-  pgnet_model_layer = PGNetDecoderModel(config=config, float_type=float_type, name=name)
-  final_dists,attn_dists = pgnet_model_layer(input_states, answer_ids, answer_mask )
-  pgnet_model = tf.keras.Model(
-      inputs=[
-              answer_ids,
-              answer_mask],
-      outputs=[final_dists,attn_dists])
-
-  return pgnet_model
 
 class PGNetDecoderModel(tf.keras.layers.Layer):
     def __init__(self,
@@ -916,9 +899,6 @@ class AttentionDecoder(tf.keras.layers.Layer):
         return outputs, state, attn_dists, p_gens, coverage
 
 
-from modeling import tf_utils
-
-
 class AttentionLayer(tf.keras.layers.Layer):
     def __init__(self, vector_size,
                  use_coverage,
@@ -1084,4 +1064,73 @@ class LinearLayer(tf.keras.layers.Layer):
 
         return res + self.bias
 
+class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
+    def __init__(self,
+                 config, training=True, **kwargs):
+        super(SimpleLSTMSeq2Seq, self).__init__(**kwargs)
+        self.config = config
+        self.training = training
+
+    def build(self, unused_input_shapes):
+
+        self.embedding_lookup = EmbeddingLookup(self.config.vocab_size,
+                                                self.config.hidden_size,
+                                                dtype=tf.float32,
+                                                )
+        self.encoder = tf.keras.layers.LSTM(self.config.hidden_size,return_sequences=True,return_state = True)
+        self.decoder_cell = tf.keras.layers.LSTMCell(self.config.hidden_size)
+        self.output_projector = OutputProjectionLayer(self.config.hidden_size, self.config.vocab_size)
+
+        super(SimpleLSTMSeq2Seq, self).build(unused_input_shapes)
+
+    def __call__(self,
+                 input_ids,
+                 input_mask=None,
+                 answer_ids=None,
+                 answer_mask=None,
+                 **kwargs):
+
+        if type(input_ids) is tuple:
+            inputs = input_ids
+        else:
+            inputs = (input_ids, input_mask, answer_ids, answer_mask)
+        return super(SimpleLSTMSeq2Seq, self).__call__(inputs, **kwargs)
+
+    def call(self, inputs ):
+        # unpacked_inputs = tf_utils.unpack_inputs(inputs)
+        (input_ids, input_mask,answer_ids,answer_mask) =inputs
+        input_mask = tf.expand_dims(input_mask, axis=2)
+
+        emb_enc_inputs = self.embedding_lookup(input_ids)
+
+        emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(answer_ids,
+                                                                       axis=1)]
+        #self.encoder.reset_states()
+        enc_outputs  = self.encoder(emb_enc_inputs,mask=tf.cast(input_mask,dtype=tf.bool))
+
+        states=[enc_outputs[1],enc_outputs[2]]
+
+
+        outputs=[]
+
+        for i, inp in enumerate(emb_dec_inputs):
+
+            if self.training:
+                input = inp
+            if i==0 and not self.training:
+                input = inp
+
+            cell_output, states = self.decoder_cell(input, states)
+            if not self.training:
+                input = cell_output  #feed back the previous step prediction
+
+            outputs.append(cell_output)
+
+        vocab_dists = self.output_projector(outputs)
+
+        return vocab_dists
+
+    # def compute_output_shape(self, inputShape):
+    #     # calculate shapes from input shape
+    #     return [tf.TensorShape((None, self.config.max_answer_length , self.config.vocab_size))]
 

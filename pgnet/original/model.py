@@ -418,7 +418,7 @@ class SummarizationModel(object):
 
     to_return = {
       "ids": self._topk_ids,
-      "probs": self._topk_log_probs,
+      "probs": self._topk_log_pro
       "states": self._dec_out_state,
       "attn_dists": self.attn_dists
     }

@@ -246,7 +246,51 @@ def create_coqa_dataset(file_path, seq_length, batch_size, is_training=True):
   dataset = dataset.prefetch(1024)
   return dataset
 
+def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_training=True):
+    name_to_features = {
+        'unique_ids': tf.io.FixedLenFeature([], tf.int64),
+        'input_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
+        'input_mask': tf.io.FixedLenFeature([seq_length], tf.int64),
+        'answer_ids': tf.io.FixedLenFeature([answer_len], tf.int64),
+        'answer_mask': tf.io.FixedLenFeature([answer_len], tf.int64),
+    }
 
+    input_fn = file_based_input_fn_builder(file_path, name_to_features)
+    dataset = input_fn()
+
+    def _select_data_from_record(record):
+        x, y = {}, {}
+        x = {
+            'unique_ids': record['unique_ids'],
+            'input_word_ids': record['input_ids'],
+            'input_mask': record['input_mask'],
+            'answer_ids': record['answer_ids'],
+            'answer_mask': record['answer_mask'],
+        }
+
+        for name, tensor in record.items():
+            if name in ('answer_mask', 'answer_ids'):
+                y[name] = tensor
+
+        return (x, y)
+
+    dataset = dataset.map(_select_data_from_record)
+
+    if is_training:
+        dataset = dataset.shuffle(100)
+        dataset = dataset.repeat()
+    else:
+        # we need decode one example at a time
+        batch_size=1
+        # bso we duplicate the example cross the batch to allow beam search
+        # dup = []
+        # for d in dataset:
+        #     dup.extend([d] * batch_size)
+        # dataset = tf.data.Dataset.from_tensor_slices(dup)
+
+    dataset = dataset.batch(batch_size, drop_remainder=True)
+    dataset = dataset.prefetch(1024)
+    return dataset
 
 def create_coqa_dataset_end2end(file_path, seq_length,answer_len,batch_size, is_training=True):
   """Creates input dataset from (tf)records files for train/eval."""
@@ -255,10 +299,10 @@ def create_coqa_dataset_end2end(file_path, seq_length,answer_len,batch_size, is_
       'input_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
       'input_mask': tf.io.FixedLenFeature([seq_length], tf.int64),
       'segment_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
+      'answer_ids': tf.io.FixedLenFeature([answer_len], tf.int64),
+      'answer_mask': tf.io.FixedLenFeature([answer_len], tf.int64),
   }
   if is_training:
-    name_to_features['answer_ids'] = tf.io.FixedLenFeature([answer_len], tf.int64)
-    name_to_features['answer_mask'] = tf.io.FixedLenFeature([answer_len], tf.int64)
     name_to_features['start_positions'] = tf.io.FixedLenFeature([], tf.int64)
     name_to_features['end_positions'] = tf.io.FixedLenFeature([], tf.int64)
 
@@ -266,6 +310,7 @@ def create_coqa_dataset_end2end(file_path, seq_length,answer_len,batch_size, is_
   dataset = input_fn()
 
   def _select_data_from_record(record):
+    x, y = {}, {}
     x = {
         'unique_ids':record['unique_ids'],
         'input_word_ids': record['input_ids'],
@@ -275,20 +320,26 @@ def create_coqa_dataset_end2end(file_path, seq_length,answer_len,batch_size, is_
         'input_type_ids': record['segment_ids'],
     }
 
-    y = {
-        'answer_ids': record['answer_ids'],
-        'answer_mask': record['answer_mask'],
-        'start_positions': record['start_positions'],
-        'end_positions': record['end_positions'],
-    }
+    for name, tensor in record.items():
+      if name in ('answer_mask','answer_ids','start_positions', 'end_positions'):
+        y[name] = tensor
 
     return (x, y)
+
+
 
   dataset = dataset.map(_select_data_from_record)
 
   if is_training:
     dataset = dataset.shuffle(100)
     dataset = dataset.repeat()
+  else:
+    #we need decode one example at a time
+    # bso we duplicate the example cross the batch to allow beam search
+    dup=[]
+    for d in dataset:
+        dup.extend([d]*batch_size)
+    dataset = tf.data.Dataset.from_tensor_slices(dup)
 
   dataset = dataset.batch(batch_size, drop_remainder=True)
   dataset = dataset.prefetch(1024)

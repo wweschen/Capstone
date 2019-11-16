@@ -115,12 +115,13 @@ class FeatureWriter(object):
         features["input_ids"] = create_int_feature(feature.input_ids)
         features["input_mask"] = create_int_feature(feature.input_mask)
         features["segment_ids"] = create_int_feature(feature.segment_ids)
+        features["answer_ids"] = create_int_feature(feature.answer_ids)
+        features["answer_mask"] = create_int_feature(feature.answer_mask)
 
         if self.is_training:
             features["start_positions"] = create_int_feature([feature.start_position])
             features["end_positions"] = create_int_feature([feature.end_position])
-            features["answer_ids"] = create_int_feature(feature.answer_ids)
-            features["answer_mask"] = create_int_feature(feature.answer_mask)
+
         tf_example = tf.train.Example(features=tf.train.Features(feature=features))
         self._writer.write(tf_example.SerializeToString())
 
@@ -193,7 +194,7 @@ def read_coqa_examples(input_file, is_training):
                 start_position = -1
                 end_position = -1
                 orig_answer_text = ""
-                gold_answer_text = ""
+                #gold_answer_text = ""
 
             example = CoqaExample(
                 story_id=story_id,
@@ -243,9 +244,14 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
         tok_start_position = None
         tok_end_position = None
         answer_tokens = []
+        answer_tokens.append("[START]")
 
         if is_training:
-            answer_tokens = tokenizer.tokenize(example.gold_answer_text)
+            answer_tokens =answer_tokens+ tokenizer.tokenize(example.gold_answer_text)
+            if len(answer_tokens) > max_answer_length - 1:
+                answer_tokens = answer_tokens[0:max_answer_length - 1]
+            answer_tokens.append("[STOP]")
+
             tok_start_position = orig_to_tok_index[example.start_position]
             if example.end_position < len(example.doc_tokens) - 1:
                 tok_end_position = orig_to_tok_index[example.end_position + 1] - 1
@@ -308,9 +314,11 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             segment_ids.append(1)
 
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
+
             answer_ids = tokenizer.convert_tokens_to_ids(answer_tokens)
-            if len(answer_ids) > max_answer_length:
-                answer_ids = answer_ids[0:max_answer_length]
+
+
+
             # The mask has 1 for real tokens and 0 for padding tokens. Only real
             # tokens are attended to.
             input_mask = [1] * len(input_ids)
@@ -371,6 +379,10 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     "input_mask: %s" % " ".join([str(x) for x in input_mask]))
                 logging.info(
                     "segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
+                logging.info(
+                    "answer_ids: %s" % " ".join([str(x) for x in answer_ids]))
+                logging.info(
+                    "answer_mask: %s" % " ".join([str(x) for x in answer_mask]))
 
                 if is_training:
                     answer_text = " ".join(tokens[start_position:(end_position + 1)])
