@@ -279,9 +279,9 @@ def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_
     if is_training:
         dataset = dataset.shuffle(100)
         dataset = dataset.repeat()
-    else:
+    #else:
         # we need decode one example at a time
-        batch_size=1
+        #batch_size=1
         # bso we duplicate the example cross the batch to allow beam search
         # dup = []
         # for d in dataset:

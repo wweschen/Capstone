@@ -57,7 +57,7 @@ flags.DEFINE_bool(
     'verbose_logging', False,
     'If true, all of the warnings related to data processing will be printed. '
     'A number of warnings are expected for a normal SQuAD evaluation.')
-flags.DEFINE_integer('predict_batch_size', 8,
+flags.DEFINE_integer('predict_batch_size', 1,
                      'Total batch size for prediction.')
 flags.DEFINE_integer(
     'n_best_size', 20,
@@ -164,15 +164,11 @@ def get_loss_fn(loss_factor=1.0):
 
 def get_raw_results(predictions):
   """Converts multi-replica predictions to RawResult."""
-  for unique_ids, start_logits, end_logits in zip(predictions['unique_ids'],
-                                                  predictions['start_logits'],
-                                                  predictions['end_logits']):
-    for values in zip(unique_ids.numpy(), start_logits.numpy(),
-                      end_logits.numpy()):
-      yield coqa_pgnet_lib.RawResult(
-          unique_id=values[0],
-          start_logits=values[1].tolist(),
-          end_logits=values[2].tolist())
+  for unique_id, final_dists  in zip(predictions['unique_ids'],
+                                                  predictions['final_dists'] ):
+      yield coqa_pgnet_lib.RawResultEnd2end(
+          unique_id=unique_id,
+          final_dists=final_dists)
 
 
 def predict_coqa_customized(strategy, input_meta_data, bert_config,
@@ -182,7 +178,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
   num_train_examples = input_meta_data['train_data_size']
   max_seq_length = input_meta_data['max_seq_length']
-  max_answer_length = 1#input_meta_data['max_answer_length']
+  max_answer_length = input_meta_data['max_answer_length']
 
   # add use_pointer_gen
   bert_config.add_from_dict({"use_pointer_gen": FLAGS.use_pointer_gen})
@@ -191,7 +187,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
   bert_config.add_from_dict({"max_seq_length": max_seq_length})
 
   with tf.device(primary_cpu_task):
-    predict_dataset = input_pipeline.create_coqa_dataset_end2end(
+    predict_dataset = input_pipeline.create_coqa_dataset_seq2seq(
         predict_tfrecord_path,
         input_meta_data['max_seq_length'],
         max_answer_length,
@@ -215,6 +211,42 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     checkpoint = tf.train.Checkpoint(model=coqa_model)
     checkpoint.restore(checkpoint_path).expect_partial()
 
+    encoder, decoder = coqa_models.one_step_decoder_model(coqa_model)
+
+    def decode_sequence(x):
+    # Encode the input as state vectors.
+        states_value = encoder.predict(x)
+
+        # Generate empty target sequence of length 1.
+        target_seq = [x.answer_ids[0]]
+
+        # Sampling loop for a batch of sequences
+        # (to simplify, here we assume a batch of size 1).
+        stop_condition = False
+        decoded_sentence = ''
+        tokens=[]
+        while not stop_condition:
+            output_tokens, h, c = decoder( [target_seq] + states_value)
+
+            # get the last token
+            last_token=output_tokens[-1]
+            tokens.append(last_token)
+
+            # Exit condition: either hit max length
+            # or find stop token.
+            if (last_token == 105 or
+                    len(decoded_sentence) > max_answer_length):
+                stop_condition = True
+
+            # Update the target sequence (of length 1).
+            target_seq = [last_token]
+
+            # Update states
+            states_value = [h, c]
+
+        return x[0], decoded_sentence
+
+
     #@tf.function
     def predict_step(iterator):
       """Predicts on distributed devices."""
@@ -222,18 +254,20 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
       def _replicated_step(inputs):
         """Replicated prediction calculation."""
         x, _ = inputs
-        unique_ids,final_dists  = coqa_model(x, training=False)
+        unique_ids,final_dists  = decode_sequence(x)
+        final_dists = tf.stack(final_dists, axis=1)
         return dict(
             unique_ids=unique_ids,
             final_dists=final_dists )
 
       outputs = strategy.experimental_run_v2(
           _replicated_step, args=(next(iterator),))
-      return tf.nest.map_structure(strategy.experimental_local_results, outputs)
+      return outputs
 
     all_results = []
     for _ in range(num_steps):
       predictions = predict_step(predict_iterator)
+
       for result in get_raw_results(predictions):
         all_results.append(result)
       if len(all_results) % 100 == 0:
@@ -340,7 +374,7 @@ def predict_coqa(strategy, input_meta_data):
   doc_stride = input_meta_data['doc_stride']
   max_seq_length=input_meta_data['max_seq_length']
   max_query_length = input_meta_data['max_query_length']
-  max_answer_length= 1#nput_meta_data['max_answer_length']
+  max_answer_length=  input_meta_data['max_answer_length']
   # Whether data should be in Ver 2.0 format.
 
   eval_examples = coqa_pgnet_lib.read_coqa_examples(
@@ -386,16 +420,19 @@ def predict_coqa(strategy, input_meta_data):
 
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
   output_null_log_odds_file = os.path.join(FLAGS.model_dir, 'null_odds.json')
+  StartToken='[START]'
+  StopToken='[STOP]'
 
   coqa_pgnet_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,
-      FLAGS.n_best_size,
-      FLAGS.max_answer_length,
-      FLAGS.do_lower_case,
       output_prediction_file,
-      output_null_log_odds_file )
+      FLAGS.max_answer_length,
+      tokenizer,
+      StartToken,
+      StopToken
+       )
 
 
 def export_coqa(model_export_path, input_meta_data):

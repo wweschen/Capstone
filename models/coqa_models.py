@@ -30,7 +30,7 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
 
     bert_model = tf.keras.models.Model() #BERT model placeholder
      
-    # `Bert Coqa Pgnet Model` only uses the sequnce_output which
+    # `Bert Coqa Pgnet Model` only uses the sequence_output which
     # has dimensionality (batch_size, sequence_length, num_hidden).
     # sequence_output = core_model.outputs[1]
 
@@ -66,7 +66,8 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
     # PGNet only: end to end - question+context to answer
 
     coqa_layer = coqalayers.SimpleLSTMSeq2Seq(config=config,
-                                              training=training)
+                                              training=training,
+                                              name = 'simple_lstm_seq2seq')
 
     final_dists = coqa_layer(input_word_ids,
                              input_mask,
@@ -100,4 +101,42 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
 
     return coqa, bert_model
 
+
+def one_step_decoder_model(model):
+
+    config = model.get_config()
+    #########
+    encoder_inputs = model.input['input_word_ids']
+
+    encoder_outputs, state_h_enc, state_c_enc = model._layers['simple_lstm_seq2seq']._layers['encoder'].output
+
+
+    encoder_states = [state_h_enc, state_c_enc]
+    encoder_model = tf.keras.Model(encoder_inputs, encoder_states)
+
+    ##########
+    #one step decoder
+    decoder_input = tf.keras.layers.Input(shape=(1,), name=' one_decoder_input')
+    decoder_state_input_h = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_h_input')
+    decoder_state_input_c = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_c_input')
+
+    decoder_input_feature = model._layers['simple_lstm_seq2seq']._layers['embedding'](decoder_input)
+    decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+
+    decoder_lstm =model._layers['simple_lstm_seq2seq']._layers['decoder']
+
+    decoder_outputs, decoder_states= decoder_lstm(
+        decoder_input_feature,  decoder_states_inputs)
+
+    projector= model._layers['simple_lstm_seq2seq']._layers['projector']
+
+    decoded_dist = projector(decoder_outputs)
+
+    _, decoded_id = tf.nn.top_k(decoded_dist, 1)
+
+    decoder_model = tf.keras.Model(
+        [decoder_input] + decoder_states_inputs,
+        [decoded_id] + decoder_states)
+
+    return encoder_model, decoder_model
 

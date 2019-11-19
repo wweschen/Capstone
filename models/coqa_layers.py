@@ -1076,10 +1076,11 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
         self.embedding_lookup = EmbeddingLookup(self.config.vocab_size,
                                                 self.config.hidden_size,
                                                 dtype=tf.float32,
+                                                name = "embedding"
                                                 )
-        self.encoder = tf.keras.layers.LSTM(self.config.hidden_size,return_sequences=True,return_state = True)
-        self.decoder_cell = tf.keras.layers.LSTMCell(self.config.hidden_size)
-        self.output_projector = OutputProjectionLayer(self.config.hidden_size, self.config.vocab_size)
+        self.encoder = tf.keras.layers.LSTM(self.config.hidden_size,return_sequences=True,return_state = True,name='encoder')
+        self.decoder_cell = tf.keras.layers.LSTMCell(self.config.hidden_size,name="decoder")
+        self.output_projector = OutputProjectionLayer(self.config.hidden_size, self.config.vocab_size,name="projector")
 
         super(SimpleLSTMSeq2Seq, self).build(unused_input_shapes)
 
@@ -1106,29 +1107,27 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
         emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(answer_ids,
                                                                        axis=1)]
         #self.encoder.reset_states()
-        enc_outputs  = self.encoder(emb_enc_inputs,mask=tf.cast(input_mask,dtype=tf.bool))
+        enc_outputs,state_h,state_c  = self.encoder(emb_enc_inputs,mask=tf.cast(input_mask,dtype=tf.bool))
 
-        states=[enc_outputs[1],enc_outputs[2]]
+        states=[state_h,state_c]
 
 
         outputs=[]
 
-        for i, inp in enumerate(emb_dec_inputs):
+        for i, inp in enumerate(emb_dec_inputs): #this is simply a plain LSTM but we unrolled it.
 
-            if self.training:
-                input = inp
-            if i==0 and not self.training:
-                input = inp
-
-            cell_output, states = self.decoder_cell(input, states)
-            if not self.training:
-                input = cell_output  #feed back the previous step prediction
+            cell_output, states = self.decoder_cell(inp, states)
 
             outputs.append(cell_output)
 
         vocab_dists = self.output_projector(outputs)
 
         return vocab_dists
+
+    def get_config(self):
+        config = {"config": self.config.to_dict()}
+        base_config = super(SimpleLSTMSeq2Seq, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
     # def compute_output_shape(self, inputShape):
     #     # calculate shapes from input shape
