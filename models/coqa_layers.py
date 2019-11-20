@@ -1087,24 +1087,23 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
     def __call__(self,
                  input_ids,
                  input_mask=None,
-                 answer_ids=None,
-                 answer_mask=None,
+                 decode_ids=None,
                  **kwargs):
 
         if type(input_ids) is tuple:
             inputs = input_ids
         else:
-            inputs = (input_ids, input_mask, answer_ids, answer_mask)
+            inputs = (input_ids, input_mask, decode_ids)
         return super(SimpleLSTMSeq2Seq, self).__call__(inputs, **kwargs)
 
     def call(self, inputs ):
         # unpacked_inputs = tf_utils.unpack_inputs(inputs)
-        (input_ids, input_mask,answer_ids,answer_mask) =inputs
+        (input_ids, input_mask,decode_ids) =inputs
         input_mask = tf.expand_dims(input_mask, axis=2)
 
         emb_enc_inputs = self.embedding_lookup(input_ids)
 
-        emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(answer_ids,
+        emb_dec_inputs = [self.embedding_lookup(x) for x in tf.unstack(decode_ids,
                                                                        axis=1)]
         #self.encoder.reset_states()
         enc_outputs,state_h,state_c  = self.encoder(emb_enc_inputs,mask=tf.cast(input_mask,dtype=tf.bool))

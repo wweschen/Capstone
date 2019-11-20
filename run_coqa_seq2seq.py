@@ -94,6 +94,7 @@ def coqa_loss_fn( final_dists,
     # Calculate the loss per step
     # This is fiddly; we use tf.gather_nd to pick out the probabilities of the gold target words
     loss_per_step = [] # will be list length max_dec_steps containing shape (batch_size)
+
     batch_nums = tf.range(0, limit=FLAGS.batch_size) # shape (batch_size)
     for dec_step, dist in enumerate(final_dists):
         targets = target_words_ids[:,dec_step] # The indices of the target words. shape (batch_size)
@@ -150,13 +151,13 @@ def get_loss_fn(loss_factor=1.0):
 
   def _loss_fn(labels, model_outputs):
     target_words_ids = labels['answer_ids']
-    dec_padding_mask = labels['answer_mask']
+    target_words_mask = labels['answer_mask']
     #unique_ids,final_dists, attn_dists = model_outputs
     unique_ids, final_dists  = model_outputs
     return coqa_loss_fn(final_dists,
                         #attn_dists,
                         target_words_ids,
-                        dec_padding_mask,
+                        target_words_mask,
                         loss_factor=loss_factor)
 
   return _loss_fn
@@ -211,21 +212,23 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     checkpoint = tf.train.Checkpoint(model=coqa_model)
     checkpoint.restore(checkpoint_path).expect_partial()
 
-    encoder, decoder = coqa_models.one_step_decoder_model(coqa_model)
+    encoder, decoder = coqa_models.one_step_decoder_model(coqa_model,bert_config)
 
     def decode_sequence(x):
     # Encode the input as state vectors.
-        states_value = encoder.predict(x)
+        states_value = encoder(x['input_word_ids'])
 
         # Generate empty target sequence of length 1.
-        target_seq = [x.answer_ids[0]]
+        target_seq = tf.unstack(x['decode_ids'],axis=1)[0]
 
+        target_seq=tf.expand_dims(target_seq,axis=1)
         # Sampling loop for a batch of sequences
         # (to simplify, here we assume a batch of size 1).
         stop_condition = False
         decoded_sentence = ''
         tokens=[]
         while not stop_condition:
+
             output_tokens, h, c = decoder( [target_seq] + states_value)
 
             # get the last token
@@ -247,7 +250,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
         return x[0], decoded_sentence
 
 
-    #@tf.function
+    @tf.function
     def predict_step(iterator):
       """Predicts on distributed devices."""
 

@@ -23,10 +23,9 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
         shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
     input_type_ids = tf.keras.layers.Input(
         shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
-    answer_ids = tf.keras.layers.Input(
-        shape=(max_answer_length,), dtype=tf.int32, name='answer_ids')
-    answer_mask = tf.keras.layers.Input(
-        shape=(max_answer_length,), dtype=tf.int32, name='answer_mask')
+    decode_ids = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
+
 
     bert_model = tf.keras.models.Model() #BERT model placeholder
      
@@ -71,8 +70,7 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
 
     final_dists = coqa_layer(input_word_ids,
                              input_mask,
-                             answer_ids,
-                             answer_mask,
+                             decode_ids,
                              )
 
     coqa = tf.keras.Model(
@@ -80,8 +78,7 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
                     'unique_ids': unique_ids,
                     'input_word_ids': input_word_ids,
                     'input_mask': input_mask,
-                    'answer_ids': answer_ids,
-                    'answer_mask': answer_mask},),
+                    'decode_ids': decode_ids},),
 
         outputs=[unique_ids, final_dists])
 
@@ -102,13 +99,14 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
     return coqa, bert_model
 
 
-def one_step_decoder_model(model):
+def one_step_decoder_model(model,config):
 
-    config = model.get_config()
     #########
-    encoder_inputs = model.input['input_word_ids']
+    encoder_inputs = model.input[0]['input_word_ids'] #input_word_ids
 
-    encoder_outputs, state_h_enc, state_c_enc = model._layers['simple_lstm_seq2seq']._layers['encoder'].output
+    encoder_input_feature=model._layers[5]._layers[0](encoder_inputs)
+    encoder_outputs, state_h_enc, state_c_enc = model.layers[5]._layers[1](encoder_input_feature)
+    #model._layers['simple_lstm_seq2seq']._layers['encoder'].output
 
 
     encoder_states = [state_h_enc, state_c_enc]
@@ -116,23 +114,26 @@ def one_step_decoder_model(model):
 
     ##########
     #one step decoder
-    decoder_input = tf.keras.layers.Input(shape=(1,), name=' one_decoder_input')
+    decoder_input = tf.keras.layers.Input(shape=(1,), dtype=tf.int32, name='one_decoder_input')
     decoder_state_input_h = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_h_input')
     decoder_state_input_c = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_c_input')
 
-    decoder_input_feature = model._layers['simple_lstm_seq2seq']._layers['embedding'](decoder_input)
+    decoder_input_feature = [model._layers[5]._layers[0](x) for x in tf.unstack(decoder_input,axis=1)]
     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 
-    decoder_lstm =model._layers['simple_lstm_seq2seq']._layers['decoder']
+    decoder_lstm =model.layers[5]._layers[2]
+    #model._layers['simple_lstm_seq2seq']._layers['decoder']
 
     decoder_outputs, decoder_states= decoder_lstm(
-        decoder_input_feature,  decoder_states_inputs)
+        decoder_input_feature[0],  decoder_states_inputs)
 
-    projector= model._layers['simple_lstm_seq2seq']._layers['projector']
+    projector =model.layers[5]._layers[3]
+    #model._layers['simple_lstm_seq2seq']._layers['projector']
 
-    decoded_dist = projector(decoder_outputs)
+    decoded_dist = projector([decoder_outputs])
 
     _, decoded_id = tf.nn.top_k(decoded_dist, 1)
+    #decoded_id=tf.squeeze(decoded_id,axis=0)
 
     decoder_model = tf.keras.Model(
         [decoder_input] + decoder_states_inputs,

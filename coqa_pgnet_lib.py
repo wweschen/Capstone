@@ -74,6 +74,7 @@ class InputFeatures(object):
                  input_mask,
                  segment_ids,
                  answer_ids=None,
+                 decode_ids =None,
                  answer_mask=None,
                  start_position=None,
                  end_position=None):
@@ -87,6 +88,7 @@ class InputFeatures(object):
         self.input_mask = input_mask
         self.segment_ids = segment_ids
         self.answer_ids = answer_ids
+        self.decode_ids =decode_ids
         self.answer_mask = answer_mask
         self.start_position = start_position
         self.end_position = end_position
@@ -115,12 +117,13 @@ class FeatureWriter(object):
         features["input_ids"] = create_int_feature(feature.input_ids)
         features["input_mask"] = create_int_feature(feature.input_mask)
         features["segment_ids"] = create_int_feature(feature.segment_ids)
-        features["answer_ids"] = create_int_feature(feature.answer_ids)
-        features["answer_mask"] = create_int_feature(feature.answer_mask)
+        features["decode_ids"] = create_int_feature(feature.decode_ids)
 
         if self.is_training:
             features["start_positions"] = create_int_feature([feature.start_position])
             features["end_positions"] = create_int_feature([feature.end_position])
+            features["answer_mask"] = create_int_feature(feature.answer_mask)
+            features["answer_ids"] = create_int_feature(feature.answer_ids)
 
         tf_example = tf.train.Example(features=tf.train.Features(feature=features))
         self._writer.write(tf_example.SerializeToString())
@@ -244,13 +247,17 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
         tok_start_position = None
         tok_end_position = None
         answer_tokens = []
-        answer_tokens.append("[START]")
+        decode_tokens =[]
+        decode_tokens.append("[START]")
 
         if is_training:
             answer_tokens =answer_tokens+ tokenizer.tokenize(example.gold_answer_text)
             if len(answer_tokens) > max_answer_length - 1:
                 answer_tokens = answer_tokens[0:max_answer_length - 1]
+
+            decode_tokens = decode_tokens + answer_tokens
             answer_tokens.append("[STOP]")
+
 
             tok_start_position = orig_to_tok_index[example.start_position]
             if example.end_position < len(example.doc_tokens) - 1:
@@ -316,22 +323,25 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
             answer_ids = tokenizer.convert_tokens_to_ids(answer_tokens)
-
+            decode_ids = tokenizer.convert_tokens_to_ids(decode_tokens)
 
 
             # The mask has 1 for real tokens and 0 for padding tokens. Only real
             # tokens are attended to.
             input_mask = [1] * len(input_ids)
             answer_mask = [1] * len(answer_ids)
-
             # Zero-pad up to the sequence length.
             while len(input_ids) < max_seq_length:
                 input_ids.append(0)
                 input_mask.append(0)
                 segment_ids.append(0)
+
             while len(answer_ids) < max_answer_length:
                 answer_ids.append(0)
                 answer_mask.append(0)
+
+            while len(decode_ids) < max_answer_length:
+                decode_ids.append(0)
 
             if len(answer_ids)!=max_answer_length:
                 print("===>", len(answer_ids), max_answer_length)
@@ -341,6 +351,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             assert len(input_mask) == max_seq_length
             assert len(segment_ids) == max_seq_length
             assert len(answer_ids) == max_answer_length
+            assert len(decode_ids) == max_answer_length
+
             assert len(answer_mask) == max_answer_length
 
             start_position = None
@@ -398,7 +410,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     logging.info(
                         "answer_ids: %s" % " ".join([str(x) for x in answer_ids]))
                     logging.info(
-                        "answer_mask: %s" % " ".join([str(x) for x in answer_mask]))
+                        "decode_ids: %s" % " ".join([str(x) for x in decode_ids]))
 
             feature = InputFeatures(
                 unique_id=unique_id,
@@ -411,6 +423,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                 input_mask=input_mask,
                 segment_ids=segment_ids,
                 answer_ids=answer_ids,
+                decode_ids=decode_ids,
                 answer_mask = answer_mask,
                 start_position=start_position,
                 end_position=end_position)
