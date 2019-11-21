@@ -86,9 +86,14 @@ common_flags.define_common_bert_flags()
 FLAGS = flags.FLAGS
 
 
-def coqa_loss_fn( final_dists,
+def coqa_loss_fn_2heads(
+                  final_dists,
                   target_words_ids,
                   dec_padding_mask,
+                  start_positions,
+                  end_positions,
+                  start_logits,
+                  end_logits,
                   loss_factor=1.0):
 
     # Calculate the loss per step
@@ -106,7 +111,15 @@ def coqa_loss_fn( final_dists,
     # Apply dec_padding_mask and get loss
     _loss = _mask_and_avg(loss_per_step, dec_padding_mask)
 
-    _total_loss = _loss
+    start_loss = tf.keras.backend.sparse_categorical_crossentropy(
+        start_positions, start_logits, from_logits=True)
+    end_loss = tf.keras.backend.sparse_categorical_crossentropy(
+        end_positions, end_logits, from_logits=True)
+
+    span_loss = (tf.reduce_mean(start_loss) + tf.reduce_mean(end_loss)) / 2
+    span_loss *= loss_factor
+
+    _total_loss = _loss+span_loss
 
     return  _total_loss
 
@@ -152,12 +165,19 @@ def get_loss_fn(loss_factor=1.0):
   def _loss_fn(labels, model_outputs):
     target_words_ids = labels['answer_ids']
     target_words_mask = labels['answer_mask']
-    #unique_ids,final_dists, attn_dists = model_outputs
-    unique_ids, final_dists  = model_outputs
-    return coqa_loss_fn(final_dists,
-                        #attn_dists,
+
+    start_positions = labels['start_positions']
+    end_positions = labels['end_positions']
+
+    unique_ids, final_dists,start_logits, end_logits= model_outputs
+
+    return coqa_loss_fn_2heads(final_dists,
                         target_words_ids,
                         target_words_mask,
+                        start_positions,
+                        end_positions,
+                        start_logits,
+                        end_logits,
                         loss_factor=loss_factor)
 
   return _loss_fn
@@ -200,7 +220,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     with strategy.scope():
       # Prediction always uses float32, even if training uses mixed precision.
       #tf.keras.mixed_precision.experimental.set_policy('float32')
-      coqa_model, _ = coqa_models.coqa_modelseq2seq(
+      coqa_model, _ = coqa_models.coqa_model_2heads(
           config=bert_config,
           max_seq_length=input_meta_data['max_seq_length'],
           max_answer_length=max_answer_length,
@@ -319,11 +339,10 @@ def train_coqa(strategy,
 
   def _get_coqa_model():
     """Get Squad model and optimizer."""
-    coqa_model, core_model  = coqa_models.coqa_modelseq2seq(
+    coqa_model, core_model  = coqa_models.coqa_model_2heads(
         bert_config,
         max_seq_length,
         max_answer_length,
-        FLAGS.max_oov_size,
         float_type=tf.float16 if use_float16 else tf.float32)
     coqa_model.optimizer = optimization.create_optimizer(
         FLAGS.learning_rate, steps_per_epoch * epochs, warmup_steps)

@@ -192,9 +192,12 @@ def  read_coqa_examples(input_file, is_training):
 
             answer_offset = answer["span_start"]
             answer_length = len(orig_answer_text)
-
-            start_position = char_to_word_offset[answer_offset]
-            end_position = char_to_word_offset[answer_offset + answer_length - 1]
+            if answer_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
+                start_position = 0
+                end_position = 0
+            else:
+                start_position = char_to_word_offset[answer_offset]
+                end_position = char_to_word_offset[answer_offset + answer_length - 1]
 
             history_qas.append('{} {}'.format(question_text, gold_answer_text))
 
@@ -202,7 +205,6 @@ def  read_coqa_examples(input_file, is_training):
             for j in range(i):
                 qa_history_text=qa_history_text + '.' + history_qas[j]
 
-            print(qa_history_text)
 
             if not is_training:
                 start_position = -1
@@ -260,8 +262,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
         tok_start_position = None
         tok_end_position = None
         answer_tokens=[]
-
         if is_training:
+
             answer_tokens = tokenizer.tokenize(example.gold_answer_text)
             tok_start_position = orig_to_tok_index[example.start_position]
             if example.end_position < len(example.doc_tokens) - 1:
@@ -343,7 +345,10 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
 
             start_position = None
             end_position = None
+
+
             if is_training:
+
                 # For training, if our document chunk does not contain an annotation
                 # we throw it out, since there is nothing to predict.
                 doc_start = doc_span.start
@@ -359,6 +364,9 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                     doc_offset = len(query_tokens)  + 2
                     start_position = tok_start_position - doc_start + doc_offset
                     end_position = tok_end_position - doc_start + doc_offset
+                if end_position <0 or start_position<0:
+                    end_position=0
+                    start_position=0
 
             if example_index < 20:
                 logging.info("*** Example ***")

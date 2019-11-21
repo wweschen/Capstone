@@ -252,9 +252,14 @@ def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_
         'input_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
         'input_mask': tf.io.FixedLenFeature([seq_length], tf.int64),
         'decode_ids': tf.io.FixedLenFeature([answer_len], tf.int64),
-        'answer_ids': tf.io.FixedLenFeature([answer_len], tf.int64),
-        'answer_mask': tf.io.FixedLenFeature([answer_len], tf.int64),
+        'segment_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
+
     }
+    if is_training:
+        name_to_features['answer_ids'] = tf.io.FixedLenFeature([answer_len], tf.int64)
+        name_to_features['answer_mask'] = tf.io.FixedLenFeature([answer_len], tf.int64)
+        name_to_features['start_positions'] = tf.io.FixedLenFeature([], tf.int64)
+        name_to_features['end_positions'] = tf.io.FixedLenFeature([], tf.int64)
 
     input_fn = file_based_input_fn_builder(file_path, name_to_features)
     dataset = input_fn()
@@ -264,12 +269,13 @@ def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_
         x = {
             'unique_ids': record['unique_ids'],
             'input_word_ids': record['input_ids'],
+            'input_type_ids':record['segment_ids'],
             'input_mask': record['input_mask'],
             'decode_ids': record['decode_ids'],
         }
 
         for name, tensor in record.items():
-            if name in ('answer_ids','answer_mask'):
+            if name in ('answer_ids','answer_mask','start_positions','end_positions'):
                 y[name] = tensor
 
         return (x, y)

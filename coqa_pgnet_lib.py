@@ -374,7 +374,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     start_position = tok_start_position - doc_start + doc_offset
                     end_position = tok_end_position - doc_start + doc_offset
 
-            if example_index < 20:
+            if example_index < 20 :
                 logging.info("*** Example ***")
                 logging.info("unique_id: %s" % (unique_id))
                 logging.info("example_index: %s" % (example_index))
@@ -513,7 +513,7 @@ RawResult = collections.namedtuple("RawResult",
                                    ["unique_id", "start_logits", "end_logits"])
 
 RawResultEnd2end = collections.namedtuple("RawResult",
-                                   ["unique_id", "final_dists"])
+                                   ["unique_id", "sentence_ids"])
 
 def _get_best_indexes(logits, n_best_size):
     """Get the n-best logits from a list."""
@@ -748,9 +748,7 @@ def write_predictions_end2end(all_examples, all_features, all_results,
 
     unique_id_to_result = {}
     for result in all_results:
-        top_probs, _top_ids = tf.nn.top_k(result.final_dists,1)
-        top_ids = tf.squeeze(tf.stack(_top_ids,axis=-1))
-        unique_id_to_result[result.unique_id.numpy()] = top_ids.numpy().tolist()
+        unique_id_to_result[result.unique_id.numpy()] = result.sentence_ids.numpy()
 
     _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
         "PrelimPrediction",
@@ -767,10 +765,15 @@ def write_predictions_end2end(all_examples, all_features, all_results,
         answers=[]
         for (feature_index, feature) in enumerate(features):
             token_ids = unique_id_to_result[feature.unique_id]
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
+            tokens=[]
             # De-tokenize WordPieces that have been split off.
+            for i in range(len(token_ids)):
+                if token_ids[i] ==tokenizer.convert_tokens_to_ids([StopToken])[0]:
+                    break
+                tokens.append(token_ids[i])
 
-            answer=" ".join(tokens)
+            answer = ' '.join(tokenizer.convert_ids_to_tokens(tokens))
+
             answer = answer.replace(" ##", "")
             answer = answer.replace("##", "")
 
