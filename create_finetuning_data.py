@@ -27,12 +27,12 @@ import tensorflow as tf
 from bert import classifier_data_lib
 import squad_lib
 import coqa_lib
-import coqa_pgnet_lib
+import coqa_end2end_lib
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_enum(
-    "fine_tuning_task_type", "classification", ["classification", "squad","coqa","coqa-pgnet"],
+    "fine_tuning_task_type", "classification", ["classification", "squad","coqa","coqa_end2end"],
     "The name of the BERT fine tuning task for which data "
     "will be generated..")
 
@@ -141,10 +141,10 @@ def generate_coqa_dataset():
       FLAGS.max_seq_length, FLAGS.do_lower_case, FLAGS.max_query_length,
       FLAGS.doc_stride )
 
-def generate_coqa_pgnet_dataset():
+def generate_coqa_end2end_dataset():
   """Generates squad training dataset and returns input meta data."""
   assert FLAGS.data_file
-  return coqa_pgnet_lib.generate_tf_record_from_json_file(
+  return coqa_end2end_lib.generate_tf_record_from_json_file(
       FLAGS.data_file, FLAGS.vocab_file, FLAGS.train_data_output_path,
       FLAGS.max_seq_length, FLAGS.max_answer_length, FLAGS.do_lower_case, FLAGS.max_query_length,
       FLAGS.doc_stride )
@@ -157,8 +157,8 @@ def main(_):
     input_meta_data = generate_squad_dataset()
   elif FLAGS.fine_tuning_task_type == "coqa":
     input_meta_data=generate_coqa_dataset()
-  else:
-      input_meta_data=generate_coqa_pgnet_dataset()
+  elif FLAGS.fine_tuning_task_type == "coqa_end2end":
+      input_meta_data=generate_coqa_end2end_dataset()
 
   with tf.io.gfile.GFile(FLAGS.meta_data_file_path, "w") as writer:
     writer.write(json.dumps(input_meta_data, indent=4) + "\n")

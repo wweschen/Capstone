@@ -182,22 +182,24 @@ def read_coqa_examples(input_file, is_training):
 
             answer_offset = answer["span_start"]
             answer_length = len(orig_answer_text)
-
-            start_position = char_to_word_offset[answer_offset]
-            end_position = char_to_word_offset[answer_offset + answer_length - 1]
+            if answer_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
+                start_position = 0
+                end_position = 0
+            else:
+                start_position = char_to_word_offset[answer_offset]
+                end_position = char_to_word_offset[answer_offset + answer_length - 1]
 
             history_qas.append('{} {}'.format(question_text, gold_answer_text))
 
             for j in range(i):
                 qa_history_text = qa_history_text + '.' + history_qas[j]
 
-            print(qa_history_text)
 
             if not is_training:
                 start_position = -1
                 end_position = -1
                 orig_answer_text = ""
-                #gold_answer_text = ""
+                gold_answer_text = ""
 
             example = CoqaExample(
                 story_id=story_id,
@@ -373,6 +375,9 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     doc_offset = len(query_tokens) + 2
                     start_position = tok_start_position - doc_start + doc_offset
                     end_position = tok_end_position - doc_start + doc_offset
+                if end_position <0 or start_position<0:
+                    end_position=0
+                    start_position=0
 
             if example_index < 20 :
                 logging.info("*** Example ***")

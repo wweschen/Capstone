@@ -22,7 +22,7 @@ from bert import optimization
 from bert import common_flags
 from bert import input_pipeline
 from bert import model_saving_utils
-import coqa_pgnet_lib
+import coqa_end2end_lib
 from bert import tokenization
 from utils.misc import keras_utils
 from utils.misc import tpu_lib
@@ -187,7 +187,7 @@ def get_raw_results(predictions):
   """Converts multi-replica predictions to RawResult."""
   for unique_id, sentence_ids  in zip(predictions['unique_ids'],
                                                   predictions['sentence_ids'] ):
-      yield coqa_pgnet_lib.RawResultEnd2end(
+      yield coqa_end2end_lib.RawResultEnd2end(
           unique_id=unique_id,
           sentence_ids=sentence_ids)
 
@@ -224,7 +224,6 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
           config=bert_config,
           max_seq_length=input_meta_data['max_seq_length'],
           max_answer_length=max_answer_length,
-          max_oov_size= FLAGS.max_oov_size,
           float_type=tf.float32)
 
     checkpoint_path = tf.train.latest_checkpoint(FLAGS.model_dir)
@@ -236,7 +235,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
     def decode_sequence(x):
     # Encode the input as state vectors.
-        states_value = encoder(x['input_word_ids'])
+        states_value = encoder([x['input_word_ids'],x['input_mask'],x['input_type_ids']])
 
         # Generate empty target sequence of length 1.
         target_seq = tf.unstack(x['decode_ids'],axis=1)[0]
@@ -394,14 +393,14 @@ def predict_coqa(strategy, input_meta_data):
   max_answer_length=  input_meta_data['max_answer_length']
   # Whether data should be in Ver 2.0 format.
 
-  eval_examples = coqa_pgnet_lib.read_coqa_examples(
+  eval_examples = coqa_end2end_lib.read_coqa_examples(
       input_file=FLAGS.predict_file,
       is_training=False )
 
   tokenizer = tokenization.FullTokenizer(
       vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
 
-  eval_writer = coqa_pgnet_lib.FeatureWriter(
+  eval_writer = coqa_end2end_lib.FeatureWriter(
       filename=os.path.join(FLAGS.model_dir, 'eval.tf_record'),
       is_training=False)
   eval_features = []
@@ -415,7 +414,7 @@ def predict_coqa(strategy, input_meta_data):
   # of examples must be a multiple of the batch size, or else examples
   # will get dropped. So we pad with fake examples which are ignored
   # later on.
-  dataset_size = coqa_pgnet_lib.convert_examples_to_features(
+  dataset_size = coqa_end2end_lib.convert_examples_to_features(
       examples=eval_examples,
       tokenizer=tokenizer,
       max_seq_length=max_seq_length,
@@ -440,7 +439,7 @@ def predict_coqa(strategy, input_meta_data):
   StartToken='[START]'
   StopToken='[STOP]'
 
-  coqa_pgnet_lib.write_predictions_end2end(
+  coqa_end2end_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,

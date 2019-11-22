@@ -604,38 +604,41 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
     null_start_logit = 0  # the start logit at the slice with min null score
     null_end_logit = 0  # the end logit at the slice with min null score
     for (feature_index, feature) in enumerate(features):
-      result = unique_id_to_result[feature.unique_id]
-      start_indexes = _get_best_indexes(result.start_logits, n_best_size)
-      end_indexes = _get_best_indexes(result.end_logits, n_best_size)
-      # if we could have irrelevant answers, get the min score of irrelevant
+        if feature.unique_id not in unique_id_to_result:
+            logging.info(feature.unique_id,' not found.')
+        if feature.unique_id in unique_id_to_result:
+          result = unique_id_to_result[feature.unique_id]
+          start_indexes = _get_best_indexes(result.start_logits, n_best_size)
+          end_indexes = _get_best_indexes(result.end_logits, n_best_size)
+          # if we could have irrelevant answers, get the min score of irrelevant
 
-      for start_index in start_indexes:
-        for end_index in end_indexes:
-          # We could hypothetically create invalid predictions, e.g., predict
-          # that the start of the span is in the question. We throw out all
-          # invalid predictions.
-          if start_index >= len(feature.tokens):
-            continue
-          if end_index >= len(feature.tokens):
-            continue
-          if start_index not in feature.token_to_orig_map:
-            continue
-          if end_index not in feature.token_to_orig_map:
-            continue
-          if not feature.token_is_max_context.get(start_index, False):
-            continue
-          if end_index < start_index:
-            continue
-          length = end_index - start_index + 1
-          if length > max_answer_length:
-            continue
-          prelim_predictions.append(
-              _PrelimPrediction(
-                  feature_index=feature_index,
-                  start_index=start_index,
-                  end_index=end_index,
-                  start_logit=result.start_logits[start_index],
-                  end_logit=result.end_logits[end_index]))
+          for start_index in start_indexes:
+            for end_index in end_indexes:
+              # We could hypothetically create invalid predictions, e.g., predict
+              # that the start of the span is in the question. We throw out all
+              # invalid predictions.
+              if start_index >= len(feature.tokens):
+                continue
+              if end_index >= len(feature.tokens):
+                continue
+              if start_index not in feature.token_to_orig_map:
+                continue
+              if end_index not in feature.token_to_orig_map:
+                continue
+              if not feature.token_is_max_context.get(start_index, False):
+                continue
+              if end_index < start_index:
+                continue
+              length = end_index - start_index + 1
+              if length > max_answer_length:
+                continue
+              prelim_predictions.append(
+                  _PrelimPrediction(
+                      feature_index=feature_index,
+                      start_index=start_index,
+                      end_index=end_index,
+                      start_logit=result.start_logits[start_index],
+                      end_logit=result.end_logits[end_index]))
 
 
     prelim_predictions = sorted(

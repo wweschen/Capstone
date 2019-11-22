@@ -22,7 +22,7 @@ from bert import optimization
 from bert import common_flags
 from bert import input_pipeline
 from bert import model_saving_utils
-import coqa_pgnet_lib
+import coqa_end2end_lib
 from bert import tokenization
 from utils.misc import keras_utils
 from utils.misc import tpu_lib
@@ -172,7 +172,7 @@ def get_raw_results(predictions):
                                                   predictions['end_logits']):
     for values in zip(unique_ids.numpy(), start_logits.numpy(),
                       end_logits.numpy()):
-      yield coqa_pgnet_lib.RawResult(
+      yield coqa_end2end_lib.RawResult(
           unique_id=values[0],
           start_logits=values[1].tolist(),
           end_logits=values[2].tolist())
@@ -349,14 +349,14 @@ def predict_coqa(strategy, input_meta_data):
   max_answer_length= 1#nput_meta_data['max_answer_length']
   # Whether data should be in Ver 2.0 format.
 
-  eval_examples = coqa_pgnet_lib.read_coqa_examples(
+  eval_examples = coqa_end2end_lib.read_coqa_examples(
       input_file=FLAGS.predict_file,
       is_training=False )
 
   tokenizer = tokenization.FullTokenizer(
       vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
 
-  eval_writer = coqa_pgnet_lib.FeatureWriter(
+  eval_writer = coqa_end2end_lib.FeatureWriter(
       filename=os.path.join(FLAGS.model_dir, 'eval.tf_record'),
       is_training=False)
   eval_features = []
@@ -370,7 +370,7 @@ def predict_coqa(strategy, input_meta_data):
   # of examples must be a multiple of the batch size, or else examples
   # will get dropped. So we pad with fake examples which are ignored
   # later on.
-  dataset_size = coqa_pgnet_lib.convert_examples_to_features(
+  dataset_size = coqa_end2end_lib.convert_examples_to_features(
       examples=eval_examples,
       tokenizer=tokenizer,
       max_seq_length=max_seq_length,
@@ -393,7 +393,7 @@ def predict_coqa(strategy, input_meta_data):
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
   output_null_log_odds_file = os.path.join(FLAGS.model_dir, 'null_odds.json')
 
-  coqa_pgnet_lib.write_predictions_end2end(
+  coqa_end2end_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,

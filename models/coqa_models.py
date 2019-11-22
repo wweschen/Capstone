@@ -200,15 +200,18 @@ def coqa_model_2heads(config, max_seq_length, max_answer_length, float_type, tra
 def one_step_decoder_model(model,config):
 
     #########
-    encoder_inputs = model.input[0]['input_word_ids'] #input_word_ids
+    encoder_inputs1 = model.input[0]['input_word_ids'] #input_word_ids
+    encoder_inputs2 = model.input[0]['input_mask']  # input_word_ids
+    encoder_inputs3 = model.input[0]['input_type_ids']  # input_word_ids
 
-    encoder_input_feature=model._layers[4]._layers[0](encoder_inputs)
-    encoder_outputs, state_h_enc, state_c_enc = model.layers[4]._layers[1](encoder_input_feature)
+
+
+    encoder_outputs, state_h_enc, state_c_enc = model.layers[2704]._layers[1].output
     #model._layers['simple_lstm_seq2seq']._layers['encoder'].output
 
 
     encoder_states = [state_h_enc, state_c_enc]
-    encoder_model = tf.keras.Model(encoder_inputs, encoder_states)
+    encoder_model = tf.keras.Model([encoder_inputs1,encoder_inputs2,encoder_inputs3], encoder_states)
 
     ##########
     #one step decoder
@@ -216,16 +219,16 @@ def one_step_decoder_model(model,config):
     decoder_state_input_h = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_h_input')
     decoder_state_input_c = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_c_input')
 
-    decoder_input_feature = [model._layers[4]._layers[0](x) for x in tf.unstack(decoder_input,axis=1)]
+    decoder_input_feature = [model.layers[2704]._layers[0](x) for x in tf.unstack(decoder_input,axis=1)]
     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 
-    decoder_lstm =model.layers[4]._layers[2]
+    decoder_lstm =model.layers[2704]._layers[2]
     #model._layers['simple_lstm_seq2seq']._layers['decoder']
 
     decoder_outputs, decoder_states= decoder_lstm(
         decoder_input_feature[0],  decoder_states_inputs)
 
-    projector =model.layers[4]._layers[3]
+    projector =model.layers[2704]._layers[3]
     #model._layers['simple_lstm_seq2seq']._layers['projector']
 
     decoded_dist = projector([decoder_outputs])
