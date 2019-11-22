@@ -605,7 +605,7 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
     null_end_logit = 0  # the end logit at the slice with min null score
     for (feature_index, feature) in enumerate(features):
         if feature.unique_id not in unique_id_to_result:
-            logging.info(feature.unique_id,' not found.')
+            logging.info('%s not found.' % (feature.unique_id))
         if feature.unique_id in unique_id_to_result:
           result = unique_id_to_result[feature.unique_id]
           start_indexes = _get_best_indexes(result.start_logits, n_best_size)
