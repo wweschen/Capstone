@@ -361,7 +361,7 @@ def train_coqa(strategy,
       steps_per_loop=FLAGS.steps_per_loop,
       epochs=epochs,
       train_input_fn=train_input_fn,
-      init_checkpoint=FLAGS.init_checkpoint,
+      init_checkpoint= None,#FLAGS.init_checkpoint, here we don't use BERT
       run_eagerly=run_eagerly,
       custom_callbacks=custom_callbacks)
 

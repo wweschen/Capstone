@@ -28,31 +28,33 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
     decode_ids = tf.keras.layers.Input(
         shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
 
-    bert_model = bert_modeling.get_bert_model(
-        input_word_ids,
-        input_mask,
-        input_type_ids,
-        config= config,
-        name='bert_model',
-        float_type=float_type)
+    bert_model = tf.keras.Model()
 
-    # `Bert Coqa Pgnet Model` only uses the sequence_output which
-    # has dimensionality (batch_size, sequence_length, num_hidden).
-    sequence_output = bert_model.outputs[1]
-
-    if initializer is None:
-        initializer = tf.keras.initializers.TruncatedNormal(
-            stddev=config.initializer_range)
-
+    # bert_model = bert_modeling.get_bert_model(
+    #     input_word_ids,
+    #     input_mask,
+    #     input_type_ids,
+    #     config= config,
+    #     name='bert_model',
+    #     float_type=float_type)
     #
-    # Double headed- trained on both span positions and final answer
-
-    coqa_logits_layer = bert_models.BertCoqaLogitsLayer(
-        initializer=initializer, float_type=float_type, name='coqa_logits')
-    start_logits, end_logits = coqa_logits_layer(sequence_output)
-
-    #figure out the span text from the start logits and end_logits here.
-    span_text_ids,span_mask=get_best_span_prediction(input_word_ids, start_logits, end_logits,max_seq_length )
+    # # `Bert Coqa Pgnet Model` only uses the sequence_output which
+    # # has dimensionality (batch_size, sequence_length, num_hidden).
+    # sequence_output = bert_model.outputs[1]
+    #
+    # if initializer is None:
+    #     initializer = tf.keras.initializers.TruncatedNormal(
+    #         stddev=config.initializer_range)
+    #
+    # #
+    # # Double headed- trained on both span positions and final answer
+    #
+    # coqa_logits_layer = bert_models.BertCoqaLogitsLayer(
+    #     initializer=initializer, float_type=float_type, name='coqa_logits')
+    # start_logits, end_logits = coqa_logits_layer(sequence_output)
+    #
+    # #figure out the span text from the start logits and end_logits here.
+    # span_text_ids,span_mask=get_best_span_prediction(input_word_ids, start_logits, end_logits,max_seq_length )
 
     # pgnet_model_layer =modeling.PGNetSummaryModel(config=config ,
     #                                                 float_type=float_type,
@@ -75,8 +77,8 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
                                               training=training,
                                               name = 'simple_lstm_seq2seq')
 
-    final_dists = coqa_layer(span_text_ids,
-                             span_mask,
+    final_dists = coqa_layer(input_word_ids,
+                             input_mask,
                              decode_ids,
                              )
 
@@ -200,18 +202,16 @@ def coqa_model_2heads(config, max_seq_length, max_answer_length, float_type, tra
 def one_step_decoder_model(model,config):
 
     #########
-    encoder_inputs1 = model.input[0]['input_word_ids'] #input_word_ids
-    encoder_inputs2 = model.input[0]['input_mask']  # input_word_ids
-    encoder_inputs3 = model.input[0]['input_type_ids']  # input_word_ids
+    input_word_ids = model.input[0]['input_word_ids'] #input_word_ids
+    input_mask = model.input[0]['input_mask']  # input_word_ids
+    input_type_ids = model.input[0]['input_type_ids']  # input_word_ids
 
 
-
-    encoder_outputs, state_h_enc, state_c_enc = model.layers[2704]._layers[1].output
-    #model._layers['simple_lstm_seq2seq']._layers['encoder'].output
+    encoder_outputs, state_h_enc, state_c_enc = model.get_layer('simple_lstm_seq2seq')._layers[1].output
 
 
     encoder_states = [state_h_enc, state_c_enc]
-    encoder_model = tf.keras.Model([encoder_inputs1,encoder_inputs2,encoder_inputs3], encoder_states)
+    encoder_model = tf.keras.Model([input_word_ids,input_mask,input_type_ids], encoder_states)
 
     ##########
     #one step decoder
@@ -219,17 +219,16 @@ def one_step_decoder_model(model,config):
     decoder_state_input_h = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_h_input')
     decoder_state_input_c = tf.keras.layers.Input(shape=(config.hidden_size,), name='state_c_input')
 
-    decoder_input_feature = [model.layers[2704]._layers[0](x) for x in tf.unstack(decoder_input,axis=1)]
+    decoder_input_feature = [ model.get_layer('simple_lstm_seq2seq')._layers[0](x) for x in tf.unstack(decoder_input,axis=1)]
     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 
-    decoder_lstm =model.layers[2704]._layers[2]
+    decoder_lstm = model.get_layer('simple_lstm_seq2seq')._layers[2]
     #model._layers['simple_lstm_seq2seq']._layers['decoder']
 
     decoder_outputs, decoder_states= decoder_lstm(
         decoder_input_feature[0],  decoder_states_inputs)
 
-    projector =model.layers[2704]._layers[3]
-    #model._layers['simple_lstm_seq2seq']._layers['projector']
+    projector = model.get_layer('simple_lstm_seq2seq')._layers[3]
 
     decoded_dist = projector([decoder_outputs])
 
