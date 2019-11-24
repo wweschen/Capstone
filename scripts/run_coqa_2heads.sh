@@ -4,7 +4,7 @@ export BERT_BASE_DIR=../pretrained/uncased_L-12_H-768_A-12
 export MODEL_DIR=../outputs/coqa/
 
 
-python ../run_coqa_seq2seq.py \
+python ../run_coqa_2heads.py \
   --input_meta_data_path=${COQA_DIR}/coqa_e2e_meta_data \
   --train_data_path=${COQA_DIR}/coqa_e2e_train.tf_record \
   --predict_file=${COQA_DIR}/coqa-dev-v1.0.sample.json \
