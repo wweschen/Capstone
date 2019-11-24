@@ -29,7 +29,8 @@ class CoqaExample(object):
                  orig_answer_text=None,
                  start_position=None,
                  end_position=None,
-                 qa_history_text=None):
+                 qa_history_text=None,
+                 qa_history_marker_text=None):
         self.story_id = story_id
         self.turn_id = turn_id
         self.question_text = question_text
@@ -39,6 +40,7 @@ class CoqaExample(object):
         self.start_position = start_position
         self.end_position = end_position
         self.qa_history_text = qa_history_text
+        self.qa_history_marker_text=qa_history_marker_text
 
     def __str__(self):
         return self.__repr__()
@@ -143,6 +145,12 @@ def read_coqa_examples(input_file, is_training):
             return True
         return False
 
+    def create_marker_string(maker,len):
+        m=[]
+        for i in range(len):
+            m.append(maker)
+        return ''.join(m)
+
     examples = []
 
     # for entry in input_data:
@@ -165,7 +173,11 @@ def read_coqa_examples(input_file, is_training):
                 prev_is_whitespace = False
             char_to_word_offset.append(len(doc_tokens) - 1)
 
-        history_qas = []
+        history_q = []
+        history_a =[]
+        history_q_marker = []
+        history_a_marker = []
+
         for i in range(len(entry["questions"])):
             que = entry["questions"][i]
             turn_id = int(que["turn_id"])
@@ -176,23 +188,29 @@ def read_coqa_examples(input_file, is_training):
             end_position = None
             orig_answer_text = ""
             qa_history_text = ""
+            qa_history_marker_text=""
 
-            orig_answer_text = answer["span_text"]
+            rationale_text = answer["span_text"]
             gold_answer_text = answer["input_text"]
 
-            answer_offset = answer["span_start"]
-            answer_length = len(orig_answer_text)
-            if answer_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
+            rationale_offset = answer["span_start"]
+            rationale_length = len(rationale_text)
+            if rationale_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
                 start_position = 0
                 end_position = 0
             else:
-                start_position = char_to_word_offset[answer_offset]
-                end_position = char_to_word_offset[answer_offset + answer_length - 1]
+                start_position = char_to_word_offset[rationale_offset]
+                end_position = char_to_word_offset[rationale_offset + rationale_length - 1]
 
-            history_qas.append('{} {}'.format(question_text, gold_answer_text))
+            history_q.append(question_text.strip())
+            history_q_marker.append(create_marker_string('Q',len(question_text.strip().split())))
 
-            for j in range(i):
-                qa_history_text = qa_history_text + '.' + history_qas[j]
+            history_a.append(gold_answer_text.strip())
+            history_a_marker.append(create_marker_string('A',len(gold_answer_text.strip().split())))
+
+            for j in range(i): # not include the current question and answers in the training example
+                qa_history_text = qa_history_text + ' ' + history_q[j] +' ' +  history_a[j]
+                qa_history_marker_text = qa_history_marker_text+' '+ history_q_marker[j]+ history_a_marker[j]
 
 
             if not is_training:
@@ -210,12 +228,64 @@ def read_coqa_examples(input_file, is_training):
                 orig_answer_text=orig_answer_text,
                 start_position=start_position,
                 end_position=end_position,
-                qa_history_text=qa_history_text
+                qa_history_text=qa_history_text,
+                qa_history_marker_text=qa_history_marker_text
             )
             examples.append(example)
 
     return examples
 
+
+def reverse_qas(qa_str, marker_str):
+    ques = []
+    ans = []
+
+    qas = []
+    k = 0
+    marks = marker_str.split()
+    qas_str = qa_str.split()
+    for i in range(len(marks)):
+        l = len(marks[i])
+        qas.append(qas_str[k:k + l])
+        k += l
+
+    for ms, qas in zip(marks, qas):
+        q = []
+        a = []
+        for m, qa in zip(ms, qas):
+            if m == 'Q':
+                q.append(qa)
+            if m == 'A':
+                a.append(qa)
+        ques.append(' '.join(q))
+        ans.append(' '.join(a))
+    return ques, ans
+
+def tokenize_qa_history(tokenizer,ques,ans):
+    qas_tokens=[]
+    q_type_ids=[]
+    ans_tokens=[]
+    qa_history_tokens=[]
+    qa_history_type_ids=[]
+
+    for q,a in zip(ques,ans):
+        qas_tokens.append(tokenizer.tokenize(''.join(q)))
+        ans_tokens.append(tokenizer.tokenize(''.join(a)))
+
+    for q, a in zip(qas_tokens,ans_tokens):
+        q_type_ids=[]
+        a_type_ids=[]
+        for i in range(len(q)):
+          q_type_ids.append(2)
+        qa_history_tokens.extend(q)
+        qa_history_type_ids.extend(q_type_ids)
+
+        for i in range(len(a)):
+          a_type_ids.append(3)
+        qa_history_tokens.extend(a)
+        qa_history_type_ids.extend(a_type_ids)
+
+    return  qa_history_tokens,qa_history_type_ids
 
 def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer_length,
                                  doc_stride, max_query_length, is_training,
@@ -224,6 +294,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
     base_id = 1000000000
     unique_id = base_id
+    #token types: 1 - original context words, 0 - current question  2 previous questions 3 - answeers to the previous questions
 
     for (example_index, example) in enumerate(examples):
         query_tokens = tokenizer.tokenize(example.question_text)
@@ -232,9 +303,13 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             query_tokens = query_tokens[0:max_query_length]
 
         max_qa_history = max_query_length - len(query_tokens)
-        qa_history_tokens = tokenizer.tokenize(example.qa_history_text)
+
+        qas,ans = reverse_qas(example.qa_history_text,example.qa_history_marker_text)
+
+        qa_history_tokens, qa_history_type_ids =tokenize_qa_history(tokenizer,qas,ans)
 
         qa_history_tokens = qa_history_tokens[-1 * (len(qa_history_tokens) % max_qa_history):-1]
+        qa_history_type_ids=qa_history_type_ids[-1 * (len(qa_history_tokens) % max_qa_history):-1]
 
         tok_to_orig_index = []
         orig_to_tok_index = []
@@ -296,14 +371,9 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             token_is_max_context = {}
             segment_ids = []
             tokens.append("[CLS]")
-            segment_ids.append(0)
+            segment_ids.append(1)
 
-            for token in query_tokens:
-                tokens.append(token)
-                segment_ids.append(0)
 
-            tokens.append("[SEP]")
-            segment_ids.append(0)
 
             for i in range(doc_span.length):
                 split_token_index = doc_span.start + i
@@ -315,12 +385,22 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                 tokens.append(all_doc_tokens[split_token_index])
                 segment_ids.append(1)
 
-            for token in qa_history_tokens:
-                tokens.append(token)
-                segment_ids.append(1)
-
             tokens.append("[SEP]")
             segment_ids.append(1)
+            if len(qa_history_tokens)>0:
+                for token,t in zip(qa_history_tokens,qa_history_type_ids):
+                    tokens.append(token)
+                    segment_ids.append(t)
+
+                tokens.append("[SEP]")
+                segment_ids.append(segment_ids[-1])
+
+            for token in query_tokens:
+                tokens.append(token)
+                segment_ids.append(0)
+
+            tokens.append("[SEP]")
+            segment_ids.append(0)
 
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
@@ -348,6 +428,9 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             if len(answer_ids)!=max_answer_length:
                 print("===>", len(answer_ids), max_answer_length)
                 print(answer_tokens)
+            if len(input_ids)!=max_seq_length:
+                print("===>", len(input_ids), max_seq_length)
+                print(input_ids)
 
             assert len(input_ids) == max_seq_length
             assert len(input_mask) == max_seq_length
@@ -372,7 +455,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     start_position = 0
                     end_position = 0
                 else:
-                    doc_offset = len(query_tokens) + 2
+                    doc_offset = 1  # we added [CLS] infront of context doc (note we moved query to the end #len(query_tokens) + 2
                     start_position = tok_start_position - doc_start + doc_offset
                     end_position = tok_end_position - doc_start + doc_offset
                 if end_position <0 or start_position<0:

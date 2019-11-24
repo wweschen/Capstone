@@ -216,7 +216,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
     def decode_sequence(x):
     # Encode the input as state vectors.
-        states_value = encoder(x['input_word_ids'])
+        states_value = encoder([x['input_word_ids'],x['input_mask'],x['input_type_ids']])
 
         # Generate empty target sequence of length 1.
         target_seq = tf.unstack(x['decode_ids'],axis=1)[0]

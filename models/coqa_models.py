@@ -79,6 +79,7 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
 
     final_dists = coqa_layer(input_word_ids,
                              input_mask,
+                             input_type_ids,
                              decode_ids,
                              )
 
