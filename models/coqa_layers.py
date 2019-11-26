@@ -1174,10 +1174,13 @@ class SimpleAttentionLayer(tf.keras.layers.Layer):
 
     def __call__(self,
                  decoder_state,
-                 encoder_features,
-                 input_mask,
+                 encoder_features=None,
+                 input_mask=None,
                  **kwargs):
-        inputs = (encoder_features, decoder_state, input_mask)
+        if type(decoder_state) is tuple:
+            inputs = decoder_state
+        else:
+            inputs = (encoder_features, decoder_state, input_mask)
         return super(SimpleAttentionLayer, self).__call__(inputs, **kwargs)
 
     def call(self, inputs):

@@ -216,7 +216,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
     def decode_sequence(x):
     # Encode the input as state vectors.
-        states_value = encoder([x['input_word_ids'],x['input_mask'],x['input_type_ids']])
+        states_value,enc_feature = encoder([x['input_word_ids'],x['input_mask'],x['input_type_ids']])
 
         # Generate empty target sequence of length 1.
         target_seq = tf.unstack(x['decode_ids'],axis=1)[0]
@@ -232,7 +232,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
         results = []
 
         while steps < FLAGS.max_answer_length:
-            output_tokens, h, c = decoder( [target_seq] + states_value)
+            output_tokens, h, c = decoder( [target_seq] + states_value+ [x['input_mask']]+[enc_feature])
             results.append(output_tokens)
 
             target_seq=output_tokens
@@ -460,7 +460,7 @@ def main(_):
   assert tf.version.VERSION.startswith('2.')
 
   #tf.enable_eager_execution()
-  tf.compat.v1.enable_eager_execution()
+  #tf.compat.v1.enable_eager_execution()
 
   with tf.io.gfile.GFile(FLAGS.input_meta_data_path, 'rb') as reader:
     input_meta_data = json.loads(reader.read().decode('utf-8'))

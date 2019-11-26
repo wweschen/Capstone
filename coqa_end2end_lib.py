@@ -852,22 +852,25 @@ def write_predictions_end2end(all_examples, all_features, all_results,
         prelim_predictions = []
         answers=[]
         for (feature_index, feature) in enumerate(features):
-            token_ids = unique_id_to_result[feature.unique_id]
-            tokens=[]
-            # De-tokenize WordPieces that have been split off.
-            for i in range(len(token_ids)):
-                if token_ids[i] ==tokenizer.convert_tokens_to_ids([StopToken])[0]:
-                    break
-                tokens.append(token_ids[i])
+            if feature.unique_id not in unique_id_to_result:
+                logging.info('%s not found.' % (feature.unique_id))
+            if feature.unique_id in unique_id_to_result:
+                token_ids = unique_id_to_result[feature.unique_id]
+                tokens=[]
+                # De-tokenize WordPieces that have been split off.
+                for i in range(len(token_ids)):
+                    if token_ids[i] ==tokenizer.convert_tokens_to_ids([StopToken])[0]:
+                        break
+                    tokens.append(token_ids[i])
 
-            answer = ' '.join(tokenizer.convert_ids_to_tokens(tokens))
+                answer = ' '.join(tokenizer.convert_ids_to_tokens(tokens))
 
-            answer = answer.replace(" ##", "")
-            answer = answer.replace("##", "")
+                answer = answer.replace(" ##", "")
+                answer = answer.replace("##", "")
 
-            # Clean whitespace
-            answer = answer.strip()
-            answers.append( " ".join(answer.split()))
+                # Clean whitespace
+                answer = answer.strip()
+                answers.append( " ".join(answer.split()))
 
         answer_text=" ".join(answers)
 
