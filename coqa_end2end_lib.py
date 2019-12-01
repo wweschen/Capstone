@@ -186,7 +186,7 @@ def read_coqa_examples(input_file, is_training):
             answer = entry['answers'][i]
             start_position = None
             end_position = None
-            orig_answer_text = ""
+            rationale_text = ""
             qa_history_text = ""
             qa_history_marker_text=""
 
@@ -216,7 +216,7 @@ def read_coqa_examples(input_file, is_training):
             if not is_training:
                 start_position = -1
                 end_position = -1
-                orig_answer_text = ""
+                rationale_text = ""
                 gold_answer_text = ""
 
             example = CoqaExample(
@@ -225,7 +225,7 @@ def read_coqa_examples(input_file, is_training):
                 question_text=question_text,
                 doc_tokens=doc_tokens,
                 gold_answer_text=gold_answer_text,
-                orig_answer_text=orig_answer_text,
+                orig_answer_text=rationale_text,
                 start_position=start_position,
                 end_position=end_position,
                 qa_history_text=qa_history_text,
@@ -483,6 +483,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     "answer_ids: %s" % " ".join([str(x) for x in answer_ids]))
                 logging.info(
                     "answer_mask: %s" % " ".join([str(x) for x in answer_mask]))
+                logging.info(
+                    "decode_ids: %s" % " ".join([str(x) for x in decode_ids]))
 
                 if is_training:
                     answer_text = " ".join(tokens[start_position:(end_position + 1)])

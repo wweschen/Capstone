@@ -40,10 +40,10 @@ def define_common_bert_flags():
       'Distribution Strategy type to use for training. `tpu` uses '
       'TPUStrategy for running on TPUs, `mirror` uses GPUs with single host, '
       '`multi_worker_mirror` uses CPUs or GPUs with multiple hosts.')
-  flags.DEFINE_integer('num_train_epochs', 3,
+  flags.DEFINE_integer('num_train_epochs', 10,
                        'Total number of training epochs to perform.')
   flags.DEFINE_integer(
-      'steps_per_loop', 200,
+      'steps_per_loop', 100,
       'Number of steps per graph-mode loop. Only training step '
       'happens inside the loop. Callbacks will not be called '
       'inside.')

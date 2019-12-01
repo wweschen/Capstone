@@ -12,6 +12,8 @@ import itertools
 from absl import logging
 
 from modeling import tf_utils
+from bert import bert_modeling
+
 
 def get_initializer(initializer_range=0.02):
   """Creates a `tf.initializers.truncated_normal` with the given range.
@@ -79,8 +81,6 @@ class Hypothesis(object):
     # normalize log probability by number of tokens (otherwise longer sequences always have lower probability)
     return self.log_prob / len(self.tokens)
 
-
-
 class PGNetConfig(object):
   """Configuration for `PGNetSummaryModel`."""
 
@@ -129,7 +129,6 @@ class PGNetConfig(object):
   def to_json_string(self):
     """Serializes this instance to a JSON string."""
     return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"
-
 
 class PGNetDecoderModel(tf.keras.layers.Layer):
     def __init__(self,
@@ -273,7 +272,7 @@ class OneStepDecodeLayer(tf.keras.layers.Layer):
         input_size = decoder_inputs.get_shape().with_rank(2)[1]
 
         if input_size is None:
-            raise ValueError("Could not infer input size from input: %s" % inp.name)
+            raise ValueError("Could not infer input size from input: %s" % decoder_inputs.name)
 
         x = self.linear([[decoder_inputs], [context_vector]])
 
@@ -465,7 +464,6 @@ class PGNetBeamSerachLayer(tf.keras.layers.Layer):
         """Return a list of Hypothesis objects, sorted by descending average log probability"""
         return sorted(hyps, key=lambda h: h.avg_log_prob, reverse=True)
 
-
 class PGNetSummaryModel(tf.keras.layers.Layer):
     def __init__(self,
                  config,training=False,
@@ -646,35 +644,73 @@ class EmbeddingPostprocessor(tf.keras.layers.Layer):
     return super(EmbeddingPostprocessor, self).__call__(inputs, **kwargs)
 
   def call(self, inputs):
+        """Implements call() for the layer."""
+        unpacked_inputs = tf_utils.unpack_inputs(inputs)
+        word_embeddings = unpacked_inputs[0]
+        token_type_ids = unpacked_inputs[1]
+        input_shape = tf_utils.get_shape_list(word_embeddings, expected_rank=3)
+        batch_size = input_shape[0]
+        seq_length = input_shape[1]
+        width = input_shape[2]
+
+        output = word_embeddings
+        if self.use_type_embeddings:
+          flat_token_type_ids = tf.reshape(token_type_ids, [-1])
+          token_type_embeddings = tf.gather(self.type_embeddings,
+                                            flat_token_type_ids)
+          token_type_embeddings = tf.reshape(token_type_embeddings,
+                                             [batch_size, seq_length, width])
+          output += token_type_embeddings
+
+        if self.use_position_embeddings:
+          position_embeddings = tf.expand_dims(
+              tf.slice(self.position_embeddings, [0, 0], [seq_length, width]),
+              axis=0)
+
+          output += position_embeddings
+
+        output = self.output_layer_norm(output)
+        output = self.output_dropout(output)
+
+        return output
+
+class PositionalEmbeddingLookup(tf.keras.layers.Layer):
+  """Looks up words embeddings for id tensor."""
+
+  def __init__(self,
+               seq_length,
+               embedding_size=768,
+               initializer_range=0.02,
+               **kwargs):
+    super(PositionalEmbeddingLookup, self).__init__(**kwargs)
+
+    self.seq_length = seq_length
+    self.embedding_size = embedding_size
+    self.initializer_range = initializer_range
+
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+    self.embeddings = self.add_weight(
+        "embeddings",
+        shape=[self.seq_length, self.embedding_size],
+        initializer=get_initializer(self.initializer_range),
+        dtype=self.dtype)
+    super(PositionalEmbeddingLookup, self).build(unused_input_shapes)
+
+  def call(self, inputs):
     """Implements call() for the layer."""
-    unpacked_inputs = tf_utils.unpack_inputs(inputs)
-    word_embeddings = unpacked_inputs[0]
-    token_type_ids = unpacked_inputs[1]
-    input_shape = tf_utils.get_shape_list(word_embeddings, expected_rank=3)
+
+    input_shape = tf_utils.get_shape_list(inputs)
     batch_size = input_shape[0]
-    seq_length = input_shape[1]
-    width = input_shape[2]
 
-    output = word_embeddings
-    if self.use_type_embeddings:
-      flat_token_type_ids = tf.reshape(token_type_ids, [-1])
-      token_type_embeddings = tf.gather(self.type_embeddings,
-                                        flat_token_type_ids)
-      token_type_embeddings = tf.reshape(token_type_embeddings,
-                                         [batch_size, seq_length, width])
-      output += token_type_embeddings
+    pos_ind = tf.tile(tf.expand_dims(tf.range(self.seq_length), 0), [batch_size, 1])
 
-    if self.use_position_embeddings:
-      position_embeddings = tf.expand_dims(
-          tf.slice(self.position_embeddings, [0, 0], [seq_length, width]),
-          axis=0)
+    output = tf.gather(self.embeddings, pos_ind)
+    output = tf.reshape(output, input_shape + [self.embedding_size])
 
-      output += position_embeddings
-
-    output = self.output_layer_norm(output)
-    output = self.output_dropout(output)
 
     return output
+
 
 class Encoder(tf.keras.layers.Layer):
     def __init__(self,
@@ -1088,7 +1124,7 @@ class AttentionLayer(tf.keras.layers.Layer):
 class LinearLayer(tf.keras.layers.Layer):
     def __init__(self,
                  output_size,
-                 use_bias=False,
+                 use_bias=True,
                  kernel_initializer=None,
                  bias_initializer="zeros",
                  activation=None,
@@ -1314,3 +1350,386 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
     #     # calculate shapes from input shape
     #     return [tf.TensorShape((None, self.config.max_answer_length , self.config.vocab_size))]
 
+class SimpleTransformer(tf.keras.layers.Layer):
+    def __init__(self, config, float_type=tf.float32, **kwargs):
+        super(SimpleTransformer, self).__init__(**kwargs)
+        self.config =  config
+        self.float_type = float_type
+
+    def build(self, unused_input_shapes):
+        """Implements build() for the layer."""
+        self.embedding_lookup = EmbeddingLookup(
+            vocab_size=self.config.vocab_size,
+            embedding_size=self.config.hidden_size,
+            initializer_range=self.config.initializer_range,
+            dtype=tf.float32,
+            name="word_embeddings")
+        self.embedding_postprocessor = EmbeddingPostprocessor(
+            use_type_embeddings=True,
+            token_type_vocab_size= 4, #self.config.type_vocab_size,
+            use_position_embeddings=True,
+            max_position_embeddings=self.config.max_position_embeddings,
+            dropout_prob=self.config.hidden_dropout_prob,
+            initializer_range=self.config.initializer_range,
+            dtype=tf.float32,
+            name="embedding_postprocessor")
+        self.encoder = bert_modeling.Transformer(
+            num_hidden_layers=self.config.num_hidden_layers,
+            hidden_size=self.config.hidden_size,
+            num_attention_heads=self.config.num_attention_heads,
+            intermediate_size=self.config.intermediate_size,
+            intermediate_activation=self.config.hidden_act,
+            hidden_dropout_prob=self.config.hidden_dropout_prob,
+            attention_probs_dropout_prob=self.config.attention_probs_dropout_prob,
+            initializer_range=self.config.initializer_range,
+            backward_compatible=self.config.backward_compatible,
+            float_type=self.float_type,
+            name="encoder")
+
+        self.decoder =  DecodeTransformer(
+            num_hidden_layers=self.config.num_hidden_layers,
+            hidden_size=self.config.hidden_size,
+            num_attention_heads=self.config.num_attention_heads,
+            intermediate_size=self.config.intermediate_size,
+            intermediate_activation=self.config.hidden_act,
+            hidden_dropout_prob=self.config.hidden_dropout_prob,
+            attention_probs_dropout_prob=self.config.attention_probs_dropout_prob,
+            initializer_range=self.config.initializer_range,
+            backward_compatible=self.config.backward_compatible,
+            float_type=self.float_type,
+            name="decoder")
+
+        self.pooler_transform = tf.keras.layers.Dense(
+            units=self.config.hidden_size,
+            activation="tanh",
+            kernel_initializer=get_initializer(self.config.initializer_range),
+            name="pooler_transform")
+
+        self.dense = tf.keras.layers.Dense(self.config.vocab_size)
+
+        self.position_embedding = PositionalEmbeddingLookup(self.config.max_answer_length)
+
+        super(SimpleTransformer, self).build(unused_input_shapes)
+
+    def __call__(self,
+                 input_word_ids,
+                 input_mask=None,
+                 input_type_ids=None,
+                 target_ids = None,
+                 target_mask = None,
+                 **kwargs):
+        if type(input_word_ids) is tuple:
+            inputs = input_word_ids
+        else:
+            inputs = (input_word_ids, input_mask, input_type_ids, target_ids,target_mask)
+
+        #inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids,target_ids,target_mask])
+        return super(SimpleTransformer, self).__call__(inputs, **kwargs)
+
+    def call(self, inputs ):
+        """Implements call() for the layer.
+
+        Args:
+          inputs: packed input tensors.
+          mode: string, `coqa` or `encoder`.
+        Returns:
+
+        """
+        #unpacked_inputs = tf_utils.unpack_inputs(inputs)
+        # input_word_ids = unpacked_inputs[0]
+        # input_mask = unpacked_inputs[1]
+        # input_type_ids = unpacked_inputs[2]
+        # target_ids = unpacked_inputs[3]
+        # target_mask =  unpacked_inputs[4]
+
+        (input_word_ids, input_mask, input_type_ids, target_ids, target_mask) =inputs
+        word_embeddings = self.embedding_lookup(input_word_ids)
+        embedding_tensor = self.embedding_postprocessor(
+            word_embeddings=word_embeddings, token_type_ids=input_type_ids)
+        if self.float_type == tf.float16:
+            embedding_tensor = tf.cast(embedding_tensor, tf.float16)
+        attention_mask = None
+        if input_mask is not None:
+            attention_mask = bert_modeling.create_attention_mask_from_input_mask(
+                input_word_ids, input_mask)
+
+        target_attention_mask =None
+        if target_mask is not None:
+            target_attention_mask = bert_modeling.create_attention_mask_from_input_mask(
+                target_ids, target_mask)
+            target_attention_mask *= construct_autoregressive_mask(target_ids)
+
+        sequence_output = self.encoder(embedding_tensor, attention_mask)
+
+        if input_mask is not None:
+            decode_attention_mask = bert_modeling.create_attention_mask_from_input_mask(
+                target_ids, input_mask)
+
+        # Target embedding + positional encoding
+        dec_inp_embed =  self.embedding_lookup(target_ids )
+        dec_inp_embed = dec_inp_embed + self.position_embedding(target_ids)
+        #
+        dec_out = self.decoder( sequence_output, decode_attention_mask,dec_inp_embed, target_attention_mask)
+        #
+        # # Make the prediction out of the decoder output.
+        logits = self.dense(dec_out)  # [batch, target_vocab]
+
+        return  logits
+
+
+class DecodeTransformerBlock(tf.keras.layers.Layer):
+  """Single transformer layer.
+
+  It has two sub-layers. The first is a multi-head self-attention mechanism, and
+  the second is a positionwise fully connected feed-forward network.
+  """
+
+  def __init__(self,
+               hidden_size=768,
+               num_attention_heads=12,
+               intermediate_size=3072,
+               intermediate_activation="gelu",
+               hidden_dropout_prob=0.0,
+               attention_probs_dropout_prob=0.0,
+               initializer_range=0.02,
+               backward_compatible=False,
+               float_type=tf.float32,
+               **kwargs):
+    super(DecodeTransformerBlock, self).__init__(**kwargs)
+    self.hidden_size = hidden_size
+    self.num_attention_heads = num_attention_heads
+    self.intermediate_size = intermediate_size
+    self.intermediate_activation = tf_utils.get_activation(
+        intermediate_activation)
+    self.hidden_dropout_prob = hidden_dropout_prob
+    self.attention_probs_dropout_prob = attention_probs_dropout_prob
+    self.initializer_range = initializer_range
+    self.backward_compatible = backward_compatible
+    self.float_type = float_type
+
+    if self.hidden_size % self.num_attention_heads != 0:
+      raise ValueError(
+          "The hidden size (%d) is not a multiple of the number of attention "
+          "heads (%d)" % (self.hidden_size, self.num_attention_heads))
+    self.attention_head_size = int(self.hidden_size / self.num_attention_heads)
+
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+    self.attention_layer = bert_modeling.Attention(
+        num_attention_heads=self.num_attention_heads,
+        size_per_head=self.attention_head_size,
+        attention_probs_dropout_prob=self.attention_probs_dropout_prob,
+        initializer_range=self.initializer_range,
+        backward_compatible=self.backward_compatible,
+        name="self_attention")
+    self.decode_attention_layer = bert_modeling.Attention(
+        num_attention_heads=self.num_attention_heads,
+        size_per_head=self.attention_head_size,
+        attention_probs_dropout_prob=self.attention_probs_dropout_prob,
+        initializer_range=self.initializer_range,
+        backward_compatible=self.backward_compatible,
+        name="decode_attention_layer")
+
+    self.attention_output_dense = bert_modeling.Dense3D(
+        num_attention_heads=self.num_attention_heads,
+        size_per_head=int(self.hidden_size / self.num_attention_heads),
+        kernel_initializer=get_initializer(self.initializer_range),
+        output_projection=True,
+        backward_compatible=self.backward_compatible,
+        name="self_attention_output")
+    self.decode_attention_output_dense = bert_modeling.Dense3D(
+        num_attention_heads=self.num_attention_heads,
+        size_per_head=int(self.hidden_size / self.num_attention_heads),
+        kernel_initializer=get_initializer(self.initializer_range),
+        output_projection=True,
+        backward_compatible=self.backward_compatible,
+        name="decode_self_attention_output")
+    self.attention_dropout = tf.keras.layers.Dropout(
+        rate=self.hidden_dropout_prob)
+    self.attention_layer_norm = (
+        tf.keras.layers.LayerNormalization(
+            name="self_attention_layer_norm", axis=-1, epsilon=1e-12,
+            # We do layer norm in float32 for numeric stability.
+            dtype=tf.float32))
+    self.intermediate_dense = bert_modeling.Dense2DProjection(
+        output_size=self.intermediate_size,
+        kernel_initializer=get_initializer(self.initializer_range),
+        activation=self.intermediate_activation,
+        # Uses float32 so that gelu activation is done in float32.
+        fp32_activation=True,
+        name="intermediate")
+    self.output_dense = bert_modeling.Dense2DProjection(
+        output_size=self.hidden_size,
+        kernel_initializer=get_initializer(self.initializer_range),
+        name="output")
+    self.output_dropout = tf.keras.layers.Dropout(rate=self.hidden_dropout_prob)
+    self.output_layer_norm = tf.keras.layers.LayerNormalization(
+        name="output_layer_norm", axis=-1, epsilon=1e-12, dtype=tf.float32)
+    super(DecodeTransformerBlock, self).build(unused_input_shapes)
+
+  def common_layers(self):
+    """Explicitly gets all layer objects inside a Transformer encoder block."""
+    return [
+        self.attention_layer, self.attention_output_dense,
+        self.attention_dropout, self.attention_layer_norm,
+        self.intermediate_dense, self.output_dense, self.output_dropout,
+        self.output_layer_norm
+    ]
+
+  def __call__(self, target_tensor, input_tensor, attention_mask,target_mask, **kwargs):
+    inputs = tf_utils.pack_inputs([target_tensor,input_tensor, attention_mask,target_mask])
+
+    if type(target_tensor) is tuple:
+        inputs = target_tensor
+    else:
+        inputs = (target_tensor, input_tensor, attention_mask, target_mask)
+
+    return super(DecodeTransformerBlock, self).__call__(inputs, **kwargs)
+
+  def call(self, inputs):
+    """Implements call() for the layer."""
+    (target_tensor, input_tensor, attention_mask, target_mask) = inputs
+
+    #(target_tensor,input_tensor, attention_mask,target_mask) = tf_utils.unpack_inputs(inputs)
+
+    output = self.decode_attention_layer(
+        from_tensor=target_tensor,
+        to_tensor=target_tensor,
+        attention_mask=target_mask)
+
+    output = self.decode_attention_output_dense(output)
+    output = self.attention_layer_norm(target_tensor + output)
+
+    attention_output = self.attention_layer(
+        from_tensor=output,
+        to_tensor=input_tensor,
+        attention_mask=attention_mask)
+
+    attention_output = self.attention_output_dense(attention_output)
+    attention_output = self.attention_layer_norm(attention_output + output)
+
+    if self.float_type == tf.float16:
+      attention_output = tf.cast(attention_output, tf.float16)
+
+    intermediate_output = self.intermediate_dense(attention_output)
+
+    if self.float_type == tf.float16:
+      intermediate_output = tf.cast(intermediate_output, tf.float16)
+
+    layer_output = self.output_dense(intermediate_output)
+
+    # Use float32 in keras layer norm for numeric stability
+    layer_output = self.output_layer_norm(layer_output + attention_output)
+    if self.float_type == tf.float16:
+      layer_output = tf.cast(layer_output, tf.float16)
+    return layer_output
+
+
+class DecodeTransformer(tf.keras.layers.Layer):
+  """Multi-headed, multi-layer Transformer from "Attention is All You Need".
+
+  This is almost an exact implementation of the original Transformer encoder.
+
+  See the original paper:
+  https://arxiv.org/abs/1706.03762
+
+  Also see:
+  https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/transformer.py
+  """
+
+  def __init__(self,
+               num_hidden_layers=12,
+               hidden_size=768,
+               num_attention_heads=12,
+               intermediate_size=3072,
+               intermediate_activation="gelu",
+               hidden_dropout_prob=0.0,
+               attention_probs_dropout_prob=0.0,
+               initializer_range=0.02,
+               backward_compatible=False,
+               float_type=tf.float32,
+               **kwargs):
+    super(DecodeTransformer, self).__init__(**kwargs)
+    self.num_hidden_layers = num_hidden_layers
+    self.hidden_size = hidden_size
+    self.num_attention_heads = num_attention_heads
+    self.intermediate_size = intermediate_size
+    self.intermediate_activation = tf_utils.get_activation(
+        intermediate_activation)
+    self.hidden_dropout_prob = hidden_dropout_prob
+    self.attention_probs_dropout_prob = attention_probs_dropout_prob
+    self.initializer_range = initializer_range
+    self.backward_compatible = backward_compatible
+    self.float_type = float_type
+
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+    self.layers = []
+    for i in range(self.num_hidden_layers):
+      self.layers.append(
+          DecodeTransformerBlock(
+              hidden_size=self.hidden_size,
+              num_attention_heads=self.num_attention_heads,
+              intermediate_size=self.intermediate_size,
+              intermediate_activation=self.intermediate_activation,
+              hidden_dropout_prob=self.hidden_dropout_prob,
+              attention_probs_dropout_prob=self.attention_probs_dropout_prob,
+              initializer_range=self.initializer_range,
+              backward_compatible=self.backward_compatible,
+              float_type=self.float_type,
+              name=("layer_%d" % i)))
+    super(DecodeTransformer, self).build(unused_input_shapes)
+
+  def __call__(self, input_tensor, attention_mask,target_tensor,target_mask, **kwargs):
+
+    if type(input_tensor) is tuple:
+        inputs=input_tensor
+    else:
+        inputs =(input_tensor, attention_mask,target_tensor,target_mask)
+    return super(DecodeTransformer, self).__call__(inputs=inputs, **kwargs)
+
+  def call(self, inputs, return_all_layers=False):
+    """Implements call() for the layer.
+
+    Args:
+      inputs: packed inputs.
+      return_all_layers: bool, whether to return outputs of all layers inside
+        encoders.
+    Returns:
+      Output tensor of the last layer or a list of output tensors.
+    """
+    # unpacked_inputs = tf_utils.unpack_inputs(inputs)
+    # input_tensor = unpacked_inputs[0]
+    # attention_mask = unpacked_inputs[1]
+    # target_tensor =  unpacked_inputs[2]
+    # target_mask =  unpacked_inputs[3]
+
+    (input_tensor, attention_mask, target_tensor, target_mask) =inputs
+    output_tensor = target_tensor
+
+    all_layer_outputs = []
+    for layer in self.layers:
+      output_tensor = layer(output_tensor,input_tensor,attention_mask,target_mask)
+      all_layer_outputs.append(output_tensor)
+
+    if return_all_layers:
+      return all_layer_outputs
+
+    return all_layer_outputs[-1]
+
+def construct_autoregressive_mask(target):
+    """
+    Args: Original target of word ids, shape [batch, seq_len]
+    Returns: a mask of shape [batch, seq_len, seq_len].
+    """
+    batch_size = tf_utils.get_shape_list(target)[0]
+    seq_len = tf_utils.get_shape_list(target)[1]
+
+    tri_matrix = tf.ones((seq_len, seq_len))
+    operator = tf.linalg.LinearOperatorLowerTriangular(tri_matrix)
+
+    mask = operator.to_dense()
+    mask = tf.convert_to_tensor(mask, dtype=tf.float32)
+    masks = tf.tile(tf.expand_dims(mask, 0),[batch_size, 1, 1])
+    masks = tf.cast(masks, dtype = tf.int32)
+    return masks
