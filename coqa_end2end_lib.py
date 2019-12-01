@@ -75,8 +75,9 @@ class InputFeatures(object):
                  input_ids,
                  input_mask,
                  segment_ids,
-                 answer_ids=None,
                  decode_ids =None,
+                 decode_mask=None,
+                 answer_ids=None,
                  answer_mask=None,
                  start_position=None,
                  end_position=None):
@@ -91,6 +92,7 @@ class InputFeatures(object):
         self.segment_ids = segment_ids
         self.answer_ids = answer_ids
         self.decode_ids =decode_ids
+        self.decode_mask = decode_mask
         self.answer_mask = answer_mask
         self.start_position = start_position
         self.end_position = end_position
@@ -412,6 +414,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             # tokens are attended to.
             input_mask = [1] * len(input_ids)
             answer_mask = [1] * len(answer_ids)
+            decode_mask= [1] * len(decode_ids)
             # Zero-pad up to the sequence length.
             while len(input_ids) < max_seq_length:
                 input_ids.append(0)
@@ -424,7 +427,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
             while len(decode_ids) < max_answer_length:
                 decode_ids.append(0)
-
+                decode_mask.append(0)
             if len(answer_ids)!=max_answer_length:
                 print("===>", len(answer_ids), max_answer_length)
                 print(answer_tokens)
@@ -437,6 +440,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             assert len(segment_ids) == max_seq_length
             assert len(answer_ids) == max_answer_length
             assert len(decode_ids) == max_answer_length
+            assert len(decode_mask) == max_answer_length
 
             assert len(answer_mask) == max_answer_length
 
@@ -512,8 +516,9 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                 input_ids=input_ids,
                 input_mask=input_mask,
                 segment_ids=segment_ids,
-                answer_ids=answer_ids,
                 decode_ids=decode_ids,
+                decode_mask=decode_mask,
+                answer_ids=answer_ids,
                 answer_mask = answer_mask,
                 start_position=start_position,
                 end_position=end_position)

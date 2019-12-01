@@ -28,7 +28,7 @@ from utils.misc import keras_utils
 from utils.misc import tpu_lib
 
 flags.DEFINE_enum(
-    'mode', 'train_and_predict',
+    'mode', 'predict',
     ['train_and_predict', 'train', 'predict', 'export_only'],
     'One of {"train_and_predict", "train", "predict", "export_only"}. '
     '`train_and_predict`: both train and predict to a json file. '
@@ -192,6 +192,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
   # max_oov_size  let's just add something for now
   bert_config.add_from_dict({"max_oov_size": FLAGS.max_oov_size})
   bert_config.add_from_dict({"max_seq_length": max_seq_length})
+  bert_config.add_from_dict({"max_answer_length": max_answer_length})
 
   with tf.device(primary_cpu_task):
     predict_dataset = input_pipeline.create_coqa_dataset_seq2seq(
@@ -217,36 +218,12 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     checkpoint = tf.train.Checkpoint(model=coqa_model)
     checkpoint.restore(checkpoint_path).expect_partial()
 
-    encoder, decoder = coqa_models.one_step_decoder_model(coqa_model,bert_config)
-
     def decode_sequence(x):
-    # Encode the input as state vectors.
-        states_value,enc_feature = encoder([x['input_word_ids'],x['input_mask'],x['input_type_ids']])
 
-        # Generate empty target sequence of length 1.
-        target_seq = tf.unstack(x['decode_ids'],axis=1)[0]
+        logits = coqa_model(x, training=False)
+        output = tf.argmax(logits, axis=-1, output_type=tf.int32)
 
-        target_seq=tf.expand_dims(target_seq,axis=1)
-        # Sampling loop for a batch of sequences
-        # (to simplify, here we assume a batch of size 1).
-        stop_condition = False
-        decoded_sentence = ''
-
-        steps = 0
-        batch_size = target_seq.shape[0]
-        results = []
-
-        while steps < FLAGS.max_answer_length:
-            output_tokens, h, c = decoder( [target_seq] + states_value+ [x['input_mask']]+[enc_feature])
-            results.append(output_tokens)
-
-            target_seq=output_tokens
-            # Update states
-            states_value = [h, c]
-            steps += 1
-
-        decoded_sentences=tf.squeeze(tf.stack(results,axis=1))
-
+        decoded_sentences=None
         return x['unique_ids'] , decoded_sentences
 
 

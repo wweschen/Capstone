@@ -258,6 +258,8 @@ def coqa_model_2heads(config, max_seq_length, max_answer_length, float_type, tra
     #     name="pgnet_model")
 
     return coqa, bert_model
+def transformer_encoder_decoder(model,config):
+    return model.get_encoder(),model.get_decoder()
 
 def one_step_decoder_model(model,config):
 
