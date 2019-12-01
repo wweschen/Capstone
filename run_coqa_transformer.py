@@ -94,16 +94,22 @@ def coqa_loss_fn( final_dists,
     # Calculate the loss per step
     # This is fiddly; we use tf.gather_nd to pick out the probabilities of the gold target words
     loss_per_step = [] # will be list length max_dec_steps containing shape (batch_size)
+    #
+    # batch_nums = tf.range(0, limit=FLAGS.batch_size) # shape (batch_size)
+    # for dec_step, dist in enumerate(final_dists):
+    #     targets = target_words_ids[:,dec_step] # The indices of the target words. shape (batch_size)
+    #     indices = tf.stack( (batch_nums, targets), axis=1) # shape (batch_size, 2)
+    #     gold_probs = tf.gather_nd(dist, indices) # shape (batch_size). prob of correct words on this step
+    #     losses = -tf.math.log(gold_probs)
+    #     loss_per_step.append(losses)
 
-    batch_nums = tf.range(0, limit=FLAGS.batch_size) # shape (batch_size)
-    for dec_step, dist in enumerate(final_dists):
-        targets = target_words_ids[:,dec_step] # The indices of the target words. shape (batch_size)
-        indices = tf.stack( (batch_nums, targets), axis=1) # shape (batch_size, 2)
-        gold_probs = tf.gather_nd(dist, indices) # shape (batch_size). prob of correct words on this step
-        losses = -tf.math.log(gold_probs)
-        loss_per_step.append(losses)
+    depth = final_dists.shape.as_list()[-1]
+    dec_target_ohe = tf.one_hot(target_words_ids, depth=depth)
+    losses=tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=final_dists, labels=dec_target_ohe)
 
+    #losses= tf.nn.sparse_softmax_cross_entropy_with_logits(target_words_ids,final_dists)
     # Apply dec_padding_mask and get loss
+    loss_per_step= tf.unstack(losses,axis=1)
     _loss = _mask_and_avg(loss_per_step, dec_padding_mask)
 
     _total_loss = _loss
