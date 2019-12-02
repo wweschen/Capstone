@@ -220,9 +220,8 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
     def decode_sequence(x):
 
-        pred_ids=x['decode_ids'].numpy()
-        pred_mask =x['decode_mask'].numpy()
-
+        pred_ids=  tf.unstack(x['decode_ids'], axis=-1)
+        pred_mask =  tf.unstack(x['decode_mask'],axis=-1)
 
 
         for i in range(1, bert_config.max_answer_length):
@@ -232,18 +231,18 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
                                     'input_word_ids' : x['input_word_ids'],
                                     'input_type_ids' : x['input_type_ids'],
                                     'input_mask':x['input_mask'],
-                                    'decode_ids':tf.convert_to_tensor(pred_ids),
-                                    'decode_mask':tf.convert_to_tensor(pred_mask)
+                                    'decode_ids':tf.stack(pred_ids,axis = 1),
+                                    'decode_mask': tf.stack( pred_mask,axis = 1),
                                 }),
                                 training=False)
 
-            next_pred = tf.argmax(logits, axis=-1, output_type=tf.int32).numpy()
+            next_pred = tf.argmax(logits, axis=-1, output_type=tf.int32)
 
             # Only update the i-th column in one step.
-            pred_ids[:, i] = next_pred[:, i - 1]
-            pred_mask[:, i] = tf.cast(tf.not_equal(next_pred[:, i - 1], 105),tf.int32) #tf.not_equal(next_pred[:, i - 1], 105)
+            pred_ids[i]=next_pred[:, i - 1]
+            pred_mask[i]=tf.cast(tf.not_equal(next_pred[:, i - 1], 105),tf.int32) #tf.not_equal(next_pred[:, i - 1], 105)
             #pred_mask[:,i]
-        return x['unique_ids'], pred_ids
+        return x['unique_ids'], tf.stack(pred_ids,axis=1)
 
 
     @tf.function

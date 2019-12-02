@@ -245,7 +245,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
         return x['unique_ids'] , decoded_sentences
 
 
-    #@tf.function
+    @tf.function
     def predict_step(iterator):
       """Predicts on distributed devices."""
 
