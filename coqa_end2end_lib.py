@@ -122,6 +122,7 @@ class FeatureWriter(object):
         features["input_mask"] = create_int_feature(feature.input_mask)
         features["segment_ids"] = create_int_feature(feature.segment_ids)
         features["decode_ids"] = create_int_feature(feature.decode_ids)
+        features["decode_mask"] = create_int_feature(feature.decode_mask)
 
         if self.is_training:
             features["start_positions"] = create_int_feature([feature.start_position])
@@ -489,6 +490,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     "answer_mask: %s" % " ".join([str(x) for x in answer_mask]))
                 logging.info(
                     "decode_ids: %s" % " ".join([str(x) for x in decode_ids]))
+                logging.info(
+                    "decode_mask: %s" % " ".join([str(x) for x in decode_mask]))
 
                 if is_training:
                     answer_text = " ".join(tokens[start_position:(end_position + 1)])
@@ -503,8 +506,6 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                         "answer: %s" % (tokenization.printable_text(example.gold_answer_text)))
                     logging.info(
                         "answer_ids: %s" % " ".join([str(x) for x in answer_ids]))
-                    logging.info(
-                        "decode_ids: %s" % " ".join([str(x) for x in decode_ids]))
 
             feature = InputFeatures(
                 unique_id=unique_id,

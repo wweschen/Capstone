@@ -220,14 +220,33 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
     def decode_sequence(x):
 
-        logits = coqa_model(x, training=False)
-        output = tf.argmax(logits, axis=-1, output_type=tf.int32)
-
-        decoded_sentences=None
-        return x['unique_ids'] , decoded_sentences
+        pred_ids=x['decode_ids'].numpy()
+        pred_mask =x['decode_mask'].numpy()
 
 
-    #@tf.function
+
+        for i in range(1, bert_config.max_answer_length):
+            unique_ids, logits = coqa_model(
+                                inputs = ( {
+                                    'unique_ids' : x['unique_ids'],
+                                    'input_word_ids' : x['input_word_ids'],
+                                    'input_type_ids' : x['input_type_ids'],
+                                    'input_mask':x['input_mask'],
+                                    'decode_ids':tf.convert_to_tensor(pred_ids),
+                                    'decode_mask':tf.convert_to_tensor(pred_mask)
+                                }),
+                                training=False)
+
+            next_pred = tf.argmax(logits, axis=-1, output_type=tf.int32).numpy()
+
+            # Only update the i-th column in one step.
+            pred_ids[:, i] = next_pred[:, i - 1]
+            pred_mask[:, i] = tf.cast(tf.not_equal(next_pred[:, i - 1], 105),tf.int32) #tf.not_equal(next_pred[:, i - 1], 105)
+            #pred_mask[:,i]
+        return x['unique_ids'], pred_ids
+
+
+    @tf.function
     def predict_step(iterator):
       """Predicts on distributed devices."""
 
@@ -285,6 +304,7 @@ def train_coqa(strategy,
   #max_oov_size  let's just add something for now
   bert_config.add_from_dict({"max_oov_size": FLAGS.max_oov_size})
   bert_config.add_from_dict({"max_seq_length":max_seq_length})
+  bert_config.add_from_dict({"max_answer_length": max_answer_length})
 
 
   epochs = FLAGS.num_train_epochs
