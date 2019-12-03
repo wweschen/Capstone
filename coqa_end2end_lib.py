@@ -311,8 +311,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
         qa_history_tokens, qa_history_type_ids =tokenize_qa_history(tokenizer,qas,ans)
 
-        qa_history_tokens = qa_history_tokens[-1 * (len(qa_history_tokens) % max_qa_history):-1]
-        qa_history_type_ids=qa_history_type_ids[-1 * (len(qa_history_tokens) % max_qa_history):-1]
+        qa_history_tokens = qa_history_tokens[-1 * (len(qa_history_tokens) % max_qa_history):]
+        qa_history_type_ids=qa_history_type_ids[-1 * (len(qa_history_tokens) % max_qa_history):]
 
         tok_to_orig_index = []
         orig_to_tok_index = []
@@ -349,8 +349,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                 all_doc_tokens, tok_start_position, tok_end_position, tokenizer,
                 example.orig_answer_text)
 
-        # The -3 accounts for [CLS], [SEP] and [SEP]
-        max_tokens_for_doc = max_seq_length - len(query_tokens) - len(qa_history_tokens) - 3
+        # The -3 accounts for [CLS], [SEP], [SEP] [SEP] (added QA history section)
+        max_tokens_for_doc = max_seq_length - len(query_tokens) - len(qa_history_tokens) - 4
 
         # We can have documents that are longer than the maximum sequence length.
         # To deal with this we do a sliding window approach, where we take chunks

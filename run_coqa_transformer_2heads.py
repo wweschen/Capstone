@@ -242,7 +242,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
 
         for i in range(1, bert_config.max_answer_length):
-            unique_ids, logits,_ = coqa_model(
+            unique_ids, logits,_ ,_ = coqa_model(
                                 inputs = ( {
                                     'unique_ids' : x['unique_ids'],
                                     'input_word_ids' : x['input_word_ids'],
