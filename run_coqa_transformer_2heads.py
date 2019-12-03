@@ -28,7 +28,7 @@ from utils.misc import keras_utils
 from utils.misc import tpu_lib
 
 flags.DEFINE_enum(
-    'mode', 'predict',
+    'mode', 'train_and_predict',
     ['train_and_predict', 'train', 'predict', 'export_only'],
     'One of {"train_and_predict", "train", "predict", "export_only"}. '
     '`train_and_predict`: both train and predict to a json file. '
@@ -89,7 +89,18 @@ FLAGS = flags.FLAGS
 def coqa_loss_fn( final_dists,
                   target_words_ids,
                   dec_padding_mask,
+                  start_positions,
+                  end_positions,
+                  start_logits,
+                  end_logits,
                   loss_factor=1.0):
+    """Returns sparse categorical crossentropy for start/end logits."""
+    start_loss = tf.keras.backend.sparse_categorical_crossentropy(
+        start_positions, start_logits, from_logits=True)
+    end_loss = tf.keras.backend.sparse_categorical_crossentropy(
+        end_positions, end_logits, from_logits=True)
+
+    span_loss = (tf.reduce_mean(start_loss) + tf.reduce_mean(end_loss)) / 2
 
     # Calculate the loss per step
     # This is fiddly; we use tf.gather_nd to pick out the probabilities of the gold target words
@@ -112,9 +123,9 @@ def coqa_loss_fn( final_dists,
     loss_per_step= tf.unstack(losses,axis=1)
     _loss = _mask_and_avg(loss_per_step, dec_padding_mask)
 
-    _total_loss = _loss
+    total_loss = _loss + span_loss
 
-    return  _total_loss
+    return  total_loss
 
 def _mask_and_avg(values, padding_mask):
   """Applies mask to values then returns overall average (a scalar)
@@ -158,12 +169,18 @@ def get_loss_fn(loss_factor=1.0):
   def _loss_fn(labels, model_outputs):
     target_words_ids = labels['answer_ids']
     target_words_mask = labels['answer_mask']
+    start_positions=labels['start_positions']
+    end_positions=labels['end_positions']
     #unique_ids,final_dists, attn_dists = model_outputs
-    unique_ids, final_dists  = model_outputs
+    unique_ids, final_dists,start_logits,end_logits  = model_outputs
     return coqa_loss_fn(final_dists,
                         #attn_dists,
                         target_words_ids,
                         target_words_mask,
+                        start_positions,
+                        end_positions,
+                        start_logits,
+                        end_logits,
                         loss_factor=loss_factor)
 
   return _loss_fn
@@ -207,7 +224,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     with strategy.scope():
       # Prediction always uses float32, even if training uses mixed precision.
       #tf.keras.mixed_precision.experimental.set_policy('float32')
-      coqa_model, _ = coqa_models.coqa_model_transformer(
+      coqa_model, _ = coqa_models.coqa_model_transformer2heads(
           config=bert_config,
           max_seq_length=input_meta_data['max_seq_length'],
           max_answer_length=max_answer_length,
@@ -225,7 +242,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
 
 
         for i in range(1, bert_config.max_answer_length):
-            unique_ids, logits = coqa_model(
+            unique_ids, logits,_ = coqa_model(
                                 inputs = ( {
                                     'unique_ids' : x['unique_ids'],
                                     'input_word_ids' : x['input_word_ids'],
@@ -320,7 +337,7 @@ def train_coqa(strategy,
 
   def _get_coqa_model():
     """Get Squad model and optimizer."""
-    coqa_model, core_model  = coqa_models.coqa_model_transformer(
+    coqa_model, core_model  = coqa_models.coqa_model_transformer2heads(
         bert_config,
         max_seq_length,
         max_answer_length,
@@ -447,7 +464,7 @@ def export_coqa(model_export_path, input_meta_data):
     raise ValueError('Export path is not specified: %s' % model_export_path)
   bert_config = bert_modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
 
-  coqa_model = coqa_models.coqa_model_transformer(
+  coqa_model = coqa_models.coqa_model_transformer2heads(
       bert_config,
       input_meta_data['max_seq_length'],
       float_type=tf.float32)

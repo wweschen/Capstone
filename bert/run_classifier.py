@@ -28,15 +28,15 @@ from absl import logging
 import tensorflow as tf
 
 # pylint: disable=g-import-not-at-top,redefined-outer-name,reimported
-from bert.modeling import model_training_utils
+from modeling import model_training_utils
 from bert import bert_modeling as modeling
 from bert import bert_models
 from bert import optimization
 from bert import common_flags
 from bert import input_pipeline
 from bert import model_saving_utils
-from bert.utils.misc import keras_utils
-from bert.utils.misc import tpu_lib
+from utils.misc import keras_utils
+from utils.misc import tpu_lib
 
 flags.DEFINE_enum(
     'mode', 'train_and_eval', ['train_and_eval', 'export_only'],

@@ -73,6 +73,68 @@ def coqa_model_transformer(config, max_seq_length, max_answer_length, float_type
     return coqa, bert_model
 
 
+def coqa_model_transformer2heads(config, max_seq_length, max_answer_length, float_type, training=False,
+                      initializer=None):
+    unique_ids = tf.keras.layers.Input(
+        shape=(1,), dtype=tf.int32, name='unique_ids')
+    input_word_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
+    input_mask = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
+    input_type_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
+    decode_ids = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
+    decode_mask = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_mask')
+
+    bert_model = tf.keras.Model()
+
+    # bert_model = bert_modeling.get_bert_model(
+    #     input_word_ids,
+    #     input_mask,
+    #     input_type_ids,
+    #     config= config,
+    #     name='bert_model',
+    #     float_type=float_type)
+    #
+    # # `Bert Coqa Pgnet Model` only uses the sequence_output which
+    # # has dimensionality (batch_size, sequence_length, num_hidden).
+    # sequence_output = bert_model.outputs[1]
+    #
+    # if initializer is None:
+    #     initializer = tf.keras.initializers.TruncatedNormal(
+    #         stddev=config.initializer_range)
+    #
+    #
+    coqa_layer = coqalayers.SimpleTransformer2Heads(config=config,
+                                              name='simple_transformer')
+
+    final_dists, sequence_output = coqa_layer(input_word_ids,
+                             input_mask,
+                             input_type_ids,
+                             decode_ids,
+                             decode_mask
+                             )
+    span_logits_layer = BertSpanLogitsLayer(
+        initializer=initializer, float_type=float_type, name='squad_logits')
+    start_logits, end_logits = span_logits_layer(sequence_output)
+
+    coqa = tf.keras.Model(
+        inputs=({
+                    'unique_ids': unique_ids,
+                    'input_word_ids': input_word_ids,
+                    'input_type_ids': input_type_ids,
+                    'input_mask': input_mask,
+                    'decode_ids': decode_ids,
+                    'decode_mask': decode_mask},),
+
+        outputs=[unique_ids, final_dists, start_logits, end_logits ])
+
+
+    return coqa, bert_model
+
+
 def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, float_type, training=False,
                initializer=None):
     
@@ -351,3 +413,37 @@ def get_best_span_prediction(ids, start_logits, end_logits,max_len):
     # )
     #return (new_spans, new_mask)
     return (spans, m)
+
+
+class BertSpanLogitsLayer(tf.keras.layers.Layer):
+  """Returns a layer that computes custom logits for BERT squad model."""
+
+  def __init__(self, initializer=None, float_type=tf.float32, **kwargs):
+    super(BertSpanLogitsLayer, self).__init__(**kwargs)
+    self.initializer = initializer
+    self.float_type = float_type
+
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+    self.final_dense = tf.keras.layers.Dense(
+        units=2, kernel_initializer=self.initializer, name='final_dense')
+    super(BertSpanLogitsLayer, self).build(unused_input_shapes)
+
+  def call(self, inputs):
+    """Implements call() for the layer."""
+    sequence_output = inputs
+
+    input_shape = sequence_output.shape.as_list()
+    sequence_length = input_shape[1]
+    num_hidden_units = input_shape[2]
+
+    final_hidden_input = tf.keras.backend.reshape(sequence_output,
+                                                  [-1, num_hidden_units])
+    logits = self.final_dense(final_hidden_input)
+    logits = tf.keras.backend.reshape(logits, [-1, sequence_length, 2])
+    logits = tf.transpose(logits, [2, 0, 1])
+    unstacked_logits = tf.unstack(logits, axis=0)
+    if self.float_type == tf.float16:
+      unstacked_logits = tf.cast(unstacked_logits, tf.float32)
+    return unstacked_logits[0], unstacked_logits[1]
+
