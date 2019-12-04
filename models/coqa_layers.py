@@ -1274,7 +1274,7 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
                                                 )
         self.embedding_postprocessor = EmbeddingPostprocessor(
             use_type_embeddings=True,
-            token_type_vocab_size=4, #we have four types of tokens (question,story,previous question, previous answer)
+            token_type_vocab_size=self.config.type_vocab_size, #4, #we have four types of tokens (question,story,previous question, previous answer)
             use_position_embeddings=False,
             max_position_embeddings=self.config.max_position_embeddings,
             dropout_prob=self.config.hidden_dropout_prob,
@@ -1350,6 +1350,83 @@ class SimpleLSTMSeq2Seq(tf.keras.layers.Layer):
     #     # calculate shapes from input shape
     #     return [tf.TensorShape((None, self.config.max_answer_length , self.config.vocab_size))]
 
+
+class SimpleTransformerDecoder(tf.keras.layers.Layer):
+    def __init__(self, config, float_type=tf.float32, **kwargs):
+        super(SimpleTransformerDecoder, self).__init__(**kwargs)
+        self.config =  config
+        self.float_type = float_type
+
+    def build(self, unused_input_shapes):
+        """Implements build() for the layer."""
+        self.embedding_lookup = EmbeddingLookup(
+            vocab_size=self.config.vocab_size,
+            embedding_size=self.config.hidden_size,
+            initializer_range=self.config.initializer_range,
+            dtype=tf.float32,
+            name="word_embeddings")
+
+        self.decoder =  DecodeTransformer(
+            num_hidden_layers=self.config.num_hidden_layers,
+            hidden_size=self.config.hidden_size,
+            num_attention_heads=self.config.num_attention_heads,
+            intermediate_size=self.config.intermediate_size,
+            intermediate_activation=self.config.hidden_act,
+            hidden_dropout_prob=self.config.hidden_dropout_prob,
+            attention_probs_dropout_prob=self.config.attention_probs_dropout_prob,
+            initializer_range=self.config.initializer_range,
+            backward_compatible=self.config.backward_compatible,
+            float_type=self.float_type,
+            name="decoder")
+
+        self.dense = tf.keras.layers.Dense(self.config.vocab_size)
+
+        self.position_embedding = PositionalEmbeddingLookup(self.config.max_answer_length)
+
+        super(SimpleTransformerDecoder, self).build(unused_input_shapes)
+
+    def __call__(self,
+                 sequence_output,
+                 input_mask=None,
+                 target_ids = None,
+                 target_mask = None,
+                 **kwargs):
+        if type(sequence_output) is tuple:
+            inputs = sequence_output
+        else:
+            inputs = (sequence_output, input_mask, target_ids,target_mask)
+
+        #inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids,target_ids,target_mask])
+        return super(SimpleTransformerDecoder, self).__call__(inputs, **kwargs)
+
+    def call(self, inputs ):
+
+        (sequence_output, input_mask, target_ids, target_mask) =inputs
+
+
+        target_attention_mask =None
+        if target_mask is not None:
+            target_attention_mask = bert_modeling.create_attention_mask_from_input_mask(
+                target_ids, target_mask)
+            target_attention_mask *= construct_autoregressive_mask(target_ids)
+
+
+        if input_mask is not None:
+            decode_attention_mask = bert_modeling.create_attention_mask_from_input_mask(
+                target_ids, input_mask)
+
+        # Target embedding + positional encoding
+        dec_inp_embed =  self.embedding_lookup(target_ids )
+        dec_inp_embed = dec_inp_embed + self.position_embedding(target_ids)
+        #
+        dec_out = self.decoder( sequence_output, decode_attention_mask,dec_inp_embed, target_attention_mask)
+        #
+        # # Make the prediction out of the decoder output.
+        logits = self.dense(dec_out)  # [batch, target_vocab]
+
+        return  logits
+
+
 class SimpleTransformer(tf.keras.layers.Layer):
     def __init__(self, config, float_type=tf.float32, **kwargs):
         super(SimpleTransformer, self).__init__(**kwargs)
@@ -1366,7 +1443,7 @@ class SimpleTransformer(tf.keras.layers.Layer):
             name="word_embeddings")
         self.embedding_postprocessor = EmbeddingPostprocessor(
             use_type_embeddings=True,
-            token_type_vocab_size= 4, #self.config.type_vocab_size,
+            token_type_vocab_size=  self.config.type_vocab_size,
             use_position_embeddings=True,
             max_position_embeddings=self.config.max_position_embeddings,
             dropout_prob=self.config.hidden_dropout_prob,
@@ -1493,7 +1570,7 @@ class SimpleTransformer2Heads(tf.keras.layers.Layer):
             name="word_embeddings")
         self.embedding_postprocessor = EmbeddingPostprocessor(
             use_type_embeddings=True,
-            token_type_vocab_size= 4, #self.config.type_vocab_size,
+            token_type_vocab_size=  self.config.type_vocab_size,
             use_position_embeddings=True,
             max_position_embeddings=self.config.max_position_embeddings,
             dropout_prob=self.config.hidden_dropout_prob,

@@ -1,6 +1,6 @@
 {
     "task_type": "bert_pgnet_coqa",
-    "train_data_size": 727,
+    "train_data_size": 732,
     "max_seq_length": 384,
     "max_query_length": 128,
     "max_answer_length": 30,
