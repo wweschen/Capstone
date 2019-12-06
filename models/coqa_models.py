@@ -393,8 +393,11 @@ def coqa_model_2heads(config, max_seq_length, max_answer_length, float_type, tra
     start_logits, end_logits = coqa_logits_layer(sequence_output)
 
     # figure out the span text from the start logits and end_logits here.
-    span_text_ids, span_mask = get_best_span_prediction(input_word_ids, start_logits, end_logits, max_seq_length)
+    ta = tf.TensorArray(dtype=tf.int32, size=max_seq_length)
 
+    span_text_ids, span_mask = get_best_span_prediction(ta, input_word_ids, start_logits, end_logits, max_seq_length)
+
+    ta.close()
     # pgnet_model_layer =modeling.PGNetSummaryModel(config=config ,
     #                                                 float_type=float_type,
     #                                                name='pgnet_summary_model')
