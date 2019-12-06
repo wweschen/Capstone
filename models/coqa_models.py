@@ -46,8 +46,12 @@ def coqa_model_bert_2heads(config, max_seq_length, max_answer_length, float_type
 
     start_logits, end_logits = span_logits_layer(sequence_output)
 
+    ta = tf.TensorArray(dtype=tf.int32, size=max_seq_length)
 
-    span_text_ids, span_mask = get_best_span_prediction(input_word_ids, start_logits, end_logits, max_seq_length)
+
+    span_text_ids, span_mask = get_best_span_prediction(ta, input_word_ids, start_logits, end_logits, max_seq_length)
+
+    ta.close()
 
     if initializer is None:
         initializer = tf.keras.initializers.TruncatedNormal(
@@ -497,14 +501,14 @@ def one_step_decoder_model(model,config):
 
     return encoder_model, decoder_model
 
-def get_best_span_prediction(ids, start_logits, end_logits,max_len):
+def get_best_span_prediction(ta, ids, start_logits, end_logits,max_len):
     _, starts = tf.nn.top_k(start_logits, k=1)
     _, ends = tf.nn.top_k(end_logits, k=1)
 
     s = tf.transpose(tf.tile(starts, [1, max_len]))
     e = tf.transpose(tf.tile(ends, [1, max_len]))
 
-    ta = tf.TensorArray(dtype=tf.int32, size=max_len)
+
     # print(s,e)
     for i in tf.range(max_len):
         x = tf.where(i >= s[i], 1, 0)
