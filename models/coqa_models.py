@@ -51,7 +51,7 @@ def coqa_model_bert_2heads(config, max_seq_length, max_answer_length, float_type
 
     span_text_ids, span_mask = get_best_span_prediction(ta, input_word_ids, start_logits, end_logits, max_seq_length)
 
-    ta.close()
+    ta.mark_used()
 
     if initializer is None:
         initializer = tf.keras.initializers.TruncatedNormal(
