@@ -47,7 +47,9 @@ def coqa_model_bert_2heads(config, max_seq_length, max_answer_length, float_type
     start_logits, end_logits = span_logits_layer(sequence_output)
 
 
-    span_text_ids, span_mask = get_best_span_prediction(input_word_ids, start_logits, end_logits, max_seq_length)
+    span_mask = get_best_span_mask(start_logits, end_logits)
+
+    new_mask=(tf.cast(tf.logical_not(tf.cast(input_type_ids,tf.bool)),tf.int32) + span_mask) * input_mask
 
     if initializer is None:
         initializer = tf.keras.initializers.TruncatedNormal(
@@ -57,8 +59,8 @@ def coqa_model_bert_2heads(config, max_seq_length, max_answer_length, float_type
     coqa_layer = coqalayers.SimpleTransformer(config=config,
                                               name='simple_transformer')
 
-    final_dists = coqa_layer(span_text_ids,
-                             span_mask ,
+    final_dists = coqa_layer(input_word_ids,
+                             new_mask ,
                              input_type_ids ,
                              decode_ids,
                              decode_mask
@@ -497,6 +499,8 @@ def one_step_decoder_model(model,config):
 
     return encoder_model, decoder_model
 
+
+
 def get_best_span_prediction(ids, start_logits, end_logits,max_len):
     _, starts = tf.nn.top_k(start_logits, k=1)
     _, ends = tf.nn.top_k(end_logits, k=1)
@@ -511,9 +515,9 @@ def get_best_span_prediction(ids, start_logits, end_logits,max_len):
         y = tf.where(i < e[i], 1, 0)
         # tf.print(x,y)
         ta.write(i, x * y)
-    x = ta.close()
+
     m = tf.transpose(x.stack(), [1, 0])
-    
+
     spans = ids * m
     # print(spans,starts)
 
@@ -568,4 +572,24 @@ class BertSpanLogitsLayer(tf.keras.layers.Layer):
     if self.float_type == tf.float16:
       unstacked_logits = tf.cast(unstacked_logits, tf.float32)
     return unstacked_logits[0], unstacked_logits[1]
+
+@tf.function(autograph=False)
+def get_best_span_mask(start_logits, end_logits):
+    starts = tf.argmax(start_logits, axis=-1, output_type=tf.int32)
+    ends = tf.argmax(end_logits, axis=-1, output_type=tf.int32)
+
+    max_len = start_logits.shape[1]
+    s = tf.transpose(tf.tile(tf.expand_dims(starts, 1), [1, max_len]))
+    e = tf.transpose(tf.tile(tf.expand_dims(ends, 1), [1, max_len]))
+    ta = tf.TensorArray(dtype=tf.int32, size=max_len)
+
+    for i in tf.range(max_len):
+        x = tf.where(i >= s[i], 1, 0)
+        y = tf.where(i < e[i], 1, 0)
+        ta.write(i, x * y)
+
+    m = tf.transpose(ta.stack(), [1, 0])
+
+    return m
+
 
