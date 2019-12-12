@@ -136,6 +136,58 @@ def coqa_model_bert_transformer(config, max_seq_length, max_answer_length, float
 
     return coqa, bert_model
 
+def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, training=False,
+                      initializer=None):
+    unique_ids = tf.keras.layers.Input(
+        shape=(1,), dtype=tf.int32, name='unique_ids')
+    input_word_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
+    input_mask = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
+    input_type_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
+    decode_ids = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
+    decode_mask = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_mask')
+
+
+    bert_model = bert_modeling.get_bert_model(
+        input_word_ids,
+        input_mask,
+        input_type_ids,
+        config= config,
+        name='bert_model',
+        float_type=float_type)
+
+    # `Bert Coqa Model` only uses the sequence_output which
+    # has dimensionality (batch_size, sequence_length, num_hidden).
+    pooled_output = bert_model.outputs[0]
+    sequence_output = bert_model.outputs[1]
+
+    yesnounknown_logits_layer = BertYNULogitsLayer(
+        initializer=initializer, float_type=float_type, name='yesnounknown_logits')
+
+    y_logits ,n_logits,u_logits= yesnounknown_logits_layer(pooled_output)
+
+    span_logits_layer = BertSpanLogitsLayer(
+        initializer=initializer, float_type=float_type, name='bert_span_logits')
+
+    start_logits, end_logits = span_logits_layer(sequence_output)
+
+
+
+    coqa = tf.keras.Model(
+        inputs=({
+                    'unique_ids': unique_ids,
+                    'input_word_ids': input_word_ids,
+                    'input_type_ids': input_type_ids,
+                    'input_mask': input_mask },),
+
+        outputs=[unique_ids, start_logits, end_logits,y_logits ,n_logits,u_logits])
+
+
+    return coqa, bert_model
 
 def coqa_model_transformer(config, max_seq_length, max_answer_length, float_type, training=False,
                       initializer=None):
@@ -240,7 +292,7 @@ def coqa_model_transformer2heads(config, max_seq_length, max_answer_length, floa
                              decode_mask
                              )
     span_logits_layer = BertSpanLogitsLayer(
-        initializer=initializer, float_type=float_type, name='squad_logits')
+        initializer=initializer, float_type=float_type, name='bert_span_logits')
     start_logits, end_logits = span_logits_layer(sequence_output)
 
     coqa = tf.keras.Model(
@@ -539,6 +591,47 @@ def get_best_span_prediction(ids, start_logits, end_logits,max_len):
     # )
     #return (new_spans, new_mask)
     return (spans, m)
+class BertYNULogitsLayer(tf.keras.layers.Layer):
+  """Returns a layer that computes custom logits for BERT squad model."""
+
+  def __init__(self, initializer=None, float_type=tf.float32, **kwargs):
+    super(BertYNULogitsLayer, self).__init__(**kwargs)
+    self.initializer = initializer
+    self.float_type = float_type
+    self.number_classes = 3
+
+
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+
+    # 2 means is A, or is not A, here A is yes,no, unknown
+
+    self.y_dense = tf.keras.layers.Dense(
+        units=2, kernel_initializer=self.initializer, name='y_final_dense')
+    self.n_dense = tf.keras.layers.Dense(
+        units=2, kernel_initializer=self.initializer, name='n_final_dense')
+    self.u_dense = tf.keras.layers.Dense(
+        units=2, kernel_initializer=self.initializer, name='u_final_dense')
+
+    super(BertYNULogitsLayer, self).build(unused_input_shapes)
+
+  def call(self, inputs):
+    """Implements call() for the layer."""
+    pooled_output = inputs
+
+
+    logits_y = self.y_dense(pooled_output)
+    logits_n = self.n_dense(pooled_output)
+    logits_u = self.u_dense(pooled_output)
+
+
+    if self.float_type == tf.float16:
+      logits_y  = tf.cast(logits_y , tf.float32)
+      logits_n = tf.cast(logits_n, tf.float32)
+      logits_u = tf.cast(logits_u, tf.float32)
+
+    return logits_y,logits_n,logits_u  #Yes,No,Unknown
+
 
 
 class BertSpanLogitsLayer(tf.keras.layers.Layer):
@@ -573,7 +666,7 @@ class BertSpanLogitsLayer(tf.keras.layers.Layer):
       unstacked_logits = tf.cast(unstacked_logits, tf.float32)
     return unstacked_logits[0], unstacked_logits[1]
 
-@tf.function(autograph=False)
+
 def get_best_span_mask(start_logits, end_logits):
     starts = tf.argmax(start_logits, axis=-1, output_type=tf.int32)
     ends = tf.argmax(end_logits, axis=-1, output_type=tf.int32)

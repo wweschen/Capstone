@@ -245,7 +245,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
         max_qa_history = max_query_length - len(query_tokens)
         qa_history_tokens = tokenizer.tokenize(example.qa_history_text)
 
-        qa_history_tokens = qa_history_tokens[ -1 * (len(qa_history_tokens) % max_qa_history):-1]
+        qa_history_tokens = qa_history_tokens[ -1 * min(len(qa_history_tokens) , max_qa_history):]
+        #fetch lastest QA up to the maximum qa history length
 
 
 

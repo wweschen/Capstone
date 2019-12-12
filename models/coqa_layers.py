@@ -1694,7 +1694,7 @@ class DecodeTransformerBlock(tf.keras.layers.Layer):
                intermediate_size=3072,
                intermediate_activation="gelu",
                hidden_dropout_prob=0.0,
-               attention_probs_dropout_prob=0.0,
+               attention_probs_dropout_prob=0.1,
                initializer_range=0.02,
                backward_compatible=False,
                float_type=tf.float32,
