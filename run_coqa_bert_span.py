@@ -97,23 +97,22 @@ def coqa_loss_fn( start_positions,
 
     depth = start_logits.shape.as_list()[-1]
     start_ohe = tf.one_hot(start_positions, depth=depth)
-    start_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=start_logits, labels=start_ohe)
+
+    s_ohe =tf.concat([ start_ohe,tf.cast(is_ynu,tf.float32) ],axis=-1)
+    s_logits = tf.concat([start_logits, ynu_logits], axis=-1)
+
+    start_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=s_logits, labels=s_ohe)
 
     end_ohe = tf.one_hot(end_positions, depth=depth)
-    end_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=end_logits, labels=end_ohe)
+    e_ohe = tf.concat([end_ohe, tf.cast(is_ynu, tf.float32)], axis=-1)
+    e_logits=tf.concat([end_logits,ynu_logits],axis=-1)
+
+    end_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=e_logits, labels=e_ohe)
 
     span_loss = (tf.reduce_mean(start_loss) + tf.reduce_mean(end_loss)) / 2
 
-    is_y_ohe = tf.squeeze(tf.one_hot(is_ynu[:,0], depth=2))
-    is_n_ohe =tf.squeeze( tf.one_hot(is_ynu[:,1], depth=2))
-    is_u_ohe = tf.squeeze(tf.one_hot(is_ynu[:,2], depth=2))
 
-    y_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=ynu_logits[:,0], labels=is_y_ohe)
-    n_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=ynu_logits[:,1], labels=is_n_ohe)
-    u_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=ynu_logits[:,2], labels=is_u_ohe)
-
-    #since we know span and yes, no, unknown are mutually exclusive in data (preprocessed data)
-    total_loss =y_loss+n_loss+u_loss+ span_loss
+    total_loss = span_loss
 
     return  total_loss
 
@@ -165,8 +164,7 @@ def get_loss_fn(loss_factor=1.0):
 
     #unique_ids,final_dists, attn_dists = model_outputs
 
-    unique_ids,start_logits,end_logits,y_logits,n_logits,u_logits  = model_outputs
-    ynu_logits=tf.stack([y_logits,n_logits,u_logits ],axis=1)
+    unique_ids,start_logits,end_logits,ynu_logits  = model_outputs
 
     #unique_ids, final_dists  = model_outputs
     return coqa_loss_fn(start_positions,
@@ -182,11 +180,16 @@ def get_loss_fn(loss_factor=1.0):
 
 def get_raw_results(predictions):
   """Converts multi-replica predictions to RawResult."""
-  for unique_id, sentence_ids  in zip(predictions['unique_ids'],
-                                                  predictions['sentence_ids'] ):
-      yield coqa_bert_span_lib.RawResultEnd2end(
-          unique_id=unique_id,
-          sentence_ids=sentence_ids)
+  for unique_ids, start_logits, end_logits  in zip(predictions['unique_ids'],
+                                                  predictions['start_logits'],
+                                                  predictions['end_logits']
+                                                  ):
+      for values in zip(unique_ids.numpy(), start_logits.numpy(), end_logits.numpy()):
+          yield coqa_bert_span_lib.RawResult(
+              unique_id=values[0],
+              start_logits=values[1].tolist(),
+              end_logits=values[2].tolist()
+          )
 
 
 def predict_coqa_customized(strategy, input_meta_data, bert_config,
@@ -228,31 +231,6 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     checkpoint = tf.train.Checkpoint(model=coqa_model)
     checkpoint.restore(checkpoint_path).expect_partial()
 
-    def decode_sequence(x):
-
-        pred_ids=  tf.unstack(x['decode_ids'], axis=-1)
-        pred_mask =  tf.unstack(x['decode_mask'],axis=-1)
-
-
-        for i in range(1, bert_config.max_answer_length):
-            unique_ids, logits = coqa_model(
-                                inputs = ( {
-                                    'unique_ids' : x['unique_ids'],
-                                    'input_word_ids' : x['input_word_ids'],
-                                    'input_type_ids' : x['input_type_ids'],
-                                    'input_mask':x['input_mask'],
-                                    'decode_ids':tf.stack(pred_ids,axis = 1),
-                                    'decode_mask': tf.stack( pred_mask,axis = 1),
-                                }),
-                                training=False)
-
-            next_pred = tf.argmax(logits, axis=-1, output_type=tf.int32)
-
-            # Only update the i-th column in one step.
-            pred_ids[i]=next_pred[:, i - 1]
-            pred_mask[i]=tf.cast(tf.not_equal(next_pred[:, i - 1], 105),tf.int32) #tf.not_equal(next_pred[:, i - 1], 105)
-            #pred_mask[:,i]
-        return x['unique_ids'],  next_pred
 
 
     #@tf.function
@@ -260,17 +238,29 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
       """Predicts on distributed devices."""
 
       def _replicated_step(inputs):
-        """Replicated prediction calculation."""
-        x, _ = inputs
-        unique_ids, sentence_ids  = decode_sequence(x)
+          """Replicated prediction calculation."""
+          x, _ = inputs
+          unique_ids, start_logits, end_logits,ynu_logits = coqa_model(x, training=False)
 
-        return dict(
-            unique_ids=unique_ids,
-            sentence_ids=sentence_ids )
+          #combine the yes,no,unknown with span start and end logits
+          #index 384 = yes, 385 = no, 386 = unknown
+          #index <384: span start and span end.
+
+          s_logits = tf.concat([start_logits, ynu_logits], axis=-1)
+
+          e_logits = tf.concat([end_logits, ynu_logits], axis=-1)
+
+          return dict(
+              unique_ids=unique_ids,
+              start_logits=s_logits,
+              end_logits=e_logits
+
+           )
 
       outputs = strategy.experimental_run_v2(
           _replicated_step, args=(next(iterator),))
-      return outputs
+      return tf.nest.map_structure(strategy.experimental_local_results, outputs)
+
 
     all_results = []
     for _ in range(num_steps):
@@ -426,20 +416,16 @@ def predict_coqa(strategy, input_meta_data):
                                          eval_writer.filename, num_steps)
 
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
-  output_null_log_odds_file = os.path.join(FLAGS.model_dir, 'null_odds.json')
-  StartToken='[START]'
-  StopToken='[STOP]'
 
-  coqa_bert_span_lib.write_predictions_end2end(
+  coqa_bert_span_lib.write_predictions_bert_span(
       eval_examples,
       eval_features,
       all_results,
-      output_prediction_file,
       FLAGS.max_answer_length,
-      tokenizer,
-      StartToken,
-      StopToken
-       )
+      FLAGS.n_best_size,
+      FLAGS.do_lower_case,
+      output_prediction_file
+   )
 
 
 def export_coqa(model_export_path, input_meta_data):

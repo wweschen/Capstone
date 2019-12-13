@@ -168,7 +168,7 @@ def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, 
     yesnounknown_logits_layer = BertYNULogitsLayer(
         initializer=initializer, float_type=float_type, name='yesnounknown_logits')
 
-    y_logits ,n_logits,u_logits= yesnounknown_logits_layer(pooled_output)
+    ynu_logits  = yesnounknown_logits_layer(pooled_output)
 
     span_logits_layer = BertSpanLogitsLayer(
         initializer=initializer, float_type=float_type, name='bert_span_logits')
@@ -184,7 +184,7 @@ def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, 
                     'input_type_ids': input_type_ids,
                     'input_mask': input_mask },),
 
-        outputs=[unique_ids, start_logits, end_logits,y_logits ,n_logits,u_logits])
+        outputs=[unique_ids, start_logits, end_logits,ynu_logits])
 
 
     return coqa, bert_model
@@ -606,12 +606,8 @@ class BertYNULogitsLayer(tf.keras.layers.Layer):
 
     # 2 means is A, or is not A, here A is yes,no, unknown
 
-    self.y_dense = tf.keras.layers.Dense(
-        units=2, kernel_initializer=self.initializer, name='y_final_dense')
-    self.n_dense = tf.keras.layers.Dense(
-        units=2, kernel_initializer=self.initializer, name='n_final_dense')
-    self.u_dense = tf.keras.layers.Dense(
-        units=2, kernel_initializer=self.initializer, name='u_final_dense')
+    self.ynu_dense = tf.keras.layers.Dense(
+        units=3, kernel_initializer=self.initializer, name='ynu_final_dense')
 
     super(BertYNULogitsLayer, self).build(unused_input_shapes)
 
@@ -620,17 +616,13 @@ class BertYNULogitsLayer(tf.keras.layers.Layer):
     pooled_output = inputs
 
 
-    logits_y = self.y_dense(pooled_output)
-    logits_n = self.n_dense(pooled_output)
-    logits_u = self.u_dense(pooled_output)
+    logits_ynu = self.ynu_dense(pooled_output)
 
 
     if self.float_type == tf.float16:
-      logits_y  = tf.cast(logits_y , tf.float32)
-      logits_n = tf.cast(logits_n, tf.float32)
-      logits_u = tf.cast(logits_u, tf.float32)
+      logits_ynu  = tf.cast(logits_ynu , tf.float32)
 
-    return logits_y,logits_n,logits_u  #Yes,No,Unknown
+    return logits_ynu  #Yes,No,Unknown
 
 
 

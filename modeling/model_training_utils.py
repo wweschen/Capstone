@@ -252,7 +252,7 @@ def run_customized_training_loop(
       for metric in train_metrics:
         metric.update_state(labels, model_outputs)
 
-    #@tf.function
+    @tf.function
     def train_steps(iterator, steps):
       """Performs distributed training steps in a loop.
 
