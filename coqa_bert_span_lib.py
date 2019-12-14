@@ -501,7 +501,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                         start_position = 0
                         end_position = 0
                     else:
-                        doc_offset = 1  # we added [CLS] infront of context doc (note we moved query to the end #len(query_tokens) + 2
+                        #doc_offset = 1  # we added [CLS] infront of context doc (note we moved query to the end #len(query_tokens) + 2
+                        doc_offset = len(query_tokens)  + len(qa_history_tokens) + 2
                         start_position = tok_start_position - doc_start + doc_offset
                         end_position = tok_end_position - doc_start + doc_offset
                     if end_position <0 or start_position<0:
@@ -722,7 +723,7 @@ def generate_tf_record_from_json_file(input_file_path,
     train_writer.close()
 
     meta_data = {
-        "task_type": "bert_pgnet_coqa",
+        "task_type": "bert_span_coqa",
         "train_data_size": number_of_examples,
         "max_seq_length": max_seq_length,
         "max_query_length": max_query_length,

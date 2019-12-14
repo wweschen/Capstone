@@ -43,7 +43,7 @@ flags.DEFINE_string(
     'Path to file that contains meta data about input '
     'to be used for training and evaluation.')
 # Model training specific flags.
-flags.DEFINE_integer('train_batch_size', 1, 'Total batch size for training.')
+#flags.DEFINE_integer('train_batch_size', 1, 'Total batch size for training.')
 # Predict processing related.
 flags.DEFINE_string('predict_file', None,
                     'Prediction data path with train tfrecords.')
@@ -57,8 +57,8 @@ flags.DEFINE_bool(
     'verbose_logging', False,
     'If true, all of the warnings related to data processing will be printed. '
     'A number of warnings are expected for a normal SQuAD evaluation.')
-flags.DEFINE_integer('predict_batch_size', 1,
-                     'Total batch size for prediction.')
+#flags.DEFINE_integer('predict_batch_size', 1,
+#                     'Total batch size for prediction.')
 flags.DEFINE_integer(
     'n_best_size', 20,
     'The total number of n-best predictions to generate in the '
@@ -486,7 +486,7 @@ if __name__ == '__main__':
   flags.mark_flag_as_required('bert_config_file')
   flags.mark_flag_as_required('model_dir')
 
-  tf.compat.v1.reset_default_graph()
+  #tf.compat.v1.reset_default_graph()
 
   app.run(main)
 

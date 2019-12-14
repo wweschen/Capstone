@@ -1,5 +1,5 @@
 {
-    "task_type": "bert_pgnet_coqa",
+    "task_type": "bert_span_coqa",
     "train_data_size": 740,
     "max_seq_length": 384,
     "max_query_length": 128,
