@@ -410,10 +410,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             tokens.append("[CLS]")
             segment_ids.append(0)
 
-            if len(qa_history_tokens) > 0:
-                for token, t in zip(qa_history_tokens, qa_history_type_ids):
-                    tokens.append(token)
-                    segment_ids.append(0)
+
 
             for token in query_tokens:
                 tokens.append(token)
@@ -431,6 +428,11 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                 token_is_max_context[len(tokens)] = is_max_context
                 tokens.append(all_doc_tokens[split_token_index])
                 segment_ids.append(1)
+
+            if len(qa_history_tokens) > 0:
+                for token, t in zip(qa_history_tokens, qa_history_type_ids):
+                    tokens.append(token)
+                    segment_ids.append(1)
 
             tokens.append("[SEP]")
             segment_ids.append(1)
@@ -502,7 +504,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                         end_position = 0
                     else:
                         #doc_offset = 1  # we added [CLS] infront of context doc (note we moved query to the end #len(query_tokens) + 2
-                        doc_offset = len(query_tokens)  + len(qa_history_tokens) + 2
+                        doc_offset = len(query_tokens) + 2
                         start_position = tok_start_position - doc_start + doc_offset
                         end_position = tok_end_position - doc_start + doc_offset
                     if end_position <0 or start_position<0:
