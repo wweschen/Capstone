@@ -188,6 +188,75 @@ def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, 
 
 
     return coqa, bert_model
+def coqa_model_span_rationale_tag(config, max_seq_length, max_answer_length, float_type, training=False,
+                      initializer=None):
+    unique_ids = tf.keras.layers.Input(
+        shape=(1,), dtype=tf.int32, name='unique_ids')
+    input_word_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
+    input_mask = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
+    input_type_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
+
+
+
+
+    bert_model = bert_modeling.get_bert_model(
+        input_word_ids,
+        input_mask,
+        input_type_ids,
+        config= config,
+        name='bert_model',
+        float_type=float_type)
+
+    # `Bert Coqa Model` only uses the sequence_output which
+    # has dimensionality (batch_size, sequence_length, num_hidden).
+    pooled_output = bert_model.outputs[0]
+    sequence_output = bert_model.outputs[1]
+
+    rationale_tag_layer = BertRationaleTagLogitsLayer(config.hidden_size,
+                                                      initializer=initializer, float_type=float_type,
+                                                      name='bert_rationale_tag_logits')
+
+    rt_logits = rationale_tag_layer(sequence_output)
+
+
+    rt_masked_sequence =sequence_output * tf.expand_dims(tf.nn.sigmoid(rt_logits),2) #it is really a masking process
+
+    attention_layer = BertSequenceAttentionLayer(config.hidden_size,
+                                                      initializer=initializer, float_type=float_type,
+                                                      name='bert_sequence_attention')
+
+    attention = attention_layer(rt_masked_sequence)
+
+    #summary for classification
+    h = tf.reduce_sum(tf.expand_dims(attention,axis=2) * sequence_output,axis=1)
+
+    yesnounknown_logits_layer = BertYNULogitsLayer(
+        initializer=initializer, float_type=float_type, name='yesnounknown_logits')
+
+    ynu_logits  = yesnounknown_logits_layer(tf.concat([pooled_output,h],axis=1))
+
+    span_logits_layer = BertSpanLogitsLayer(
+        initializer=initializer, float_type=float_type, name='bert_span_logits')
+
+    start_logits, end_logits = span_logits_layer(sequence_output)
+
+
+
+    coqa = tf.keras.Model(
+        inputs=({
+                    'unique_ids': unique_ids,
+                    'input_word_ids': input_word_ids,
+                    'input_type_ids': input_type_ids,
+                    'input_mask': input_mask },),
+
+        outputs=[unique_ids, start_logits, end_logits,ynu_logits,rt_logits])
+
+
+    return coqa, bert_model
+
 
 def coqa_model_transformer(config, max_seq_length, max_answer_length, float_type, training=False,
                       initializer=None):
@@ -629,10 +698,11 @@ class BertYNULogitsLayer(tf.keras.layers.Layer):
 class BertSpanLogitsLayer(tf.keras.layers.Layer):
   """Returns a layer that computes custom logits for BERT squad model."""
 
-  def __init__(self, initializer=None, float_type=tf.float32, **kwargs):
+  def __init__(self,initializer=None, float_type=tf.float32, **kwargs):
     super(BertSpanLogitsLayer, self).__init__(**kwargs)
     self.initializer = initializer
     self.float_type = float_type
+
 
   def build(self, unused_input_shapes):
     """Implements build() for the layer."""
@@ -657,6 +727,75 @@ class BertSpanLogitsLayer(tf.keras.layers.Layer):
     if self.float_type == tf.float16:
       unstacked_logits = tf.cast(unstacked_logits, tf.float32)
     return unstacked_logits[0], unstacked_logits[1]
+
+
+class BertRationaleTagLogitsLayer(tf.keras.layers.Layer):
+  """Returns a layer that computes custom logits for BERT squad model."""
+
+  def __init__(self, hidden_size,initializer=None, float_type=tf.float32, **kwargs):
+    super(BertRationaleTagLogitsLayer, self).__init__(**kwargs)
+    self.initializer = initializer
+    self.float_type = float_type
+
+    self.hidden_size = hidden_size
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+
+    self.w = self.add_weight('w', [self.hidden_size, self.hidden_size], dtype=tf.float32,
+                             initializer=tf.keras.initializers.TruncatedNormal())
+
+    self.v = self.add_weight('v', [self.hidden_size], dtype=tf.float32,
+                             initializer=tf.keras.initializers.TruncatedNormal())
+
+    super(BertRationaleTagLogitsLayer, self).build(unused_input_shapes)
+
+  def call(self, inputs):
+    """Implements call() for the layer."""
+    sequence_output = inputs
+
+    input_shape = sequence_output.shape.as_list()
+    sequence_length = input_shape[1]
+    num_hidden_units = input_shape[2]
+
+    ret = tf.einsum("abc,cd->abd", inputs, self.w)
+
+    logits= tf.einsum("abc,c->ab", tf.nn.relu(ret),self.v)
+
+    return logits
+
+class BertSequenceAttentionLayer(tf.keras.layers.Layer):
+  """Returns a layer that computes custom logits for BERT squad model."""
+
+  def __init__(self, hidden_size,initializer=None, float_type=tf.float32, **kwargs):
+    super(BertSequenceAttentionLayer, self).__init__(**kwargs)
+    self.initializer = initializer
+    self.float_type = float_type
+
+    self.hidden_size = hidden_size
+  def build(self, unused_input_shapes):
+    """Implements build() for the layer."""
+
+    self.w = self.add_weight('w_a', [self.hidden_size, self.hidden_size], dtype=tf.float32,
+                             initializer=tf.keras.initializers.TruncatedNormal())
+
+    self.v = self.add_weight('v_a', [self.hidden_size], dtype=tf.float32,
+                             initializer=tf.keras.initializers.TruncatedNormal())
+
+    super(BertSequenceAttentionLayer, self).build(unused_input_shapes)
+
+  def call(self, inputs):
+    """Implements call() for the layer."""
+    sequence_output = inputs
+
+    input_shape = sequence_output.shape.as_list()
+    sequence_length = input_shape[1]
+    num_hidden_units = input_shape[2]
+
+    ret = tf.einsum("abc,cd->abd", inputs, self.w)
+
+    attention= tf.nn.softmax(tf.einsum("abc,c->ab", tf.nn.relu(ret),self.v))
+
+    return attention
 
 
 def get_best_span_mask(start_logits, end_logits):

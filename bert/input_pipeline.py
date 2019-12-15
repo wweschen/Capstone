@@ -246,6 +246,49 @@ def create_coqa_dataset(file_path, seq_length, batch_size, is_training=True):
   dataset = dataset.prefetch(1024)
   return dataset
 
+def create_coqa_span_rationale_tag_dataset(file_path, seq_length, batch_size, is_training=True):
+  """Creates input dataset from (tf)records files for train/eval."""
+  name_to_features = {
+      'unique_ids': tf.io.FixedLenFeature([], tf.int64),
+      'input_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
+      'input_mask': tf.io.FixedLenFeature([seq_length], tf.int64),
+      'segment_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
+  }
+  if is_training:
+    name_to_features['start_positions'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['end_positions'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['is_yes'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['is_no'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['is_unknown'] = tf.io.FixedLenFeature([], tf.int64)
+    name_to_features['rationale_tags'] =tf.io.FixedLenFeature([seq_length], tf.int64)
+
+  input_fn = file_based_input_fn_builder(file_path, name_to_features)
+  dataset = input_fn()
+
+  def _select_data_from_record(record):
+    x, y = {}, {}
+    x = {
+        'unique_ids': record['unique_ids'],
+        'input_word_ids': record['input_ids'],
+        'input_type_ids': record['segment_ids'],
+        'input_mask': record['input_mask']
+    }
+    for name, tensor in record.items():
+      if name in ('start_positions', 'end_positions','is_yes','is_no','is_unknown','rationale_tags'):
+        y[name] = tensor
+
+    return (x, y)
+
+  dataset = dataset.map(_select_data_from_record)
+
+  if is_training:
+    dataset = dataset.shuffle(100)
+    dataset = dataset.repeat()
+
+  dataset = dataset.batch(batch_size, drop_remainder=True)
+  dataset = dataset.prefetch(1024)
+  return dataset
+
 def create_coqa_bert_span_dataset(file_path, seq_length, batch_size, is_training=True):
   """Creates input dataset from (tf)records files for train/eval."""
   name_to_features = {

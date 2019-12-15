@@ -30,11 +30,12 @@ import coqa_lib
 import coqa_end2end_lib
 import coqa_bert_lib
 import coqa_bert_span_lib
+import coqa_span_rationale_tag_lib
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_enum(
-    "fine_tuning_task_type", "classification", ["classification", "squad","coqa","coqa_end2end","coqa_bert_e2e","coqa_bert_span"],
+    "fine_tuning_task_type", "classification", ["coqa_span_rationale_tag","classification", "squad","coqa","coqa_end2end","coqa_bert_e2e","coqa_bert_span"],
     "The name of the BERT fine tuning task for which data "
     "will be generated..")
 
@@ -163,6 +164,12 @@ def generate_coqa_bert_span_dataset():
         FLAGS.data_file, FLAGS.vocab_file, FLAGS.train_data_output_path,
         FLAGS.max_seq_length, FLAGS.max_answer_length, FLAGS.do_lower_case, FLAGS.max_query_length,
         FLAGS.doc_stride)
+def generate_coqa_span_rationale_tag_dataset():
+    assert FLAGS.data_file
+    return coqa_span_rationale_tag_lib.generate_tf_record_from_json_file(
+        FLAGS.data_file, FLAGS.vocab_file, FLAGS.train_data_output_path,
+        FLAGS.max_seq_length, FLAGS.max_answer_length, FLAGS.do_lower_case, FLAGS.max_query_length,
+        FLAGS.doc_stride)
 
 def main(_):
   if FLAGS.fine_tuning_task_type == "classification":
@@ -177,6 +184,8 @@ def main(_):
       input_meta_data=generate_coqa_bert_e2e_dataset()
   elif FLAGS.fine_tuning_task_type == "coqa_bert_span":
       input_meta_data = generate_coqa_bert_span_dataset()
+  elif FLAGS.fine_tuning_task_type =="coqa_span_rationale_tag":
+      input_meta_data = generate_coqa_span_rationale_tag_dataset()
 
   with tf.io.gfile.GFile(FLAGS.meta_data_file_path, "w") as writer:
     writer.write(json.dumps(input_meta_data, indent=4) + "\n")

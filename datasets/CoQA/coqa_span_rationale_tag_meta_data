@@ -1,0 +1,8 @@
+{
+    "task_type": "coqa_span_rationale_tag",
+    "train_data_size": 740,
+    "max_seq_length": 384,
+    "max_query_length": 128,
+    "max_answer_length": 30,
+    "doc_stride": 128
+}
