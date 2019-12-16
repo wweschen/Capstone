@@ -13,6 +13,7 @@ import tensorflow as tf
 
 from bert import tokenization
 
+from coqa_data_augmentation import find_best_f1_span
 
 class CoqaExample(object):
     """A single training/test example for simple sequence classification.
@@ -215,9 +216,14 @@ def read_coqa_examples(input_file, is_training):
 
             rationale_text = answer["span_text"]
             gold_answer_text = answer["input_text"]
+            # data augementation
+            offset, new_len, new_span = find_best_f1_span(gold_answer_text, rationale_text)
 
-            rationale_offset = answer["span_start"]
-            rationale_length = len(rationale_text)
+            rationale_offset = answer["span_start"] + offset
+            rationale_length = new_len  # len(rationale_text)
+            rationale_text = new_span
+            ############
+
             if rationale_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
                 start_position = 0
                 end_position = 0
