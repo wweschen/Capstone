@@ -236,7 +236,7 @@ def read_coqa_examples(input_file, is_training):
                 offset,offset_len, new_span = find_best_f1_span(gold_answer_text, rationale_text)
 
                 start_position = start_position + offset
-                end_position=start_position+offset_len
+                end_position=start_position+offset_len-1
 
                 rationale_text = new_span
                 ############
@@ -381,8 +381,6 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             decode_tokens = decode_tokens + answer_tokens
             answer_tokens.append("[STOP]")
 
-            if (example.start_position<0 or example.start_position>= len(orig_to_tok_index)):
-                print(example)
 
             tok_start_position = orig_to_tok_index[example.start_position]
 
