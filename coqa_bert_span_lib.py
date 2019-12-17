@@ -219,7 +219,14 @@ def read_coqa_examples(input_file, is_training):
             rationale_offset = answer["span_start"]
             rationale_length = len(rationale_text)
 
-            if rationale_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
+            if gold_answer_text.lower() == "yes":
+                is_yes = 1
+            if gold_answer_text.lower() == "no":
+                is_no = 1
+            if gold_answer_text.lower() == "unknown":
+                is_unknown = 1
+
+            if rationale_offset <0 or is_unknown==1:  #here we have bad data, we don't want to generate wrong start/end positions
                 start_position = 0
                 end_position = 0
             else:
@@ -233,13 +240,6 @@ def read_coqa_examples(input_file, is_training):
 
                 rationale_text = new_span
                 ############
-
-            if gold_answer_text.lower() == "yes":
-                is_yes = 1
-            if gold_answer_text.lower() == "no":
-                is_no = 1
-            if gold_answer_text.lower() == "unknown":
-                is_unknown = 1
 
             history_q.append(question_text.strip())
             history_q_marker.append(create_marker_string('Q',len(question_text.strip().split())))
@@ -381,8 +381,11 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
             decode_tokens = decode_tokens + answer_tokens
             answer_tokens.append("[STOP]")
 
+            if (example.start_position<0 or example.start_position>= len(orig_to_tok_index)):
+                print(example)
 
             tok_start_position = orig_to_tok_index[example.start_position]
+
             if example.end_position < len(example.doc_tokens) - 1:
                 tok_end_position = orig_to_tok_index[example.end_position + 1] - 1
             else:
