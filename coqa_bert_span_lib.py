@@ -240,6 +240,10 @@ def read_coqa_examples(input_file, is_training):
 
                 rationale_text = new_span
                 ############
+            if start_position>=len(doc_tokens) or end_position>=len(doc_tokens):
+                is_unknown=1
+                start_position=0
+                end_position=0
 
             history_q.append(question_text.strip())
             history_q_marker.append(create_marker_string('Q',len(question_text.strip().split())))
@@ -446,9 +450,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
             tokens.append("[SEP]")
             segment_ids.append(1)
-
-
-
+ 
 
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
