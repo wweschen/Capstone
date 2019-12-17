@@ -216,13 +216,8 @@ def read_coqa_examples(input_file, is_training):
 
             rationale_text = answer["span_text"]
             gold_answer_text = answer["input_text"]
-            # data augementation
-            offset, new_len, new_span = find_best_f1_span(gold_answer_text, rationale_text)
-
-            rationale_offset = answer["span_start"] + offset
-            rationale_length = new_len  # len(rationale_text)
-            rationale_text = new_span
-            ############
+            rationale_offset = answer["span_start"]
+            rationale_length = len(rationale_text)
 
             if rationale_offset <0:  #here we have bad data, we don't want to generate wrong start/end positions
                 start_position = 0
@@ -230,6 +225,14 @@ def read_coqa_examples(input_file, is_training):
             else:
                 start_position = char_to_word_offset[rationale_offset]
                 end_position = char_to_word_offset[rationale_offset + rationale_length - 1]
+                # data augementation
+                offset,offset_len, new_span = find_best_f1_span(gold_answer_text, rationale_text)
+
+                start_position = start_position + offset
+                end_position=start_position+offset_len
+
+                rationale_text = new_span
+                ############
 
             if gold_answer_text.lower() == "yes":
                 is_yes = 1
@@ -546,17 +549,18 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
                     "decode_mask: %s" % " ".join([str(x) for x in decode_mask]))
 
                 if is_training:
-                    answer_text = " ".join(tokens[start_position:(end_position + 1)])
+
                     logging.info("start_position: %d" % (start_position))
                     logging.info("end_position: %d" % (end_position))
                     logging.info("is_yes: %s" % (is_yes))
                     logging.info("is_no: %s" % (is_no))
                     logging.info("is_unknown: %s" % (is_unknown))
-                    logging.info(
-                        "rationale: %s" % (tokenization.printable_text(answer_text)))
-                    logging.info(
-                        "span text: %s" % (tokenization.printable_text(example.orig_answer_text)))
 
+                    logging.info(
+                        "rationale: %s" % (tokenization.printable_text(example.orig_answer_text)))
+                    span_text = " ".join(tokens[start_position:(end_position + 1)])
+                    logging.info(
+                        "span text: %s" % (tokenization.printable_text(span_text)))
                     logging.info(
                         "answer: %s" % (tokenization.printable_text(example.gold_answer_text)))
                     logging.info(
