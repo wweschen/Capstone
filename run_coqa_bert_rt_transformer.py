@@ -423,16 +423,19 @@ def predict_coqa(strategy, input_meta_data):
                                          eval_writer.filename, num_steps)
 
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
+  StartToken = '[START]'
+  StopToken = '[STOP]'
 
   coqa_bert_rt_transformer_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,
+      output_prediction_file,
       FLAGS.max_answer_length,
-      FLAGS.n_best_size,
-      FLAGS.do_lower_case,
-      output_prediction_file
-   )
+      tokenizer,
+      StartToken,
+      StopToken
+  )
 
 
 def export_coqa(model_export_path, input_meta_data):
