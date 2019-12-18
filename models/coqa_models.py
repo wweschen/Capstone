@@ -257,6 +257,70 @@ def coqa_model_span_rationale_tag(config, max_seq_length, max_answer_length, flo
 
     return coqa, bert_model
 
+def coqa_model_bert_rt_transformer(config, max_seq_length, max_answer_length, float_type, training=False,
+                      initializer=None):
+    unique_ids = tf.keras.layers.Input(
+        shape=(1,), dtype=tf.int32, name='unique_ids')
+    input_word_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
+    input_mask = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
+    input_type_ids = tf.keras.layers.Input(
+        shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
+
+    decode_ids = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
+    decode_mask = tf.keras.layers.Input(
+        shape=(max_answer_length,), dtype=tf.int32, name='decode_mask')
+
+    bert_model = bert_modeling.get_bert_model(
+        input_word_ids,
+        input_mask,
+        input_type_ids,
+        config= config,
+        name='bert_model',
+        float_type=float_type)
+
+    # `Bert Coqa Model` only uses the sequence_output which
+    # has dimensionality (batch_size, sequence_length, num_hidden).
+    pooled_output = bert_model.outputs[0]
+    sequence_output = bert_model.outputs[1]
+
+    rationale_tag_layer = BertRationaleTagLogitsLayer(config.hidden_size,
+                                                      initializer=initializer, float_type=float_type,
+                                                      name='bert_rationale_tag_logits')
+
+    rt_logits = rationale_tag_layer(sequence_output)
+
+
+    rt_masked_sequence =sequence_output * tf.expand_dims(tf.nn.sigmoid(rt_logits),2) #it is really a masking process
+
+
+
+    coqa_layer = coqalayers.SimpleTransformerDecoder(config=config,
+                                              name='simple_transformer_decoder')
+
+    final_dists = coqa_layer(rt_masked_sequence,
+                             input_mask,
+                             decode_ids,
+                             decode_mask
+                             )
+
+    coqa = tf.keras.Model(
+        inputs=({
+                    'unique_ids': unique_ids,
+                    'input_word_ids': input_word_ids,
+                    'input_type_ids': input_type_ids,
+                    'input_mask': input_mask,
+                    'decode_ids': decode_ids,
+                    'decode_mask': decode_mask},),
+
+        outputs=[unique_ids, final_dists, rt_logits])
+
+
+    return coqa, bert_model
+
+
 
 def coqa_model_transformer(config, max_seq_length, max_answer_length, float_type, training=False,
                       initializer=None):
