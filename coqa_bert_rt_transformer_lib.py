@@ -919,6 +919,62 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
     with tf.io.gfile.GFile(output_prediction_file, "w") as writer:
 
         writer.write(json.dumps(all_predictions, indent=4) + "\n")
+def write_predictions_end2end(all_examples, all_features, all_results,
+                                 output_prediction_file,max_answer_length,
+                                tokenizer,StartToken='[START]',StopToken='[STOP]'
+                                ):
+
+    """Write final predictions to the json file and log-odds of null if needed."""
+    logging.info("Writing predictions to: %s" % (output_prediction_file))
+
+    example_index_to_features = collections.defaultdict(list)
+    for feature in all_features:
+        example_index_to_features[feature.example_index].append(feature)
+
+    unique_id_to_result = {}
+    for result in all_results:
+        unique_id_to_result[result.unique_id.numpy()] = result.sentence_ids.numpy()
+
+    _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
+        "PrelimPrediction",
+        ["feature_index", "Token_ids"])
+
+    _Prediction = collections.namedtuple('Prediction', ['id', 'turn_id', 'answer'])
+
+    all_predictions = []  # collections.OrderedDict()
+
+    for (example_index, example) in enumerate(all_examples):
+        features = example_index_to_features[example_index]
+
+        prelim_predictions = []
+        answers=[]
+        for (feature_index, feature) in enumerate(features):
+            if feature.unique_id not in unique_id_to_result:
+                logging.info('%s not found.' % (feature.unique_id))
+            if feature.unique_id in unique_id_to_result:
+                token_ids = unique_id_to_result[feature.unique_id]
+                tokens=[]
+                # De-tokenize WordPieces that have been split off.
+                for i in range(len(token_ids)):
+                    if token_ids[i] ==tokenizer.convert_tokens_to_ids([StopToken])[0]:
+                        break
+                    tokens.append(token_ids[i])
+
+                answer = ' '.join(tokenizer.convert_ids_to_tokens(tokens))
+
+                answer = answer.replace(" ##", "")
+                answer = answer.replace("##", "")
+
+                # Clean whitespace
+                answer = answer.strip()
+                answers.append( " ".join(answer.split()))
+
+        answer_text=" ".join(answers)
+
+        all_predictions.append({"id": example.story_id, "turn_id": example.turn_id, "answer": answer_text})
+
+    with tf.io.gfile.GFile(output_prediction_file, "w") as writer:
+        writer.write(json.dumps(all_predictions, indent=4) + "\n")
 
 def write_predictions_bert_span(all_examples, all_features, all_results,
                       max_answer_length,  n_best_size, do_lower_case, output_prediction_file):
