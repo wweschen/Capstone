@@ -171,16 +171,11 @@ def get_loss_fn(loss_factor=1.0):
 
 def get_raw_results(predictions):
   """Converts multi-replica predictions to RawResult."""
-  for unique_ids, start_logits, end_logits  in zip(predictions['unique_ids'],
-                                                  predictions['start_logits'],
-                                                  predictions['end_logits']
-                                                  ):
-      for values in zip(unique_ids.numpy(), start_logits.numpy(), end_logits.numpy()):
+  for unique_id, sentence_ids in zip(predictions['unique_ids'],
+                                         predictions['sentence_ids']):
           yield coqa_bert_rt_transformer_lib.RawResult(
-              unique_id=values[0],
-              start_logits=values[1].tolist(),
-              end_logits=values[2].tolist()
-          )
+              unique_id=unique_id,
+              sentence_ids=sentence_ids)
 
 
 def predict_coqa_customized(strategy, input_meta_data, bert_config,
@@ -429,7 +424,7 @@ def predict_coqa(strategy, input_meta_data):
 
   output_prediction_file = os.path.join(FLAGS.model_dir, 'predictions.json')
 
-  coqa_bert_rt_transformer_lib.write_predictions_bert_span(
+  coqa_bert_rt_transformer_lib.write_predictions_end2end(
       eval_examples,
       eval_features,
       all_results,

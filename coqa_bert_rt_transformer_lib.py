@@ -693,8 +693,11 @@ def _check_is_max_context(doc_spans, cur_span_index, position):
     return cur_span_index == best_span_index
 
 
+# RawResult = collections.namedtuple("RawResult",
+#                                    ["unique_id", "start_logits", "end_logits" ])
+
 RawResult = collections.namedtuple("RawResult",
-                                   ["unique_id", "start_logits", "end_logits" ])
+                                   ["unique_id", "sentence_ids" ])
 
 
 def _get_best_indexes(logits, n_best_size):
@@ -914,7 +917,9 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
         all_predictions.append({"id": example.story_id, "turn_id": example.turn_id, "answer": nbest_json[0]["text"]})
 
     with tf.io.gfile.GFile(output_prediction_file, "w") as writer:
+
         writer.write(json.dumps(all_predictions, indent=4) + "\n")
+
 def write_predictions_bert_span(all_examples, all_features, all_results,
                       max_answer_length,  n_best_size, do_lower_case, output_prediction_file):
     """Write final predictions to the json file and log-odds of null if needed."""
