@@ -203,6 +203,7 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
     predict_dataset = input_pipeline.create_coqa_bert_rt_transformer_dataset(
         predict_tfrecord_path,
         input_meta_data['max_seq_length'],
+        max_answer_length,
         FLAGS.predict_batch_size,
         is_training=False)
     predict_iterator = iter(
