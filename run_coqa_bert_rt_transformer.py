@@ -235,10 +235,9 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
               unique_ids=unique_ids,
               sentence_ids=sentence_ids)
 
-
       outputs = strategy.experimental_run_v2(
           _replicated_step, args=(next(iterator),))
-      return tf.nest.map_structure(strategy.experimental_local_results, outputs)
+      return outputs
 
     def decode_sequence(x):
 
