@@ -425,8 +425,6 @@ def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_
         'input_mask': tf.io.FixedLenFeature([seq_length], tf.int64),
         'decode_ids': tf.io.FixedLenFeature([answer_len], tf.int64),
         'segment_ids': tf.io.FixedLenFeature([seq_length], tf.int64),
-        'decode_mask': tf.io.FixedLenFeature([answer_len], tf.int64),
-
     }
     if is_training:
         name_to_features['answer_ids'] = tf.io.FixedLenFeature([answer_len], tf.int64)
@@ -441,11 +439,10 @@ def create_coqa_dataset_seq2seq(file_path, seq_length,answer_len,batch_size, is_
         x, y = {}, {}
         x = {
             'unique_ids': record['unique_ids'],
-            'input_word_ids': record['input_ids'],
+            'input_ids': record['input_ids'],
             'input_type_ids':record['segment_ids'],
             'input_mask': record['input_mask'],
             'decode_ids': record['decode_ids'],
-            'decode_mask':record['decode_mask'],
         }
 
         for name, tensor in record.items():

@@ -448,7 +448,7 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
     
     unique_ids = tf.keras.layers.Input(
         shape=(1,), dtype=tf.int32, name='unique_ids')
-    input_word_ids = tf.keras.layers.Input(
+    input_ids = tf.keras.layers.Input(
         shape=(max_seq_length,), dtype=tf.int32, name='input_word_ids')
     input_mask = tf.keras.layers.Input(
         shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
@@ -506,16 +506,16 @@ def coqa_modelseq2seq(config, max_seq_length, max_answer_length, max_oov_size, f
                                               training=training,
                                               name = 'simple_lstm_seq2seq')
 
-    final_dists = coqa_layer(input_word_ids,
-                             input_mask,
-                             input_type_ids,
-                             decode_ids,
+    final_dists = coqa_layer(input_ids= input_ids,
+                             input_mask= input_mask,
+                             input_type_ids=input_type_ids,
+                             decode_ids=decode_ids
                              )
 
     coqa = tf.keras.Model(
         inputs=({
                     'unique_ids': unique_ids,
-                    'input_word_ids': input_word_ids,
+                    'input_ids': input_ids,
                     'input_type_ids':input_type_ids,
                     'input_mask': input_mask,
                     'decode_ids': decode_ids},),
