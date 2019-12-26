@@ -16,4 +16,5 @@ python ../run_coqa_bert_span.py \
   --learning_rate=8e-5 \
   --num_train_epochs=2 \
   --model_dir=${MODEL_DIR} \
-  --strategy_type=mirror
+  --strategy_type=mirror \
+   --model_export_path =${MODEL_DIR}/saved

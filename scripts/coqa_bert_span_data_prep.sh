@@ -10,6 +10,6 @@ python ../create_finetuning_data.py \
  --train_data_output_path=${COQA_DIR}/coqa_bert_span_train.tf_record \
  --meta_data_file_path=${COQA_DIR}/coqa_bert_span_meta_data \
  --fine_tuning_task_type=coqa_bert_span \
- --max_seq_length=384
+ --max_seq_length=384 
 
 

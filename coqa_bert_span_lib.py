@@ -450,7 +450,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
             tokens.append("[SEP]")
             segment_ids.append(1)
- 
+
 
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
@@ -561,7 +561,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length, max_answer
 
                     logging.info(
                         "rationale: %s" % (tokenization.printable_text(example.orig_answer_text)))
-                    span_text = " ".join(tokens[start_position:(end_position + 1)])
+                    span_text = " ".join(tokens[start_position:(end_position+1)])
                     logging.info(
                         "span text: %s" % (tokenization.printable_text(span_text)))
                     logging.info(

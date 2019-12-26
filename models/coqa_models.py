@@ -146,11 +146,6 @@ def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, 
         shape=(max_seq_length,), dtype=tf.int32, name='input_mask')
     input_type_ids = tf.keras.layers.Input(
         shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
-    decode_ids = tf.keras.layers.Input(
-        shape=(max_answer_length,), dtype=tf.int32, name='decode_ids')
-    decode_mask = tf.keras.layers.Input(
-        shape=(max_answer_length,), dtype=tf.int32, name='decode_mask')
-
 
     bert_model = bert_modeling.get_bert_model(
         input_word_ids,
@@ -175,14 +170,12 @@ def coqa_model_bert_span(config, max_seq_length, max_answer_length, float_type, 
 
     start_logits, end_logits = span_logits_layer(sequence_output)
 
-
-
     coqa = tf.keras.Model(
         inputs=({
                     'unique_ids': unique_ids,
                     'input_word_ids': input_word_ids,
                     'input_type_ids': input_type_ids,
-                    'input_mask': input_mask },),
+                    'input_mask': input_mask }),
 
         outputs=[unique_ids, start_logits, end_logits,ynu_logits])
 

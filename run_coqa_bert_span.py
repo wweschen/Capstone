@@ -43,7 +43,7 @@ flags.DEFINE_string(
     'Path to file that contains meta data about input '
     'to be used for training and evaluation.')
 # Model training specific flags.
-#flags.DEFINE_integer('train_batch_size', 1, 'Total batch size for training.')
+flags.DEFINE_integer('train_batch_size', 8, 'Total batch size for training.')
 # Predict processing related.
 flags.DEFINE_string('predict_file', None,
                     'Prediction data path with train tfrecords.')
@@ -57,8 +57,8 @@ flags.DEFINE_bool(
     'verbose_logging', False,
     'If true, all of the warnings related to data processing will be printed. '
     'A number of warnings are expected for a normal SQuAD evaluation.')
-#flags.DEFINE_integer('predict_batch_size', 1,
-#                     'Total batch size for prediction.')
+flags.DEFINE_integer('predict_batch_size', 4,
+                    'Total batch size for prediction.')
 flags.DEFINE_integer(
     'n_best_size', 20,
     'The total number of n-best predictions to generate in the '
@@ -442,9 +442,10 @@ def export_coqa(model_export_path, input_meta_data):
     raise ValueError('Export path is not specified: %s' % model_export_path)
   bert_config = bert_modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
 
-  coqa_model = coqa_models.coqa_model_bert_span(
+  coqa_model,_ = coqa_models.coqa_model_bert_span(
       bert_config,
       input_meta_data['max_seq_length'],
+      input_meta_data['max_answer_length'],
       float_type=tf.float32)
   model_saving_utils.export_bert_model(
       model_export_path, model=coqa_model, checkpoint_dir=FLAGS.model_dir)
