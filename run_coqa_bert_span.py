@@ -98,14 +98,14 @@ def coqa_loss_fn( start_positions,
     depth = start_logits.shape.as_list()[-1]
     start_ohe = tf.one_hot(start_positions, depth=depth)
 
-    s_ohe =tf.concat([ start_ohe,tf.cast(is_ynu,tf.float32) ],axis=-1)
+    s_ohe = tf.concat([ start_ohe,tf.cast(is_ynu,tf.float32) ],axis=-1)
     s_logits = tf.concat([start_logits, ynu_logits], axis=-1)
 
     start_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=s_logits, labels=s_ohe)
 
     end_ohe = tf.one_hot(end_positions, depth=depth)
     e_ohe = tf.concat([end_ohe, tf.cast(is_ynu, tf.float32)], axis=-1)
-    e_logits=tf.concat([end_logits,ynu_logits],axis=-1)
+    e_logits= tf.concat([end_logits,ynu_logits],axis=-1)
 
     end_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(logits=e_logits, labels=e_ohe)
 
@@ -240,15 +240,14 @@ def predict_coqa_customized(strategy, input_meta_data, bert_config,
       def _replicated_step(inputs):
           """Replicated prediction calculation."""
           x, _ = inputs
-          unique_ids, start_logits, end_logits,ynu_logits = coqa_model(x, training=False)
-
+          unique_ids, start_logits, end_logits ,ynu_logits = coqa_model(x, training=False)
           #combine the yes,no,unknown with span start and end logits
           #index 384 = yes, 385 = no, 386 = unknown
           #index <384: span start and span end.
 
           s_logits = tf.concat([start_logits, ynu_logits], axis=-1)
 
-          e_logits = tf.concat([end_logits, ynu_logits], axis=-1)
+          e_logits =  tf.concat([end_logits, ynu_logits], axis=-1)
 
           return dict(
               unique_ids=unique_ids,

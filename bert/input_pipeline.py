@@ -398,8 +398,8 @@ def create_coqa_bert_span_dataset(file_path, seq_length, batch_size, is_training
     x, y = {}, {}
     x = {
         'unique_ids': record['unique_ids'],
-        'input_word_ids': record['input_ids'],
-        'input_type_ids': record['segment_ids'],
+        'input_ids': record['input_ids'],
+        'segment_ids': record['segment_ids'],
         'input_mask': record['input_mask']
     }
     for name, tensor in record.items():

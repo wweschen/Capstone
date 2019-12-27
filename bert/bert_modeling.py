@@ -122,8 +122,8 @@ def get_bert_model(input_word_ids,
                    float_type=tf.float32):
   """Wraps the core BERT model as a keras.Model."""
   bert_model_layer = BertModel(config=config, float_type=float_type, name=name)
-  pooled_output, sequence_output = bert_model_layer(input_word_ids, input_mask,
-                                                    input_type_ids)
+  pooled_output, sequence_output = bert_model_layer([input_word_ids, input_mask,
+                                                    input_type_ids])
   bert_model = tf.keras.Model(
       inputs=[input_word_ids, input_mask, input_type_ids],
       outputs=[pooled_output, sequence_output])
@@ -195,13 +195,13 @@ class BertModel(tf.keras.layers.Layer):
         name="pooler_transform")
     super(BertModel, self).build(unused_input_shapes)
 
-  def __call__(self,
-               input_word_ids,
-               input_mask=None,
-               input_type_ids=None,
-               **kwargs):
-    inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids])
-    return super(BertModel, self).__call__(inputs, **kwargs)
+  # def __call__(self,
+  #              input_word_ids,
+  #              input_mask=None,
+  #              input_type_ids=None,
+  #              **kwargs):
+  #   inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids])
+  #   return super(BertModel, self).__call__(inputs, **kwargs)
 
   def call(self, inputs, mode="bert"):
     """Implements call() for the layer.
