@@ -129,7 +129,8 @@ class BertPretrainLayer(tf.keras.layers.Layer):
     sequence_output = unpacked_inputs[1]
     masked_lm_positions = unpacked_inputs[2]
 
-    mask_lm_input_tensor = gather_indexes(sequence_output, masked_lm_positions)
+    mask_lm_input_tensor = gather_indexes(
+        sequence_output, masked_lm_positions)
     lm_output = self.lm_dense(mask_lm_input_tensor)
     lm_output = self.lm_layer_norm(lm_output)
     lm_output = tf.matmul(lm_output, self.embedding_table, transpose_b=True)
@@ -327,11 +328,7 @@ class BertSquadLogitsLayer(tf.keras.layers.Layer):
     return unstacked_logits[0], unstacked_logits[1]
 
 
-def squad_model(bert_config,
-                max_seq_length,
-                float_type,
-                initializer=None,
-                hub_module_url=None):
+def squad_model(bert_config, max_seq_length, float_type, initializer=None):
   """Returns BERT Squad model along with core BERT model to import weights.
 
   Args:
@@ -339,7 +336,6 @@ def squad_model(bert_config,
     max_seq_length: integer, the maximum input sequence length.
     float_type: tf.dtype, tf.float32 or tf.bfloat16.
     initializer: Initializer for weights in BertSquadLogitsLayer.
-    hub_module_url: TF-Hub path/url to Bert module.
 
   Returns:
     Two tensors, start logits and end logits, [batch x sequence length].
@@ -353,26 +349,17 @@ def squad_model(bert_config,
   input_type_ids = tf.keras.layers.Input(
       shape=(max_seq_length,), dtype=tf.int32, name='segment_ids')
 
-  if hub_module_url:
-    core_model = hub.KerasLayer(
-        hub_module_url,
-        trainable=True)
-    _, sequence_output = core_model(
-        [input_word_ids, input_mask, input_type_ids])
-    # Sets the shape manually due to a bug in TF shape inference.
-    # TODO(hongkuny): remove this once shape inference is correct.
-    sequence_output.set_shape((None, max_seq_length, bert_config.hidden_size))
-  else:
-    core_model = modeling.get_bert_model(
-        input_word_ids,
-        input_mask,
-        input_type_ids,
-        config=bert_config,
-        name='bert_model',
-        float_type=float_type)
-    # `BertSquadModel` only uses the sequnce_output which
-    # has dimensionality (batch_size, sequence_length, num_hidden).
-    sequence_output = core_model.outputs[1]
+  core_model = modeling.get_bert_model(
+      input_word_ids,
+      input_mask,
+      input_type_ids,
+      config=bert_config,
+      name='bert_model',
+      float_type=float_type)
+
+  # `BertSquadModel` only uses the sequnce_output which
+  # has dimensionality (batch_size, sequence_length, num_hidden).
+  sequence_output = core_model.outputs[1]
 
   if initializer is None:
     initializer = tf.keras.initializers.TruncatedNormal(

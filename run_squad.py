@@ -135,50 +135,53 @@ def get_raw_results(predictions):
 def predict_squad_customized(strategy, input_meta_data, bert_config,
                              predict_tfrecord_path, num_steps):
   """Make predictions using a Bert-based squad model."""
-  predict_dataset = input_pipeline.create_squad_dataset(
-      predict_tfrecord_path,
-      input_meta_data['max_seq_length'],
-      FLAGS.predict_batch_size,
-      is_training=False)
-  predict_iterator = iter(
-      strategy.experimental_distribute_dataset(predict_dataset))
+  primary_cpu_task = '/job:worker' if FLAGS.tpu else ''
 
-  with strategy.scope():
-    # Prediction always uses float32, even if training uses mixed precision.
-    tf.keras.mixed_precision.experimental.set_policy('float32')
-    squad_model, _ = bert_models.squad_model(
-        bert_config, input_meta_data['max_seq_length'], float_type=tf.float32)
+  with tf.device(primary_cpu_task):
+    predict_dataset = input_pipeline.create_squad_dataset(
+        predict_tfrecord_path,
+        input_meta_data['max_seq_length'],
+        FLAGS.predict_batch_size,
+        is_training=False)
+    predict_iterator = iter(
+        strategy.experimental_distribute_dataset(predict_dataset))
 
-  checkpoint_path = tf.train.latest_checkpoint(FLAGS.model_dir)
-  logging.info('Restoring checkpoints from %s', checkpoint_path)
-  checkpoint = tf.train.Checkpoint(model=squad_model)
-  checkpoint.restore(checkpoint_path).expect_partial()
+    with strategy.scope():
+      # Prediction always uses float32, even if training uses mixed precision.
+      tf.keras.mixed_precision.experimental.set_policy('float32')
+      squad_model, _ = bert_models.squad_model(
+          bert_config, input_meta_data['max_seq_length'], float_type=tf.float32)
 
-  @tf.function
-  def predict_step(iterator):
-    """Predicts on distributed devices."""
+    checkpoint_path = tf.train.latest_checkpoint(FLAGS.model_dir)
+    logging.info('Restoring checkpoints from %s', checkpoint_path)
+    checkpoint = tf.train.Checkpoint(model=squad_model)
+    checkpoint.restore(checkpoint_path).expect_partial()
 
-    def _replicated_step(inputs):
-      """Replicated prediction calculation."""
-      x, _ = inputs
-      unique_ids, start_logits, end_logits = squad_model(x, training=False)
-      return dict(
-          unique_ids=unique_ids,
-          start_logits=start_logits,
-          end_logits=end_logits)
+    @tf.function
+    def predict_step(iterator):
+      """Predicts on distributed devices."""
 
-    outputs = strategy.experimental_run_v2(
-        _replicated_step, args=(next(iterator),))
-    return tf.nest.map_structure(strategy.experimental_local_results, outputs)
+      def _replicated_step(inputs):
+        """Replicated prediction calculation."""
+        x, _ = inputs
+        unique_ids, start_logits, end_logits = squad_model(x, training=False)
+        return dict(
+            unique_ids=unique_ids,
+            start_logits=start_logits,
+            end_logits=end_logits)
 
-  all_results = []
-  for _ in range(num_steps):
-    predictions = predict_step(predict_iterator)
-    for result in get_raw_results(predictions):
-      all_results.append(result)
-    if len(all_results) % 100 == 0:
-      logging.info('Made predictions for %d records.', len(all_results))
-  return all_results
+      outputs = strategy.experimental_run_v2(
+          _replicated_step, args=(next(iterator),))
+      return tf.nest.map_structure(strategy.experimental_local_results, outputs)
+
+    all_results = []
+    for _ in range(num_steps):
+      predictions = predict_step(predict_iterator)
+      for result in get_raw_results(predictions):
+        all_results.append(result)
+      if len(all_results) % 100 == 0:
+        logging.info('Made predictions for %d records.', len(all_results))
+    return all_results
 
 
 def train_squad(strategy,
@@ -215,7 +218,7 @@ def train_squad(strategy,
     squad_model, core_model = bert_models.squad_model(
         bert_config,
         max_seq_length,
-        float_type=tf.float16 if use_float16 else tf.float32 )
+        float_type=tf.float16 if use_float16 else tf.float32)
     squad_model.optimizer = optimization.create_optimizer(
         FLAGS.learning_rate, steps_per_epoch * epochs, warmup_steps)
     if use_float16:

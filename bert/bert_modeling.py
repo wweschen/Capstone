@@ -90,8 +90,6 @@ class BertConfig(object):
       config.__dict__[key] = value
     return config
 
-
-
   @classmethod
   def from_json_file(cls, json_file):
     """Constructs a `BertConfig` from a json file of parameters."""
@@ -122,8 +120,8 @@ def get_bert_model(input_word_ids,
                    float_type=tf.float32):
   """Wraps the core BERT model as a keras.Model."""
   bert_model_layer = BertModel(config=config, float_type=float_type, name=name)
-  pooled_output, sequence_output = bert_model_layer([input_word_ids, input_mask,
-                                                    input_type_ids])
+  pooled_output, sequence_output = bert_model_layer(input_word_ids=input_word_ids, input_mask=input_mask,
+                                                    input_type_ids=input_type_ids)
   bert_model = tf.keras.Model(
       inputs=[input_word_ids, input_mask, input_type_ids],
       outputs=[pooled_output, sequence_output])
@@ -195,13 +193,13 @@ class BertModel(tf.keras.layers.Layer):
         name="pooler_transform")
     super(BertModel, self).build(unused_input_shapes)
 
-  # def __call__(self,
-  #              input_word_ids,
-  #              input_mask=None,
-  #              input_type_ids=None,
-  #              **kwargs):
-  #   inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids])
-  #   return super(BertModel, self).__call__(inputs, **kwargs)
+  def __call__(self,
+               input_word_ids,
+               input_mask=None,
+               input_type_ids=None,
+               **kwargs):
+    inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids])
+    return super(BertModel, self).__call__(inputs, **kwargs)
 
   def call(self, inputs, mode="bert"):
     """Implements call() for the layer.
@@ -348,8 +346,11 @@ class EmbeddingPostprocessor(tf.keras.layers.Layer):
     output = word_embeddings
     if self.use_type_embeddings:
       flat_token_type_ids = tf.reshape(token_type_ids, [-1])
-      token_type_embeddings = tf.gather(self.type_embeddings,
-                                        flat_token_type_ids)
+      one_hot_ids = tf.one_hot(
+          flat_token_type_ids,
+          depth=self.token_type_vocab_size,
+          dtype=self.dtype)
+      token_type_embeddings = tf.matmul(one_hot_ids, self.type_embeddings)
       token_type_embeddings = tf.reshape(token_type_embeddings,
                                          [batch_size, seq_length, width])
       output += token_type_embeddings
@@ -781,9 +782,9 @@ class TransformerBlock(tf.keras.layers.Layer):
         self.output_layer_norm
     ]
 
-  def __call__(self, input_tensor, attention_mask=None, **kwargs):
+  def __call__(self, input_tensor, attention_mask=None):
     inputs = tf_utils.pack_inputs([input_tensor, attention_mask])
-    return super(TransformerBlock, self).__call__(inputs, **kwargs)
+    return super(TransformerBlock, self).__call__(inputs)
 
   def call(self, inputs):
     """Implements call() for the layer."""
