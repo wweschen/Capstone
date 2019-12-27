@@ -196,12 +196,11 @@ class BertModel(tf.keras.layers.Layer):
   def __call__(self,
                input_word_ids,
                input_mask=None,
-               input_type_ids=None,
-               **kwargs):
+               input_type_ids=None ):
     inputs = tf_utils.pack_inputs([input_word_ids, input_mask, input_type_ids])
-    return super(BertModel, self).__call__(inputs, **kwargs)
+    return super(BertModel, self).__call__(inputs )
 
-  def call(self, inputs, mode="bert"):
+  def call(self, inputs):
     """Implements call() for the layer.
 
     Args:
@@ -227,9 +226,9 @@ class BertModel(tf.keras.layers.Layer):
       attention_mask = create_attention_mask_from_input_mask(
           input_word_ids, input_mask)
 
-    if mode == "encoder":
-      return self.encoder(
-          embedding_tensor, attention_mask, return_all_layers=True)
+    # if mode == "encoder":
+    #   return self.encoder(
+    #       embedding_tensor, attention_mask, return_all_layers=True)
 
     sequence_output = self.encoder(embedding_tensor, attention_mask)
     first_token_tensor = tf.squeeze(sequence_output[:, 0:1, :], axis=1)
